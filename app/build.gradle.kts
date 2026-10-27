@@ -15,6 +15,16 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+    signingConfigs {
+        // Fester Debug-Schlüssel, damit CI-Builds denselben Signatur-Key nutzen und
+        // sich per `adb install -r` aktualisieren lassen (sonst INSTALL_FAILED_UPDATE_INCOMPATIBLE).
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = true
