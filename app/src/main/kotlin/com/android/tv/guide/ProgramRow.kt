@@ -78,13 +78,15 @@ class ProgramRow @JvmOverloads constructor(
         val focusedEntry = (focused as ProgramItemView).tableEntry ?: return super.focusSearch(focused, direction)
         val fromMillis = programManager.fromUtcMillis
         val toMillis = programManager.toUtcMillis
-        if (!programGuide.isAccessibilityEnabled() && (isDirectionStart(direction) || direction == FOCUS_BACKWARD)) {
+        // Bugfix: Lücken (Kanal ohne Programm) haben nichts zum Aufdecken; ihr Zeit-Scrollen
+        // würde das ganze Raster bis ans rechte Ende schieben und den Fokus dort stranden lassen.
+        if (!focusedEntry.isGap && !programGuide.isAccessibilityEnabled() && (isDirectionStart(direction) || direction == FOCUS_BACKWARD)) {
             if (focusedEntry.entryStartUtcMillis < fromMillis) {
                 // Anfang der Sendung ist nicht sichtbar: zurückscrollen
                 scrollByTime(max(-ONE_HOUR_MILLIS, focusedEntry.entryStartUtcMillis - fromMillis))
                 return focused
             }
-        } else if (isDirectionEnd(direction) || direction == FOCUS_FORWARD) {
+        } else if (!focusedEntry.isGap && (isDirectionEnd(direction) || direction == FOCUS_FORWARD)) {
             if (focusedEntry.entryEndUtcMillis >= toMillis + ONE_HOUR_MILLIS) {
                 // Ende liegt mehr als 1 h rechts: weiterscrollen
                 scrollByTime(ONE_HOUR_MILLIS)
@@ -93,7 +95,7 @@ class ProgramRow @JvmOverloads constructor(
         }
         val target = super.focusSearch(focused, direction)
         if (target !is ProgramItemView) {
-            if ((isDirectionEnd(direction) || direction == FOCUS_FORWARD) && focusedEntry.entryEndUtcMillis != toMillis) {
+            if (!focusedEntry.isGap && (isDirectionEnd(direction) || direction == FOCUS_FORWARD) && focusedEntry.entryEndUtcMillis != toMillis) {
                 // Rest der Sendung sichtbar machen
                 scrollByTime(focusedEntry.entryEndUtcMillis - toMillis)
                 return focused
