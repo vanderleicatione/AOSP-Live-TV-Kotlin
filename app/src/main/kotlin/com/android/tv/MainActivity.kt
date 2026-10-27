@@ -23,6 +23,7 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewStub
 import android.view.ViewTreeObserver
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
@@ -223,7 +224,9 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
         setContentView(R.layout.activity_tv)
         contentView = findViewById(android.R.id.content)
         tvView = findViewById(R.id.main_tunable_tv_view)
-        val tvIAppView: View? = if (TvFeatures.hasTiaf()) findViewById(R.id.tv_app_view) else null
+        // Bugfix: TvInteractiveAppView (API 33+) erst hier aus dem ViewStub inflaten,
+        // sonst crasht das Layout auf Geräten vor Android 13 (ClassNotFoundException).
+        val tvIAppView: View? = if (TvFeatures.hasTiaf()) findViewById<ViewStub>(R.id.tv_app_view_stub).inflate() else null
         tvView.initialize(programDataManager, tvInputManagerHelper, tvIAppView)
 
         intentHandler = IntentHandler(this, dbDispatcher)

@@ -29,11 +29,12 @@
         android:layout_height="match_parent"
         android:layout_gravity="start|center_vertical" />
 
-    <android.media.tv.interactive.TvInteractiveAppView
-        android:id="@+id/tv_app_view"
+    <!-- Bugfix: TvInteractiveAppView (API 33+) per ViewStub, sonst Crash beim Inflaten auf <13 -->
+    <ViewStub
+        android:id="@+id/tv_app_view_stub"
+        android:layout="@layout/tv_app_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent" />
+        android:layout_height="match_parent" />
 
     <include layout="@layout/menu" />
 
