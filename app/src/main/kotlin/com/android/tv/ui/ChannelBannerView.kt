@@ -9,10 +9,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.media.tv.TvContentRating
 import android.media.tv.TvInputInfo
-import android.text.Spannable
-import android.text.SpannableString
 import android.text.format.DateUtils
-import android.text.style.TextAppearanceSpan
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
@@ -112,9 +109,8 @@ class ChannelBannerView @JvmOverloads constructor(
     private val showDurationMillis = resources.getInteger(R.integer.channel_banner_show_duration).toLong()
     private val channelLogoImageViewWidth = resources.getDimensionPixelSize(R.dimen.channel_banner_channel_logo_width)
     private val channelLogoImageViewHeight = resources.getDimensionPixelSize(R.dimen.channel_banner_channel_logo_height)
-    private val channelLogoImageViewMarginStart = resources.getDimensionPixelSize(R.dimen.channel_banner_channel_logo_margin_start)
     private val programDescriptionTextViewWidth = resources.getDimensionPixelSize(R.dimen.channel_banner_program_description_width)
-    private val channelBannerTextColor = resources.getColor(R.color.channel_banner_text_color, null)
+    private val channelBannerTextColor = resources.getColor(R.color.tcl_banner_text_color, null)
     private val channelBannerDimTextColor = resources.getColor(R.color.channel_banner_dim_text_color, null)
     private val resizeAnimDuration = resources.getInteger(R.integer.channel_banner_fast_anim_duration).toLong()
     private val recordingIconPadding = resources.getDimensionPixelOffset(R.dimen.channel_banner_recording_icon_padding)
@@ -402,17 +398,10 @@ class ChannelBannerView @JvmOverloads constructor(
         programTextView.setTextColor(if (dimText) channelBannerDimTextColor else channelBannerTextColor)
         updateTextView(programTextView, R.dimen.channel_banner_program_large_text_size,
             R.dimen.channel_banner_program_large_margin_top)
-        if (episodeDisplayTitle.isNullOrEmpty()) {
-            programTextView.text = title
-        } else {
-            val fullTitle = "$title  $episodeDisplayTitle"
-            programTextView.text = SpannableString(fullTitle).apply {
-                setSpan(TextAppearanceSpan(context, R.style.text_appearance_channel_banner_episode_title),
-                    fullTitle.length - episodeDisplayTitle.length, fullTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
-        }
-        val width = programDescriptionTextViewWidth +
-            if (currentChannelLogoExists) 0 else channelLogoImageViewWidth + channelLogoImageViewMarginStart
+        // TCL style: one plain line, "Title: Episode".
+        programTextView.text = if (episodeDisplayTitle.isNullOrEmpty()) title else "$title: $episodeDisplayTitle"
+        // Fixed column like TCL; the text doesn't slide into the logo slot when a channel has no logo.
+        val width = programDescriptionTextViewWidth
         programTextView.layoutParams = programTextView.layoutParams.apply { this.width = width }
         programTextView.measure(
             MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),

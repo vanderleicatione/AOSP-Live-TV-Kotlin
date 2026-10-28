@@ -258,24 +258,25 @@
     <dimen name="empty_input_status_block_info_margin_top">16dp</dimen>
 
     <!-- Channel banner -->
-    <dimen name="channel_banner_width">696dp</dimen>
-    <dimen name="channel_banner_channel_number_large_text_size">54sp</dimen>
-    <dimen name="channel_banner_channel_number_medium_text_size">44sp</dimen>
-    <dimen name="channel_banner_channel_number_small_text_size">34sp</dimen>
-    <dimen name="channel_banner_channel_number_large_margin_top">-19sp</dimen>
-    <dimen name="channel_banner_channel_number_medium_margin_top">-15.5sp</dimen>
-    <dimen name="channel_banner_channel_number_small_margin_top">-11.5sp</dimen>
-    <dimen name="channel_banner_channel_logo_width">72dp</dimen>
-    <dimen name="channel_banner_channel_logo_height">44dp</dimen>
-    <dimen name="channel_banner_channel_logo_margin_start">8dp</dimen>
+    <!-- TCL Live TV infobar values: 300dp card, number always 28sp, logo 64x36dp. -->
+    <dimen name="channel_banner_width">300dp</dimen>
+    <dimen name="channel_banner_channel_number_large_text_size">28sp</dimen>
+    <dimen name="channel_banner_channel_number_medium_text_size">28sp</dimen>
+    <dimen name="channel_banner_channel_number_small_text_size">28sp</dimen>
+    <dimen name="channel_banner_channel_number_large_margin_top">8dp</dimen>
+    <dimen name="channel_banner_channel_number_medium_margin_top">8dp</dimen>
+    <dimen name="channel_banner_channel_number_small_margin_top">8dp</dimen>
+    <dimen name="channel_banner_channel_logo_width">64dp</dimen>
+    <dimen name="channel_banner_channel_logo_height">36dp</dimen>
+    <dimen name="channel_banner_channel_logo_margin_start">32dp</dimen>
     <dimen name="channel_banner_input_logo_size">16dp</dimen>
-    <dimen name="channel_banner_program_description_width">456dp</dimen>
-    <dimen name="channel_banner_program_large_text_size">28sp</dimen>
-    <dimen name="channel_banner_program_medium_text_size">20sp</dimen>
-    <dimen name="channel_banner_program_large_margin_top">-10sp</dimen>
-    <dimen name="channel_banner_program_medium_margin_top">-7sp</dimen>
-    <dimen name="channel_banner_anchor_one_line_y">44dp</dimen>
-    <dimen name="channel_banner_anchor_two_line_y">64dp</dimen>
+    <dimen name="channel_banner_program_description_width">164dp</dimen>
+    <dimen name="channel_banner_program_large_text_size">14sp</dimen>
+    <dimen name="channel_banner_program_medium_text_size">14sp</dimen>
+    <dimen name="channel_banner_program_large_margin_top">4dp</dimen>
+    <dimen name="channel_banner_program_medium_margin_top">4dp</dimen>
+    <dimen name="channel_banner_anchor_one_line_y">0dp</dimen>
+    <dimen name="channel_banner_anchor_two_line_y">0dp</dimen>
     <dimen name="channel_name_max_width">100dp</dimen>
     <dimen name="channel_banner_small_text_size">14sp</dimen>
     <dimen name="channel_banner_track_meta_text_size">8sp</dimen>
@@ -288,10 +289,9 @@
     <dimen name="input_banner_item_label_max_width">324dp</dimen>
 
     <!-- Keypad channel switch -->
-    <dimen name="keypad_channel_switch_channel_number_text_size">
-        @dimen/channel_banner_channel_number_large_text_size</dimen>
-    <dimen name="keypad_channel_switch_channel_number_margin_top">
-        @dimen/channel_banner_channel_number_large_margin_top</dimen>
+    <!-- Inlined (were aliases of the channel banner's) so the TCL banner restyle leaves the keypad alone. -->
+    <dimen name="keypad_channel_switch_channel_number_text_size">54sp</dimen>
+    <dimen name="keypad_channel_switch_channel_number_margin_top">-19sp</dimen>
     <dimen name="keypad_channel_switch_item_height">48dp</dimen>
     <!-- A height of Keypad channel switch view without channel_list -->
     <dimen name="keypad_channel_switch_base_height">84dp</dimen>
