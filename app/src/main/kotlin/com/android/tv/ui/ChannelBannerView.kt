@@ -94,6 +94,12 @@ class ChannelBannerView @JvmOverloads constructor(
     private lateinit var programDescriptionTextView: TextView
     private var programDescriptionText: String = ""
     private lateinit var anchorView: View
+    private lateinit var previousChannelView: View
+    private lateinit var previousChannelNumberView: TextView
+    private lateinit var previousChannelNameView: TextView
+    private lateinit var nextChannelView: View
+    private lateinit var nextChannelNumberView: TextView
+    private lateinit var nextChannelNameView: TextView
 
     private var currentChannel: Channel? = null
     private var currentChannelLogoExists = false
@@ -154,6 +160,12 @@ class ChannelBannerView @JvmOverloads constructor(
         contentRatingsTextViews[2] = findViewById(R.id.content_ratings_2)
         programDescriptionTextView = findViewById(R.id.program_description)
         anchorView = findViewById(R.id.anchor)
+        previousChannelView = findViewById(R.id.channel_banner_previous)
+        previousChannelNumberView = findViewById(R.id.channel_banner_previous_number)
+        previousChannelNameView = findViewById(R.id.channel_banner_previous_name)
+        nextChannelView = findViewById(R.id.channel_banner_next)
+        nextChannelNumberView = findViewById(R.id.channel_banner_next_number)
+        nextChannelNameView = findViewById(R.id.channel_banner_next_name)
         programDescriptionFadeInAnimator.setTarget(programDescriptionTextView)
         programDescriptionFadeOutAnimator.setTarget(programDescriptionTextView)
         programDescriptionFadeOutAnimator.addListener(object : AnimatorListenerAdapter() {
@@ -220,6 +232,22 @@ class ChannelBannerView @JvmOverloads constructor(
         }
         updateProgramInfo(currentProgramProvider.get())
         this.updateOnTune = false
+    }
+
+    /** TCL-Stil: vorheriger Kanal über, nächster unter der Karte (unsichtbar, wenn es keinen anderen gibt). */
+    fun setAdjacentChannels(previous: Channel?, next: Channel?) {
+        bindAdjacentChannel(previousChannelView, previousChannelNumberView, previousChannelNameView, previous)
+        bindAdjacentChannel(nextChannelView, nextChannelNumberView, nextChannelNameView, next)
+    }
+
+    private fun bindAdjacentChannel(view: View, number: TextView, name: TextView, channel: Channel?) {
+        if (channel == null || channel.id == currentChannelProvider.get()?.id) {
+            view.visibility = INVISIBLE
+            return
+        }
+        number.text = channel.displayNumber
+        name.text = channel.displayName
+        view.visibility = VISIBLE
     }
 
     private fun hide() {

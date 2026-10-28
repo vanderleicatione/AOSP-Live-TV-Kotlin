@@ -414,6 +414,8 @@ class TvOverlayManager(
             } else if (TvFeatures.TUNER_SIGNAL_STRENGTH && reason == UPDATE_CHANNEL_BANNER_REASON_UPDATE_SIGNAL_STRENGTH) {
                 channelBannerView.updateChannelSignalStrengthView(tvView.channelSignalStrength)
             } else {
+                channelBannerView.setAdjacentChannels(
+                    channelTuner.getAdjacentBrowsableChannel(false), channelTuner.getAdjacentBrowsableChannel(true))
                 channelBannerView.updateViews(
                     reason == UPDATE_CHANNEL_BANNER_REASON_TUNE || reason == UPDATE_CHANNEL_BANNER_REASON_TUNE_FAST)
             }
