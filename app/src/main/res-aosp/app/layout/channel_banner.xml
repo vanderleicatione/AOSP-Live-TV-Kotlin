@@ -19,10 +19,9 @@
     android:id="@+id/scene_transition_common"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="27dp"
-    android:layout_marginStart="132dp"
-    android:layout_marginEnd="132dp"
-    android:background="@drawable/info_banner_background"
+    android:layout_gravity="start|center_vertical"
+    android:layout_marginStart="48dp"
+    android:background="@drawable/tcl_channel_banner_background"
     android:elevation="8dp" >
 
     <RelativeLayout android:id="@+id/channel_banner_view"
