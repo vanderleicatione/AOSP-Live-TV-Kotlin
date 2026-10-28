@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Progress layer id ProgramItemView looks up; the TCL-style cell background has no such layer. -->
+    <item name="reverse_progress" type="id" />
+</resources>
