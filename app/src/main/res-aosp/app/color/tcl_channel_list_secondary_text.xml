@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TCL Live TV channel list now-playing line: black 60% on the light bar, white 70% otherwise. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true" android:color="#99000000" />
+    <item android:color="#B3FFFFFF" />
+</selector>

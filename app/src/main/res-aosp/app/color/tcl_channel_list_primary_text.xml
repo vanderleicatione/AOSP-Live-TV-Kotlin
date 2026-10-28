@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TCL Live TV channel list number/name: text_color_focused on the light bar, white 70% otherwise. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true" android:color="#E6000000" />
+    <item android:color="#B3F0F0F2" />
+</selector>

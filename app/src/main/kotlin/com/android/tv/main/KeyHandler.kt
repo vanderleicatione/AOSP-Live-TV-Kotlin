@@ -36,6 +36,7 @@ class KeyHandler(
     private val overlayManager get() = activity.overlayManager
     private val tuning get() = activity.tuningController
     private var backKeyPressed = false
+    private var okLongPressed = false
     var needShowBackKeyGuide = false
 
     private val handler = Handler(Looper.getMainLooper()) { msg -> handleMessage(msg); true }
@@ -107,6 +108,16 @@ class KeyHandler(
         }
         if (activity.searchFragment.isVisible) return null
         if (!channelTuner.areAllChannelsLoaded()) return false
+        if (isOkKey(keyCode) && !channelTuner.isCurrentChannelPassthrough) {
+            // OK lang gedrückt: das AOSP-Menü (OK selbst öffnet jetzt die Kanalliste).
+            if (event.repeatCount == 0) {
+                okLongPressed = false
+            } else if (event.isLongPress && channelTuner.browsableChannelCount > 0) {
+                okLongPressed = true
+                overlayManager.showMenu(Menu.REASON_NONE)
+            }
+            return true
+        }
         if (!channelTuner.isCurrentChannelPassthrough) {
             when (keyCode) {
                 KeyEvent.KEYCODE_CHANNEL_UP, KeyEvent.KEYCODE_DPAD_UP -> {
@@ -201,8 +212,16 @@ class KeyHandler(
                     activity.enterPictureInPictureMode()
                     return true
                 }
-                KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_NUMPAD_ENTER, KeyEvent.KEYCODE_E,
-                KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_MENU -> {
+                KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_NUMPAD_ENTER, KeyEvent.KEYCODE_DPAD_CENTER -> {
+                    // TCL-Stil: OK öffnet die Kanalliste; nach Langdruck (Menü, s. onKeyDown) nichts mehr tun.
+                    if (event.isCanceled || okLongPressed) {
+                        okLongPressed = false
+                        return true
+                    }
+                    overlayManager.showChannelList()
+                    return true
+                }
+                KeyEvent.KEYCODE_E, KeyEvent.KEYCODE_MENU -> {
                     if (event.isCanceled) return true // Menü-Langdruck
                     if (keyCode != KeyEvent.KEYCODE_MENU) {
                         overlayManager.updateChannelBannerAndShowIfNeeded(TvOverlayManager.UPDATE_CHANNEL_BANNER_REASON_FORCE_SHOW)
@@ -292,6 +311,9 @@ class KeyHandler(
     }
 
     fun release() = handler.removeCallbacksAndMessages(null)
+
+    private fun isOkKey(keyCode: Int) = keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
+        keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER
 
     private fun handleMessage(msg: Message) {
         when (msg.what) {

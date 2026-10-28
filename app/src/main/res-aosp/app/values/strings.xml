@@ -1066,4 +1066,10 @@
     <string name="interactive_app_settings">Interactive app settings</string>
     <string name="tv_iapp_on">On</string>
     <string name="tv_iapp_off">Off</string>
+
+    <!-- TCL-style left channel list -->
+    <string name="tcl_no_information">No information</string>
+    <string name="tcl_channel_type_all">All channels</string>
+    <string name="tcl_channel_type_streaming">Streaming</string>
+    <string name="tcl_channel_type_digital">Digital</string>
 </resources>

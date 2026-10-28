@@ -75,6 +75,7 @@ class TvOverlayManager(
     val menu: Menu
     val sideFragmentManager: SideFragmentManager
     val programGuide: ProgramGuide
+    val channelList: ChannelListOverlay
 
     var currentDialog: SafeDismissDialogFragment? = null
         private set
@@ -125,6 +126,11 @@ class TvOverlayManager(
             dvrDataManager, singletons.getDvrScheduleManager(),
             { onOverlayOpened(OVERLAY_TYPE_GUIDE) },
             { onOverlayClosed(OVERLAY_TYPE_GUIDE) },
+        )
+        channelList = ChannelListOverlay(
+            mainActivity, channelTuner, programDataManager, inputManager,
+            { onOverlayOpened(OVERLAY_TYPE_CHANNEL_LIST) },
+            { onOverlayClosed(OVERLAY_TYPE_CHANNEL_LIST) },
         )
         mainActivity.addOnActionClickListener(object : OnActionClickListener {
             override fun onActionClick(category: String, id: Int, params: Bundle?): Boolean {
@@ -312,6 +318,12 @@ class TvOverlayManager(
 
     fun showProgramGuide() = programGuide.show { hideOverlays(FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE) }
 
+    /** Kanalliste links (TCL-Stil, OK-Taste). */
+    fun showChannelList() {
+        hideOverlays(FLAG_HIDE_OVERLAYS_KEEP_CHANNEL_LIST)
+        channelList.show()
+    }
+
     /** true, wenn die Programmübersicht danach sichtbar ist. */
     fun toggleProgramGuide(): Boolean {
         if (programGuide.isActive) {
@@ -358,6 +370,7 @@ class TvOverlayManager(
             else sideFragmentManager.hideAll(withAnimation)
         }
         if (f and FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE == 0) programGuide.hide()
+        if (f and FLAG_HIDE_OVERLAYS_KEEP_CHANNEL_LIST == 0) channelList.hide()
     }
 
     override fun onAccessibilityStateChanged(enabled: Boolean) {
@@ -411,7 +424,8 @@ class TvOverlayManager(
             !isSetupFragmentActive && !isNewSourcesFragmentActive
         ) {
             when {
-                channelTuner.currentChannel == null -> channelBannerHiddenBySideFragment = false
+                // Beim Umschalten aus der Kanalliste kein Banner darüber (wie bei TCL).
+                channelTuner.currentChannel == null || channelList.isActive -> channelBannerHiddenBySideFragment = false
                 sideFragmentManager.isActive -> channelBannerHiddenBySideFragment = true
                 else -> {
                     channelBannerHiddenBySideFragment = false
@@ -465,6 +479,7 @@ class TvOverlayManager(
             sideFragmentManager.isActive -> sideFragmentManager.scheduleHideAll()
             menu.isActive -> menu.scheduleHide()
             programGuide.isActive -> programGuide.scheduleHide()
+            channelList.isActive -> channelList.scheduleHide()
         }
     }
 
@@ -477,7 +492,7 @@ class TvOverlayManager(
     fun onKeyDown(keyCode: Int, event: KeyEvent): Int {
         if (currentDialog != null) return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED
         if (isMediaStartKey(keyCode)) return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED
-        if (menu.isActive || sideFragmentManager.isActive || programGuide.isActive ||
+        if (menu.isActive || sideFragmentManager.isActive || programGuide.isActive || channelList.isActive ||
             isSetupFragmentActive || isNewSourcesFragmentActive
         ) return MainActivity.KEY_EVENT_HANDLER_RESULT_DISPATCH_TO_OVERLAY
         if (transitionManager.isKeypadChannelSwitchActive) {
@@ -493,7 +508,7 @@ class TvOverlayManager(
 
     fun onKeyUp(keyCode: Int, event: KeyEvent): Int {
         if (isMediaStartKey(keyCode)) {
-            if (currentDialog != null || programGuide.isActive || sideFragmentManager.isActive ||
+            if (currentDialog != null || programGuide.isActive || channelList.isActive || sideFragmentManager.isActive ||
                 searchFragment.isVisible || transitionManager.isKeypadChannelSwitchActive ||
                 transitionManager.isSelectInputActive || isSetupFragmentActive || isNewSourcesFragmentActive
             ) return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED
@@ -525,6 +540,13 @@ class TvOverlayManager(
         if (programGuide.isActive) {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 programGuide.onBackPressed()
+                return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED
+            }
+            return MainActivity.KEY_EVENT_HANDLER_RESULT_DISPATCH_TO_OVERLAY
+        }
+        if (channelList.isActive) {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                channelList.hide()
                 return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED
             }
             return MainActivity.KEY_EVENT_HANDLER_RESULT_DISPATCH_TO_OVERLAY
@@ -603,6 +625,7 @@ class TvOverlayManager(
         const val FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE = 0b001000000
         const val FLAG_HIDE_OVERLAYS_KEEP_MENU = 0b010000000
         const val FLAG_HIDE_OVERLAYS_KEEP_FRAGMENT = 0b100000000
+        const val FLAG_HIDE_OVERLAYS_KEEP_CHANNEL_LIST = 0b1000000000
 
         private const val MSG_OVERLAY_CLOSED = 1000
 
@@ -616,6 +639,7 @@ class TvOverlayManager(
         private const val OVERLAY_TYPE_SCENE_KEYPAD_CHANNEL_SWITCH = 0b001000000
         private const val OVERLAY_TYPE_SCENE_SELECT_INPUT = 0b010000000
         private const val OVERLAY_TYPE_FRAGMENT = 0b100000000
+        private const val OVERLAY_TYPE_CHANNEL_LIST = 0b1000000000
 
         const val UPDATE_CHANNEL_BANNER_REASON_FORCE_SHOW = 1
         const val UPDATE_CHANNEL_BANNER_REASON_TUNE = 2

@@ -44,6 +44,7 @@
         android:layout_height="match_parent"
         android:layout_width="match_parent" />
     <include layout="@layout/option_container" />
+    <include layout="@layout/channel_list_overlay" />
     <include layout="@layout/program_guide" />
     <FrameLayout android:id="@+id/fragment_container"
         android:layout_height="match_parent"

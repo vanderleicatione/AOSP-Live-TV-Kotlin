@@ -354,4 +354,8 @@
     <string name="dvr_date_tomorrow_time" msgid="8364654556105292594">"<xliff:g id="TIME_RANGE">%1$s</xliff:g> amanhã"</string>
     <string name="program_guide_critic_score" msgid="340530743913585150">"Pontuação"</string>
     <string name="recorded_programs_preview_channel" msgid="890404366427245812">"Programas gravados"</string>
+    <string name="tcl_no_information">"Sem informações"</string>
+    <string name="tcl_channel_type_all">"Todos os canais"</string>
+    <string name="tcl_channel_type_streaming">"Streaming"</string>
+    <string name="tcl_channel_type_digital">"Digital"</string>
 </resources>

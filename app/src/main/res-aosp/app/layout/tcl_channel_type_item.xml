@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Category rail entry, as TCL's item_channel_type: 42dp tall, 18dp icon at 15dp/12dp. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="42dp"
+    android:background="@drawable/tcl_channel_list_item_bg"
+    android:focusable="true">
+
+    <ImageView
+        android:id="@+id/channel_type_icon"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="12dp"
+        android:duplicateParentState="true"
+        android:tint="@color/tcl_channel_type_icon" />
+</FrameLayout>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TCL Live TV bg_channel_selector: light #F0F0F2 bar with 6dp corners when focused, clear otherwise.
+     Also used by the category rail items. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <solid android:color="#FFF0F0F2" />
+            <corners android:radius="6dp" />
+        </shape>
+    </item>
+    <item android:drawable="@android:color/transparent" />
+</selector>
