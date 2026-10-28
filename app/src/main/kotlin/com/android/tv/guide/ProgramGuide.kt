@@ -10,16 +10,17 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityManager.AccessibilityStateChangeListener
+import android.widget.TextView
 import androidx.leanback.widget.VerticalGridView
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.tv.ChannelTuner
 import com.android.tv.MainActivity
 import com.android.tv.R
+import com.android.tv.TvSingletons
 import com.android.tv.data.ChannelDataManager
 import com.android.tv.data.GenreItems
 import com.android.tv.data.ProgramDataManager
@@ -69,6 +70,10 @@ class ProgramGuide(
     val programGrid: ProgramGrid = table.findViewById(R.id.grid)
     private val timeListAdapter = TimeListAdapter(res)
     private val currentTimeIndicator: View = table.findViewById(R.id.current_time_indicator)
+    private val detailTitle: TextView = container.findViewById(R.id.program_guide_detail_title)
+    private val detailTime: TextView = container.findViewById(R.id.program_guide_detail_time)
+    private val detailDescription: TextView = container.findViewById(R.id.program_guide_detail_desc)
+    private val clock = TvSingletons.getSingletons(activity).getClock()
     private val showAnimatorFull: Animator
     private val showAnimatorPartial: Animator
     private val hideAnimatorFull: Animator
@@ -149,7 +154,8 @@ class ProgramGuide(
             }
             selectRow(view)
         }
-        programGrid.focusScrollStrategy = VerticalGridView.FOCUS_SCROLL_ALIGNED
+        // TCL: Fokus wandert durch die sichtbaren Zeilen, gescrollt wird erst am Rand
+        programGrid.focusScrollStrategy = VerticalGridView.FOCUS_SCROLL_ITEM
         programGrid.windowAlignmentOffset = selectionRow * rowHeight
         programGrid.windowAlignmentOffsetPercent = VerticalGridView.WINDOW_ALIGN_OFFSET_PERCENT_DISABLED
         programGrid.itemAlignmentOffset = 0
@@ -223,7 +229,8 @@ class ProgramGuide(
         timelineRow.resetScroll()
         container.visibility = View.VISIBLE
         isActive = true
-        if (!showGuidePartial) table.requestFocus()
+        // Genre-Leiste ist ausgeblendet (TCL-Layout): Fokus immer direkt ins Raster
+        table.requestFocus()
         positionCurrentTimeIndicator()
         sidePanelGridView.selectedPosition = 0
         val listener = object : ViewTreeObserver.OnGlobalLayoutListener {
@@ -302,24 +309,30 @@ class ProgramGuide(
 
     internal fun isAccessibilityEnabled(): Boolean = accessibilityManager.isEnabled
 
-    /** Tabellenhöhe an die Kanalanzahl anpassen (wenige Kanäle: unten ausrichten). */
+    /** TCL: Tabelle unten mit höchstens [VISIBLE_ROWS] Zeilen (weniger Kanäle: entsprechend niedriger). */
     private fun updateGuidePosition() {
-        val screenHeight = container.height
-        if (screenHeight <= 0) return
-        val startPadding = res.getDimensionPixelOffset(R.dimen.program_guide_table_margin_start)
-        val topPadding = res.getDimensionPixelOffset(R.dimen.program_guide_table_margin_top)
-        val bottomPadding = res.getDimensionPixelOffset(R.dimen.program_guide_table_margin_bottom)
-        val tableHeight = res.getDimensionPixelOffset(R.dimen.program_guide_table_header_row_height) + detailHeight +
-            rowHeight * (programGrid.adapter?.itemCount ?: 0) + topPadding + bottomPadding
+        val rows = minOf(programGrid.adapter?.itemCount ?: 0, VISIBLE_ROWS)
         val layoutParams = table.layoutParams
-        if (tableHeight > screenHeight) {
-            table.setPaddingRelative(startPadding, topPadding, 0, 0)
-            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-        } else {
-            table.setPaddingRelative(startPadding, topPadding, 0, bottomPadding)
-            layoutParams.height = tableHeight
-        }
+        layoutParams.height = res.getDimensionPixelOffset(R.dimen.program_guide_table_header_row_height) + detailHeight +
+            rowHeight * rows + table.paddingTop + table.paddingBottom
         table.layoutParams = layoutParams
+    }
+
+    /** TCL: Titel, Zeit und Beschreibung der fokussierten Sendung oben statt in einer Detailzeile. */
+    private fun updateDetail(entry: ProgramManager.TableEntry) {
+        val program = entry.program
+        val title = program?.title
+        detailTitle.text = if (entry.isGap || program == null || title.isNullOrEmpty()) {
+            activity.getString(R.string.tcl_no_information)
+        } else {
+            program.getEpisodeDisplayTitle(activity).let { if (it.isNullOrEmpty()) title else "$title: $it" }
+        }
+        detailTime.text = Utils.getDurationString(activity, clock, entry.entryStartUtcMillis, entry.entryEndUtcMillis, true)
+        detailDescription.text = when {
+            entry.isBlocked -> activity.getString(R.string.program_guide_content_locked)
+            program?.description.isNullOrEmpty() -> activity.getString(R.string.tcl_no_program_details)
+            else -> program?.description
+        }
     }
 
     private fun createAnimator(sidePanelAnimResId: Int, sidePanelGridAnimResId: Int, tableAnimResId: Int): Animator {
@@ -486,6 +499,7 @@ class ProgramGuide(
     private inner class GlobalFocusChangeListener : ViewTreeObserver.OnGlobalFocusChangeListener {
         override fun onGlobalFocusChanged(oldFocus: View?, newFocus: View?) {
             if (!isActive) return
+            (newFocus as? ProgramItemView)?.tableEntry?.let { updateDetail(it) }
             val from = getLocation(oldFocus)
             val to = getLocation(newFocus)
             when {
@@ -512,6 +526,8 @@ class ProgramGuide(
         private val HALF_HOUR_IN_MILLIS = HOUR_IN_MILLIS / 2
         private val MIN_DURATION_FROM_START_TIME_TO_CURRENT_TIME = ProgramManager.FIRST_ENTRY_MIN_DURATION
         private const val MSG_PROGRAM_TABLE_FADE_IN_ANIM = 1000
+        /** TCL EPGView epg_channelSize. */
+        private const val VISIBLE_ROWS = 6
         private const val UNKNOWN = 0
         private const val SIDE_PANEL = 1
         private const val PROGRAM_TABLE = 2

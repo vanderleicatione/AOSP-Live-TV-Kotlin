@@ -40,12 +40,15 @@ internal class TimeListAdapter(res: Resources) : RecyclerView.Adapter<TimeListAd
         val startTime = startUtcMs + position * TIME_UNIT_MS
         val endTime = startTime + TIME_UNIT_MS
         val itemView = holder.itemView
-        val pattern = if (Utils.isInGivenDay(System.currentTimeMillis(), startTime)) timePatternSameDay else timePatternDifferentDay
+        val now = System.currentTimeMillis()
+        val pattern = if (Utils.isInGivenDay(now, startTime)) timePatternSameDay else timePatternDifferentDay
         itemView.findViewById<TextView>(R.id.time).text = DateFormat.format(pattern, Date(startTime)).toString()
+        // TCL: die halbe Stunde mit "jetzt" heller
+        itemView.isSelected = now in startTime until endTime
         val lp = itemView.layoutParams as RecyclerView.LayoutParams
         lp.width = GuideUtils.convertMillisToPixel(startTime, endTime)
-        // Erste Zeitmarke mittig über dem Kanal-Kopf
-        lp.marginStart = if (position == 0) rowHeaderOverlapping - lp.width / 2 else 0
+        // TCL: Marke am Beginn des Zeitfensters (nicht mittig)
+        lp.marginStart = if (position == 0) rowHeaderOverlapping else 0
         itemView.layoutParams = lp
     }
 
@@ -56,8 +59,9 @@ internal class TimeListAdapter(res: Resources) : RecyclerView.Adapter<TimeListAd
 
     companion object {
         private val TIME_UNIT_MS = TimeUnit.MINUTES.toMillis(30)
-        private const val TIME_PATTERN_SAME_DAY = "h:mm a"
-        private const val TIME_PATTERN_DIFFERENT_DAY = "MMM d, h:mm a"
+        // TCL: 24-Stunden-Zeit ("18:00"); das Datum steht über der Kanalspalte
+        private const val TIME_PATTERN_SAME_DAY = "Hm"
+        private const val TIME_PATTERN_DIFFERENT_DAY = "MMMd Hm"
         private var rowHeaderOverlapping = 0
     }
 }

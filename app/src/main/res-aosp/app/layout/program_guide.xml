@@ -15,14 +15,99 @@
   ~ limitations under the License.
   -->
 
+<!-- Laid out like TCL Live TV's fragment_epg_pro: the video stays visible behind black masks, a 58dp
+     strip on the left (where TCL has its category rail), title and clock at 32dp from the top, details of
+     the focused programme at 73dp, and the 6-row grid at the bottom. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/program_guide"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/program_guide_scrim"
     android:visibility="gone">
 
-    <include layout="@layout/program_guide_side_panel" />
+    <View
+        android:layout_width="58dp"
+        android:layout_height="match_parent"
+        android:background="#FF000000" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="58dp"
+        android:background="@drawable/tcl_epg_left_mask" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginStart="58dp"
+        android:background="@drawable/tcl_epg_top_mask" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="337dp"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="58dp"
+        android:background="@drawable/tcl_epg_bottom_mask" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="58dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/tcl_epg_title"
+        android:textColor="#B3F0F0F2"
+        android:textSize="19sp" />
+
+    <TextClock
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:format12Hour="EEE dd/MM/yyyy h:mm a"
+        android:format24Hour="EEE dd/MM/yyyy HH:mm"
+        android:textColor="#B3F0F0F2"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="58dp"
+        android:layout_marginTop="73dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/program_guide_detail_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:letterSpacing="0.04"
+            android:maxLines="2"
+            android:textColor="#E6FFFFFF"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/program_guide_detail_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:singleLine="true"
+            android:textColor="#B3FFFFFF"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/program_guide_detail_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:ellipsize="end"
+            android:letterSpacing="0.04"
+            android:maxLines="2"
+            android:textColor="#B3F0F0F2"
+            android:textSize="19sp" />
+    </LinearLayout>
+
+    <!-- AOSP genre panel: TCL has an icon rail here instead, so it is kept (ProgramGuide binds it) but hidden. -->
+    <include layout="@layout/program_guide_side_panel" android:visibility="gone" />
     <include layout="@layout/program_guide_table" />
 
 </FrameLayout>

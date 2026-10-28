@@ -22,15 +22,13 @@
     android:id="@+id/program_guide_table"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical"
+    android:layout_gravity="bottom"
     android:paddingTop="@dimen/program_guide_table_margin_top"
     android:paddingBottom="@dimen/program_guide_table_margin_bottom"
     android:paddingStart="@dimen/program_guide_table_margin_start"
     android:paddingEnd="0dp"
     android:translationX="@dimen/program_guide_table_exit_x"
     android:alpha="0"
-    android:elevation="@dimen/program_guide_table_elevation"
-    android:outlineProvider="paddedBounds"
     android:clipToPadding="false" >
 
     <!-- Provides the background for time_row. This is needed in order to place the current time
@@ -41,31 +39,23 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/program_guide_table_header_row_background" />
+        android:background="@android:color/transparent" />
 
-    <com.android.tv.ui.LocaleAwareTextClock
+    <!-- TCL shows the date over the channel column. -->
+    <TextClock
         android:id="@+id/clock"
         android:layout_width="@dimen/program_guide_table_header_column_width"
         android:layout_height="@dimen/program_guide_table_header_row_height"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:paddingStart="@dimen/program_guide_table_header_column_padding_start"
+        android:paddingStart="12dp"
         android:paddingEnd="@dimen/program_guide_table_header_column_padding_end"
         android:gravity="start|center_vertical"
         android:textAlignment="viewStart"
-        android:fontFamily="@string/condensed_font"
-        android:textSize="@dimen/program_guide_table_header_row_font_size"
-        android:textColor="@color/program_guide_table_header_row_current_time_text_color" />
-
-    <ImageView
-        android:id="@+id/current_time_indicator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/clock"
-        android:layout_marginTop="-4dp"
-        android:contentDescription="@null"
-        android:src="@drawable/program_guide_time_indicator" />
+        android:format12Hour="EEE dd/MM/yyyy"
+        android:format24Hour="EEE dd/MM/yyyy"
+        android:textSize="14sp"
+        android:textColor="#B3FFFFFF" />
 
     <com.android.tv.guide.TimelineRow
         android:id="@+id/time_row"
@@ -86,5 +76,18 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/time_row" />
+
+    <!-- TCL's now line runs over the grid (from 28.5dp below the table top to the bottom), so it is drawn
+         after it. ProgramGuide positions it horizontally through its start padding. -->
+    <ImageView
+        android:id="@+id/current_time_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="296.5dp"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@id/clock"
+        android:layout_marginTop="28.5dp"
+        android:contentDescription="@null"
+        android:scaleType="fitXY"
+        android:src="@drawable/tcl_epg_now_line" />
 
 </RelativeLayout>

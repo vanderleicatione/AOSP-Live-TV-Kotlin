@@ -211,10 +211,8 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
             programRow.setChildFocusListener(this)
             programRow.resetScroll(programGuide.getTimelineRowScrollOffset())
             detailView.visibility = View.GONE
-            // Letzte Zeile mit abgerundetem Hintergrund
-            channelHeaderView.setBackgroundResource(
-                if (position < programListAdapters.size - 1) R.drawable.program_guide_table_header_column_item_background
-                else R.drawable.program_guide_table_header_column_last_item_background)
+            // Hintergrund (TCL-Zelle) kommt aus dem Layout; Auswahl folgt dem Fokus (onChildFocus)
+            channelHeaderView.isSelected = false
         }
 
         private fun onBindChannel(channel: Channel?) {
@@ -241,7 +239,8 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
             val locked = tvInputManagerHelper.isParentalControlsEnabled() && channel.isLocked
             channelNumberView.setTextColor(if (locked) channelBlockedTextColor else channelTextColor)
             channelLogoView.setImageBitmap(null)
-            channelLogoView.visibility = View.GONE
+            // Platz für das Logo bleibt (TCL), damit die Namen bündig stehen
+            channelLogoView.visibility = View.INVISIBLE
             if (locked) {
                 channelNameView.visibility = View.GONE
                 channelBlockView.visibility = View.VISIBLE
@@ -256,6 +255,8 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
 
         /** Detailbereich beim Fokuswechsel mit Aus-/Einblenden aktualisieren. */
         override fun onChildFocus(oldFocus: View?, newFocus: View?) {
+            // TCL: Kanalzelle der Zeile mit Fokus heller
+            channelHeaderView.isSelected = newFocus != null
             if (newFocus == null) return
             selectedEntry = when {
                 // Mit Screenreader kann der Kanal-Kopf fokussiert sein
@@ -435,8 +436,8 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
         }
 
         internal fun updateChannelLogo(logo: Bitmap?) {
+            // TCL zeigt Logo und Namen nebeneinander
             channelLogoView.setImageBitmap(logo)
-            channelNameView.visibility = View.GONE
             channelLogoView.visibility = View.VISIBLE
         }
 

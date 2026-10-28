@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TCL Live TV EPG channel name (Text_Body3_Medium_Weak): white 40%, brighter on the row with focus. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true" android:color="#E6F0F0F2" />
+    <item android:color="#66F0F0F2" />
+</selector>

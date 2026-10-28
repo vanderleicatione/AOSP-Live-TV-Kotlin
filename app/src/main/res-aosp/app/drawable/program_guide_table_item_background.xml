@@ -15,42 +15,34 @@
   ~ limitations under the License.
   -->
 
+<!-- TCL Live TV EPG programme cell (epg_pro_program_item_*_bg): 6dp corners, #F0F0F2 when focused,
+     #1FF0F0F2 for the programme on air, #0FF0F0F2 otherwise. Inset so the 48dp row slot shows a 44dp cell
+     with TCL's 4dp gaps. No progress overlay (TCL has none), so ProgramItemView finds no reverse_progress. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tv="http://schemas.android.com/apk/res-auto" >
 
-    <!-- This state is needed as a too wide ripple will try to allocate too much memory. -->
-    <item android:state_focused="true" tv:state_current_program="true"
-        tv:state_program_too_wide="true" >
-        <layer-list>
-            <item>
-                <nine-patch
-                    android:src="@drawable/program_guide_table_item_background_focused_enabled" />
-            </item>
-            <item android:id="@+id/reverse_progress" >
-                <clip android:gravity="end" >
-                    <color android:color="@color/program_guide_table_item_focus_progress_overlay" />
-                </clip>
-            </item>
-        </layer-list>
-    </item>
-
-    <item android:state_focused="true" tv:state_current_program="true" >
-        <ripple android:color="?android:attr/colorControlHighlight" >
-            <item>
-                <nine-patch
-                    android:src="@drawable/program_guide_table_item_background_focused_enabled" />
-            </item>
-            <item android:id="@+id/reverse_progress" >
-                <clip android:gravity="end" >
-                    <color android:color="@color/program_guide_table_item_focus_progress_overlay" />
-                </clip>
-            </item>
-        </ripple>
-    </item>
     <item android:state_focused="true" >
-        <nine-patch android:src="@drawable/program_guide_table_item_background_focused" />
+        <inset android:insetRight="4dp" android:insetBottom="4dp">
+            <shape>
+                <solid android:color="#FFF0F0F2" />
+                <corners android:radius="6dp" />
+            </shape>
+        </inset>
+    </item>
+    <item tv:state_current_program="true" >
+        <inset android:insetRight="4dp" android:insetBottom="4dp">
+            <shape>
+                <solid android:color="#1FF0F0F2" />
+                <corners android:radius="6dp" />
+            </shape>
+        </inset>
     </item>
     <item>
-        <nine-patch android:src="@drawable/program_guide_table_item_background_normal" />
+        <inset android:insetRight="4dp" android:insetBottom="4dp">
+            <shape>
+                <solid android:color="#0FF0F0F2" />
+                <corners android:radius="6dp" />
+            </shape>
+        </inset>
     </item>
 </selector>

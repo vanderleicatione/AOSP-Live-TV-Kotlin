@@ -103,9 +103,10 @@ class ProgramItemView @JvmOverloads constructor(
         visibleThreshold = res.getDimensionPixelOffset(R.dimen.program_guide_table_item_visible_threshold)
         itemPadding = res.getDimensionPixelOffset(R.dimen.program_guide_table_item_padding)
         iconPadding = res.getDimensionPixelOffset(R.dimen.program_guide_table_item_compound_drawable_padding)
-        val programTitleColor = ColorStateList.valueOf(res.getColor(R.color.program_guide_table_item_program_title_text_color, null))
+        // TCL: dunkle Schrift auf der hellen Fokuszelle
+        val programTitleColor = res.getColorStateList(R.color.tcl_epg_program_text, null)
         val grayedOutProgramTitleColor = res.getColorStateList(R.color.program_guide_table_item_grayed_out_program_text_color, null)
-        val episodeTitleColor = ColorStateList.valueOf(res.getColor(R.color.program_guide_table_item_program_episode_title_text_color, null))
+        val episodeTitleColor = res.getColorStateList(R.color.tcl_epg_program_text, null)
         val grayedOutEpisodeTitleColor =
             ColorStateList.valueOf(res.getColor(R.color.program_guide_table_item_grayed_out_program_episode_title_text_color, null))
         val programTitleSize = res.getDimensionPixelSize(R.dimen.program_guide_table_item_program_title_font_size)
@@ -240,7 +241,8 @@ class ProgramItemView @JvmOverloads constructor(
         if (endPadding > 0 && width - endPadding < minWidth) endPadding = max(0, width - minWidth)
         if (startPadding + itemPadding != paddingStart || endPadding + itemPadding != paddingEnd) {
             preventParentRelayout = true // Größe bleibt gleich, Eltern nicht neu layouten
-            setPaddingRelative(startPadding + itemPadding, 0, endPadding + itemPadding, 0)
+            // Oben/unten beibehalten: unten gleicht den 4dp-Abstand des TCL-Hintergrunds aus
+            setPaddingRelative(startPadding + itemPadding, paddingTop, endPadding + itemPadding, paddingBottom)
             preventParentRelayout = false
         }
     }

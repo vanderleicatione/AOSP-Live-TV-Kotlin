@@ -1072,4 +1072,8 @@
     <string name="tcl_channel_type_all">All channels</string>
     <string name="tcl_channel_type_streaming">Streaming</string>
     <string name="tcl_channel_type_digital">Digital</string>
+
+    <!-- TCL-style programme guide -->
+    <string name="tcl_epg_title">Programme Guide</string>
+    <string name="tcl_no_program_details">No programme details.</string>
 </resources>

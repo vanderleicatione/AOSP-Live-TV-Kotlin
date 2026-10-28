@@ -15,11 +15,27 @@
   ~ limitations under the License.
   -->
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/time"
+<!-- Half-hour mark like TCL's epg_pro_time_item_layout: a 2x12dp tick at the start of the slot and the
+     time 8dp after it. Selected = the slot containing now. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/program_guide_table_header_row_height"
-    android:gravity="center"
-    android:fontFamily="@string/condensed_font"
-    android:textSize="@dimen/program_guide_table_header_row_font_size"
-    android:textColor="@color/program_guide_table_header_row_time_text_color" />
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <View
+        android:layout_width="2dp"
+        android:layout_height="12dp"
+        android:background="@color/tcl_epg_time_tick"
+        android:duplicateParentState="true" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="65dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:duplicateParentState="true"
+        android:singleLine="true"
+        android:textColor="@color/tcl_epg_time_text"
+        android:textSize="14sp" />
+</LinearLayout>

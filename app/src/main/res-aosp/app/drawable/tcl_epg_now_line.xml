@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TCL Live TV epg_pro_channel_current_time_line.png: red line with a downward triangle on top
+     (12x296.5dp, red as TCL's playing marker). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="12dp"
+    android:height="296.5dp"
+    android:viewportWidth="24"
+    android:viewportHeight="593">
+    <path android:fillColor="#FFFA2C25" android:pathData="M0,0h24l-12,14z" />
+    <path android:fillColor="#FFFA2C25" android:pathData="M11,10h2v583h-2z" />
+</vector>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TCL Live TV epg_pro_bottom_mask.9.png: clear at the top, near-opaque black by 23%, opaque below. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="270"
+        android:startColor="#00000000"
+        android:centerColor="#F7000000"
+        android:centerY="0.23"
+        android:endColor="#FF000000" />
+</shape>
