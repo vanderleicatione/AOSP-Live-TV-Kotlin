@@ -23,9 +23,11 @@
             android:orientation="vertical" />
     </FrameLayout>
 
+    <!-- Over the rail's last pixel, as in TCL, so the channel column starts right at 58dp. -->
     <View
         android:layout_width="1px"
         android:layout_height="match_parent"
+        android:layout_marginStart="-1px"
         android:background="#1FF0F0F2" />
 
     <androidx.leanback.widget.VerticalGridView

@@ -53,6 +53,8 @@ class ChannelListOverlay(
         grid.adapter = adapter
         // Ohne Änderungsanimation bleibt der Fokus beim Umschalten auf der Zeile.
         grid.itemAnimator = null
+        // Fokuszeile wie bei TCL bei y=404..540 von 1080 (Mitte 472 statt Bildschirmmitte).
+        grid.windowAlignmentOffsetPercent = 472f / 1080f * 100f
     }
 
     fun show() {
