@@ -5,6 +5,7 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.util.Log
 import android.util.Range
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.leanback.widget.VerticalGridView
@@ -65,6 +66,26 @@ class ProgramGrid @JvmOverloads constructor(
         // Kein View-Cache: sonst stimmen Fokus-Bereiche nicht
         setItemViewCacheSize(0)
         setOnKeyInterceptListener(onRepeatedKeyInterceptListener)
+    }
+
+    /**
+     * TCL-Layout ohne Genre-Leiste: Fokus kommt nicht mehr von dort ins Raster und bleibt sonst auf dem Raster
+     * selbst hängen (Pfeiltasten wirkungslos). Dann an die laufende Sendung der ausgewählten Zeile weitergeben.
+     */
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        super.onLayout(changed, l, t, r, b)
+        if (isFocused) post { if (isFocused) findSelectedProgramView()?.requestFocus() }
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (isFocused && event.action == KeyEvent.ACTION_DOWN && findSelectedProgramView()?.requestFocus() == true) return true
+        return super.dispatchKeyEvent(event)
+    }
+
+    private fun findSelectedProgramView(): View? {
+        val row = findViewHolderForAdapterPosition(selectedPosition)?.itemView?.findViewById<ProgramRow>(R.id.row)
+            ?: return null
+        return row.getCurrentProgramView() ?: row.getChildAt(0)
     }
 
     override fun requestChildFocus(child: View?, focused: View?) {
