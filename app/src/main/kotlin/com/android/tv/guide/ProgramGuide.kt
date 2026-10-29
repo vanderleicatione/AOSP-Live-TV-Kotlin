@@ -327,7 +327,7 @@ class ProgramGuide(
     private fun focusCurrentProgram() {
         val position = maxOf(programManager.getChannelIndex(channelTuner.currentChannel), 0)
         // Die Zeile existiert evtl. noch nicht: Task läuft, sobald sie gelayoutet ist
-        programGrid.setSelectedPosition(position, object : ViewHolderTask() {
+        programGrid.setSelectedPosition(position, object : ViewHolderTask {
             override fun run(viewHolder: RecyclerView.ViewHolder) {
                 val row = viewHolder.itemView.findViewById<ProgramRow>(R.id.row) ?: return
                 row.post { (row.getCurrentProgramView() ?: row.getChildAt(0))?.requestFocus() }
