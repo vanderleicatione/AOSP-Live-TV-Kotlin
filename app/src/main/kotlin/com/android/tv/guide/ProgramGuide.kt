@@ -327,10 +327,17 @@ class ProgramGuide(
     private fun focusCurrentProgram() {
         val position = maxOf(programManager.getChannelIndex(channelTuner.currentChannel), 0)
         // Die Zeile existiert evtl. noch nicht: Task läuft, sobald sie gelayoutet ist
+        android.util.Log.d("TclGuideDbg", "focusCurrentProgram pos=$position count=${programGrid.adapter?.itemCount}")
         programGrid.setSelectedPosition(position, object : ViewHolderTask {
             override fun run(viewHolder: RecyclerView.ViewHolder) {
-                val row = viewHolder.itemView.findViewById<ProgramRow>(R.id.row) ?: return
-                row.post { (row.getCurrentProgramView() ?: row.getChildAt(0))?.requestFocus() }
+                val row = viewHolder.itemView.findViewById<ProgramRow>(R.id.row)
+                android.util.Log.d("TclGuideDbg", "task row=$row children=${row?.childCount}")
+                row ?: return
+                row.post {
+                    val target = row.getCurrentProgramView() ?: row.getChildAt(0)
+                    val ok = target?.requestFocus()
+                    android.util.Log.d("TclGuideDbg", "requestFocus target=$target ok=$ok now=${activity.currentFocus}")
+                }
             }
         })
     }
@@ -515,6 +522,7 @@ class ProgramGuide(
     /** Fokus zwischen Genre-Leiste/Kanalspalte und Raster schaltet Teil-/Vollansicht. */
     private inner class GlobalFocusChangeListener : ViewTreeObserver.OnGlobalFocusChangeListener {
         override fun onGlobalFocusChanged(oldFocus: View?, newFocus: View?) {
+            android.util.Log.d("TclGuideDbg", "focus $oldFocus -> $newFocus active=$isActive")
             if (!isActive) return
             (newFocus as? ProgramItemView)?.tableEntry?.let { updateDetail(it) }
             val from = getLocation(oldFocus)
