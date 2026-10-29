@@ -1,7 +1,6 @@
 package com.android.tv.ui
 
 import android.graphics.Bitmap
-import android.media.tv.TvInputInfo
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,21 +15,21 @@ import com.android.tv.R
 import com.android.tv.data.ProgramDataManager
 import com.android.tv.data.api.Channel
 import com.android.tv.ui.hideable.AutoHideScheduler
-import com.android.tv.util.TvInputManagerHelper
 import com.android.tv.util.images.ImageLoader
 
 /**
  * Kanalliste links im Stil von TCL Live TV (activity_channellist/item_channel), mit OK geöffnet:
- * Kategorieleiste (alle / Streaming / digital) und die sichtbaren Kanäle mit Logo, Nummer, Name und
- * laufender Sendung. OK schaltet um; OK auf dem laufenden Kanal oder Zurück schließt die Liste.
+ * Kategorieleiste (alle / Übertragung / Antenne / IPTV, darunter das Zahnrad für die Optionen) und die
+ * sichtbaren Kanäle mit Logo, Nummer, Name und laufender Sendung. OK schaltet um; OK auf dem laufenden
+ * Kanal oder Zurück schließt die Liste; CH+/CH- blättern seitenweise.
  */
 class ChannelListOverlay(
     private val activity: MainActivity,
     private val channelTuner: ChannelTuner,
     private val programDataManager: ProgramDataManager,
-    private val inputManager: TvInputManagerHelper,
     private val onShown: Runnable,
     private val onHidden: Runnable,
+    private val onSettings: Runnable,
 ) {
     private val container: View = activity.findViewById(R.id.channel_list_overlay)
     private val typeRail: LinearLayout = container.findViewById(R.id.channel_list_types)
@@ -81,8 +80,22 @@ class ChannelListOverlay(
 
     fun scheduleHide() = autoHideScheduler.schedule(SHOW_DURATION_MILLIS)
 
-    private fun Channel.category(): Category =
-        if (inputManager.getTvInputInfo(inputId)?.type == TvInputInfo.TYPE_TUNER) Category.DIGITAL else Category.STREAMING
+    /** Eine Seite (sichtbare Zeilen) nach oben bzw. unten. */
+    fun page(down: Boolean) {
+        scheduleHide()
+        if (adapter.itemCount == 0) return
+        val step = (grid.childCount - 1).coerceAtLeast(1)
+        val target = grid.selectedPosition + if (down) step else -step
+        grid.selectedPosition = target.coerceIn(0, adapter.itemCount - 1)
+        grid.requestFocus()
+    }
+
+    /** Nach Eingang: Antenne = Tuner der TV, Übertragung = TCL Channel+, IPTV = alle anderen (OpenTV …). */
+    private fun Channel.category(): Category = when {
+        inputId.startsWith(INPUT_ANTENNA) -> Category.ANTENNA
+        inputId.startsWith(INPUT_BROADCAST) -> Category.BROADCAST
+        else -> Category.IPTV
+    }
 
     /** Wie bei TCL nur Kategorien mit Kanälen; "Alle" immer. */
     private fun buildRail() {
@@ -101,6 +114,19 @@ class ChannelListOverlay(
             item.setOnClickListener { grid.requestFocus() }
             typeRail.addView(item)
         }
+        // Zahnrad unter den Kategorien: öffnet das Menü auf der Zeile mit den Optionen.
+        val settings = inflater.inflate(R.layout.tcl_channel_type_item, typeRail, false)
+        settings.contentDescription = activity.getString(R.string.tcl_channel_list_settings)
+        settings.findViewById<ImageView>(R.id.channel_type_icon).setImageResource(R.drawable.tcl_ic_settings)
+        settings.nextFocusRightId = R.id.channel_list_grid
+        (settings.layoutParams as ViewGroup.MarginLayoutParams).topMargin =
+            res.getDimensionPixelSize(R.dimen.tcl_channel_list_settings_margin_top)
+        settings.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) scheduleHide() }
+        settings.setOnClickListener {
+            hide()
+            onSettings.run()
+        }
+        typeRail.addView(settings)
         updateRail()
     }
 
@@ -145,8 +171,9 @@ class ChannelListOverlay(
 
     private enum class Category(val iconRes: Int, val labelRes: Int) {
         ALL(R.drawable.tcl_ic_type_all, R.string.tcl_channel_type_all),
-        STREAMING(R.drawable.tcl_ic_type_streaming, R.string.tcl_channel_type_streaming),
-        DIGITAL(R.drawable.tcl_ic_type_digital, R.string.tcl_channel_type_digital),
+        BROADCAST(R.drawable.tcl_ic_type_streaming, R.string.tcl_channel_type_broadcast),
+        ANTENNA(R.drawable.tcl_ic_type_digital, R.string.tcl_channel_type_antenna),
+        IPTV(R.drawable.tcl_ic_type_iptv, R.string.tcl_channel_type_iptv),
     }
 
     private class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -202,5 +229,7 @@ class ChannelListOverlay(
 
     companion object {
         private const val SHOW_DURATION_MILLIS = 15_000L
+        private const val INPUT_ANTENNA = "com.tcl.tvinput/.TDTVInputService"
+        private const val INPUT_BROADCAST = "com.tcl.channelplus/"
     }
 }

@@ -1070,8 +1070,10 @@
     <!-- TCL-style left channel list -->
     <string name="tcl_no_information">No information</string>
     <string name="tcl_channel_type_all">All channels</string>
-    <string name="tcl_channel_type_streaming">Streaming</string>
-    <string name="tcl_channel_type_digital">Digital</string>
+    <string name="tcl_channel_type_broadcast">Broadcast</string>
+    <string name="tcl_channel_type_antenna">Antenna</string>
+    <string name="tcl_channel_type_iptv">IPTV</string>
+    <string name="tcl_channel_list_settings">Settings</string>
 
     <!-- TCL-style programme guide -->
     <string name="tcl_epg_title">Programme Guide</string>

@@ -356,8 +356,10 @@
     <string name="recorded_programs_preview_channel" msgid="890404366427245812">"Programas gravados"</string>
     <string name="tcl_no_information">"Sem informações"</string>
     <string name="tcl_channel_type_all">"Todos os canais"</string>
-    <string name="tcl_channel_type_streaming">"Streaming"</string>
-    <string name="tcl_channel_type_digital">"Digital"</string>
+    <string name="tcl_channel_type_broadcast">"Transmissão"</string>
+    <string name="tcl_channel_type_antenna">"Antena"</string>
+    <string name="tcl_channel_type_iptv">"IPTV"</string>
+    <string name="tcl_channel_list_settings">"Configurações"</string>
     <string name="tcl_epg_title">"Guia de Programa"</string>
     <string name="tcl_no_program_details">"Nenhum detalhe de programa."</string>
 </resources>

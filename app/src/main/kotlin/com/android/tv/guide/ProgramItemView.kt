@@ -138,7 +138,7 @@ class ProgramItemView @JvmOverloads constructor(
             layoutParams = it
         }
         var title = if (entry.isGap) gapTitle else entry.program?.title
-        if (title.isNullOrEmpty()) title = resources.getString(R.string.program_title_for_no_information)
+        if (title.isNullOrEmpty()) title = resources.getString(R.string.tcl_no_information)
         updateText(selectedGenreId, title)
         updateIcons()
         updateContentDescription(title)

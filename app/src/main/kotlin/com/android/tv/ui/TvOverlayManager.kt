@@ -128,9 +128,10 @@ class TvOverlayManager(
             { onOverlayClosed(OVERLAY_TYPE_GUIDE) },
         )
         channelList = ChannelListOverlay(
-            mainActivity, channelTuner, programDataManager, inputManager,
+            mainActivity, channelTuner, programDataManager,
             { onOverlayOpened(OVERLAY_TYPE_CHANNEL_LIST) },
             { onOverlayClosed(OVERLAY_TYPE_CHANNEL_LIST) },
+            { showMenu(Menu.REASON_TV_OPTIONS) },
         )
         mainActivity.addOnActionClickListener(object : OnActionClickListener {
             override fun onActionClick(category: String, id: Int, params: Bundle?): Boolean {
@@ -494,6 +495,11 @@ class TvOverlayManager(
     fun onKeyDown(keyCode: Int, event: KeyEvent): Int {
         if (currentDialog != null) return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED
         if (isMediaStartKey(keyCode)) return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED
+        // CH+/CH- blättern in der Kanalliste seitenweise (TCL).
+        if (channelList.isActive && (keyCode == KeyEvent.KEYCODE_CHANNEL_UP || keyCode == KeyEvent.KEYCODE_CHANNEL_DOWN)) {
+            channelList.page(keyCode == KeyEvent.KEYCODE_CHANNEL_DOWN)
+            return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED
+        }
         if (menu.isActive || sideFragmentManager.isActive || programGuide.isActive || channelList.isActive ||
             isSetupFragmentActive || isNewSourcesFragmentActive
         ) return MainActivity.KEY_EVENT_HANDLER_RESULT_DISPATCH_TO_OVERLAY

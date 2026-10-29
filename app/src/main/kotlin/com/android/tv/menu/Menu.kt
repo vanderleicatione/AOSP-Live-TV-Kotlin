@@ -121,11 +121,14 @@ class Menu(
         const val REASON_PLAY_CONTROLS_FAST_FORWARD = 6
         const val REASON_PLAY_CONTROLS_JUMP_TO_PREVIOUS = 7
         const val REASON_PLAY_CONTROLS_JUMP_TO_NEXT = 8
+        /** Zahnrad der Kanalliste: Menü direkt auf der Zeile "Optionen" (Untertitel, Bildformat …). */
+        const val REASON_TV_OPTIONS = 9
 
         private val ROW_ID_FOR_REASON: List<String?> = listOf(
             null, ChannelsRow.ID,
             PlayControlsRow.ID, PlayControlsRow.ID, PlayControlsRow.ID, PlayControlsRow.ID,
             PlayControlsRow.ID, PlayControlsRow.ID, PlayControlsRow.ID,
+            MenuRowFactory.TvOptionsRow.ID,
         )
 
         private val PRELOAD_VIEW_IDS = mapOf(

@@ -13,7 +13,7 @@ internal class ProgramListAdapter(res: Resources, private val programGuide: Prog
     RecyclerView.Adapter<ProgramListAdapter.ProgramItemViewHolder>(), ProgramManager.TableEntriesUpdatedListener {
 
     private val programManager = programGuide.programManager
-    private val noInfoProgramTitle = res.getString(R.string.program_title_for_no_information)
+    private val noInfoProgramTitle = res.getString(R.string.tcl_no_information)
     private val blockedProgramTitle = res.getString(R.string.program_title_for_blocked_channel)
     private var channelId = 0L
 

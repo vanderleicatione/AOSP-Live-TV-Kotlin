@@ -109,12 +109,13 @@ class KeyHandler(
         if (activity.searchFragment.isVisible) return null
         if (!channelTuner.areAllChannelsLoaded()) return false
         if (isOkKey(keyCode) && !channelTuner.isCurrentChannelPassthrough) {
-            // OK lang gedrückt: das AOSP-Menü (OK selbst öffnet jetzt die Kanalliste).
+            // OK lang gedrückt: Programmübersicht wie bei TCL (OK selbst öffnet die Kanalliste, das Menü
+            // erreicht man über die Menü-Taste und das Zahnrad der Kanalliste).
             if (event.repeatCount == 0) {
                 okLongPressed = false
             } else if (event.isLongPress && channelTuner.browsableChannelCount > 0) {
                 okLongPressed = true
-                overlayManager.showMenu(Menu.REASON_NONE)
+                overlayManager.showProgramGuide()
             }
             return true
         }
@@ -176,11 +177,8 @@ class KeyHandler(
             }
             return null
         }
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            // Enthält Aufräumarbeiten für das Verlassen der App
-            activity.onBackPressedDispatcher.onBackPressed()
-            return true
-        }
+        // Zurück im Vollbild verlässt die App nicht mehr (TCL-Verhalten); Overlays schließt es weiterhin oben.
+        if (keyCode == KeyEvent.KEYCODE_BACK) return true
         if (!channelTuner.areAllChannelsLoaded()) {
             // Tasten ignorieren
         } else if (channelTuner.browsableChannelCount == 0) {
@@ -213,7 +211,7 @@ class KeyHandler(
                     return true
                 }
                 KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_NUMPAD_ENTER, KeyEvent.KEYCODE_DPAD_CENTER -> {
-                    // TCL-Stil: OK öffnet die Kanalliste; nach Langdruck (Menü, s. onKeyDown) nichts mehr tun.
+                    // TCL-Stil: OK öffnet die Kanalliste; nach Langdruck (Guide, s. onKeyDown) nichts mehr tun.
                     if (event.isCanceled || okLongPressed) {
                         okLongPressed = false
                         return true

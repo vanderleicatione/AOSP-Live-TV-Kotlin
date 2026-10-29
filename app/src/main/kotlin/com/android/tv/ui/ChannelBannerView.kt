@@ -71,7 +71,7 @@ class ChannelBannerView @JvmOverloads constructor(
     private val accessibilityManager = context.getSystemService(AccessibilityManager::class.java)
 
     private val noProgram: Program = ProgramImpl.Builder()
-        .setTitle(context.getString(R.string.channel_banner_no_title)).setDescription(EMPTY_STRING).build()
+        .setTitle(context.getString(R.string.tcl_no_information)).setDescription(EMPTY_STRING).build()
     private val lockedChannelProgram: Program = ProgramImpl.Builder()
         .setTitle(context.getString(R.string.channel_banner_locked_channel_title)).setDescription(EMPTY_STRING).build()
     private val closedCaptionMark = context.getString(R.string.closed_caption)

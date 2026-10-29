@@ -64,7 +64,7 @@ class ChannelCardView @JvmOverloads constructor(
                 program = currentProgram
                 if (currentProgram == null || currentProgram.title.isNullOrEmpty()) {
                     setTextViewEnabled(false)
-                    setText(R.string.program_title_for_no_information)
+                    setText(R.string.tcl_no_information)
                 } else {
                     setTextViewEnabled(true)
                     setText(currentProgram.title)

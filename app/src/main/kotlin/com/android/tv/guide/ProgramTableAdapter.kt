@@ -60,7 +60,7 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
     private val channelLogoHeight = res.getDimensionPixelSize(R.dimen.program_guide_table_header_column_channel_logo_height)
     private val imageWidth = res.getDimensionPixelSize(R.dimen.program_guide_table_detail_image_width)
     private val imageHeight = res.getDimensionPixelSize(R.dimen.program_guide_table_detail_image_height)
-    private val programTitleForNoInformation = res.getString(R.string.program_title_for_no_information)
+    private val programTitleForNoInformation = res.getString(R.string.tcl_no_information)
     private val programTitleForBlockedChannel = res.getString(R.string.program_title_for_blocked_channel)
     private val channelTextColor = res.getColor(R.color.program_guide_table_header_column_channel_number_text_color, null)
     private val channelBlockedTextColor = res.getColor(R.color.program_guide_table_header_column_channel_number_blocked_text_color, null)
