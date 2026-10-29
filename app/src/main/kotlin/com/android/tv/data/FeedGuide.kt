@@ -17,8 +17,10 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.android.tv.R
 import com.android.tv.data.api.Channel
 import com.android.tv.data.api.Program
+import com.android.tv.util.images.ImageLoader
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -181,7 +183,14 @@ object FeedGuide {
         }
         channels = map
         Log.i(TAG, "Feed channels loaded: ${map.size}")
-        mainHandler.post { listeners.toList().forEach { it.run() } }
+        mainHandler.post {
+            listeners.toList().forEach { it.run() }
+            // Logos vorab in den Speicher-Cache, damit das erste Öffnen der Liste nicht beim Dekodieren ruckelt.
+            val res = appContext.resources
+            val w = res.getDimensionPixelSize(R.dimen.tcl_channel_list_logo_width)
+            val h = res.getDimensionPixelSize(R.dimen.tcl_channel_list_logo_height)
+            map.values.forEach { c -> c.logoUri?.let { ImageLoader.prefetchBitmap(appContext, it, w, h) } }
+        }
     }
 
     /** Lädt Feed und fehlende Logos. Ohne Netz bleibt die letzte Kopie. */
