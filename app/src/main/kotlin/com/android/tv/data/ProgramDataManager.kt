@@ -106,9 +106,20 @@ class ProgramDataManager @Inject constructor(
     /** Kanal-ID → Feed-ID aller Kanäle, die der Feed kennt (Main-Thread). */
     private fun feedIds(): Map<Long, String> {
         val map = HashMap<Long, String>()
-        for (channel in channelDataManager.getChannelList()) FeedGuide.feedId(channel)?.let { map[channel.id] = it }
+        val unmatched = ArrayList<String>()
+        for (channel in channelDataManager.getChannelList()) {
+            val feedId = FeedGuide.feedId(channel)
+            if (feedId != null) map[channel.id] = feedId
+            else if (FeedGuide.isFeedSource(channel)) unmatched.add("${channel.inputId}|${channel.displayName}")
+        }
+        if (map.size != lastFeedMatchCount) {
+            lastFeedMatchCount = map.size
+            Log.i(TAG, "Feed matched ${map.size} channels; unmatched: $unmatched")
+        }
         return map
     }
+
+    private var lastFeedMatchCount = -1
 
     private fun feedIdOf(channelId: Long): String? = channelDataManager.getChannel(channelId)?.let { FeedGuide.feedId(it) }
 
@@ -308,9 +319,11 @@ class ProgramDataManager @Inject constructor(
                     if (duplicateCount > 0) Log.w(TAG, "Found $duplicateCount overlapping programs")
                     result
                 } ?: return@withContext null
-                // Kanäle ohne laufende TIF-Sendung: aus dem Feed
-                val covered = tif.mapTo(HashSet()) { it.channelId }
-                tif + FeedGuide.programsAt(time, feedIds.filterKeys { it !in covered })
+                // Kanäle ohne laufende TIF-Sendung (oder nur ohne Titel): aus dem Feed
+                val covered = tif.filter { !it.title.isNullOrBlank() }.mapTo(HashSet()) { it.channelId }
+                val feed = FeedGuide.programsAt(time, feedIds.filterKeys { it !in covered })
+                val fed = feed.mapTo(HashSet()) { it.channelId }
+                tif.filter { it.channelId !in fed } + feed
             }
             programsUpdateJob = null
             if (programs != null) {
@@ -338,9 +351,12 @@ class ProgramDataManager @Inject constructor(
         val feedId = feedIdOf(channelId)
         val job = scope.launch {
             val program = withContext(dbDispatcher) {
-                queryPrograms(TvContract.buildProgramsUriForChannel(channelId, time, time), SORT_BY_TIME) { c ->
+                val tif = queryPrograms(TvContract.buildProgramsUriForChannel(channelId, time, time), SORT_BY_TIME) { c ->
                     if (c.moveToNext()) ProgramImpl.fromCursor(c) else null
-                } ?: feedId?.let { FeedGuide.programsAt(time, mapOf(channelId to it)).firstOrNull() }
+                }
+                tif?.takeIf { !it.title.isNullOrBlank() }
+                    ?: feedId?.let { FeedGuide.programsAt(time, mapOf(channelId to it)).firstOrNull() }
+                    ?: tif
             }
             programUpdateJobs.remove(channelId)
             updateCurrentProgram(channelId, program)

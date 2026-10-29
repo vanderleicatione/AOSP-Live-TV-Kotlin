@@ -81,6 +81,9 @@ object FeedGuide {
     /** Main-Thread; wird nach jedem Laden/Aktualisieren des Feeds aufgerufen. */
     fun addListener(listener: Runnable) { listeners.add(listener) }
 
+    fun isFeedSource(channel: Channel) =
+        channel.inputId.startsWith(INPUT_ANTENNA) || channel.inputId.startsWith(INPUT_BROADCAST)
+
     private fun key(channel: Channel): String? {
         val source = when {
             channel.inputId.startsWith(INPUT_ANTENNA) -> "antena"
@@ -137,10 +140,14 @@ object FeedGuide {
         return result
     }
 
-    /** TIF zuerst: Feed-Programme nur in Zeiten, in denen das TIF nichts hat. Beide nach Start sortiert. */
-    fun merge(tif: List<Program>, feed: List<Program>): ArrayList<Program> {
+    /**
+     * TIF zuerst: Feed-Programme nur in Zeiten, in denen das TIF nichts hat. Beide nach Start sortiert.
+     * TIF-Einträge ohne Titel (Platzhalter der TCL-Antenne) zählen nicht als Programm.
+     */
+    fun merge(allTif: List<Program>, feed: List<Program>): ArrayList<Program> {
+        if (feed.isEmpty()) return ArrayList(allTif)
+        val tif = allTif.filter { !it.title.isNullOrBlank() }
         val out = ArrayList(tif)
-        if (feed.isEmpty()) return out
         var i = 0
         for (p in feed) {
             while (i < tif.size && tif[i].endTimeUtcMillis <= p.startTimeUtcMillis) i++
