@@ -227,6 +227,7 @@ class ProgramGuide(
         lastRequestedGenreId = GenreItems.ID_ALL_CHANNELS
         timeListAdapter.update(startUtcTime)
         timelineRow.resetScroll()
+        programGrid.selectedPosition = maxOf(programManager.getChannelIndex(channelTuner.currentChannel), 0)
         container.visibility = View.VISIBLE
         isActive = true
         // Genre-Leiste ist ausgeblendet (TCL-Layout): Fokus immer direkt ins Raster
@@ -245,6 +246,7 @@ class ProgramGuide(
                 timelineAnimation = true
                 startCurrentTimeIndicator(TIME_INDICATOR_UPDATE_FREQUENCY)
                 updateGuidePosition()
+                focusCurrentProgram()
                 runnableAfterAnimatorReady.run()
                 if (showGuidePartial) showAnimatorPartial.start() else showAnimatorFull.start()
             }
@@ -316,6 +318,16 @@ class ProgramGuide(
         layoutParams.height = res.getDimensionPixelOffset(R.dimen.program_guide_table_header_row_height) + detailHeight +
             rowHeight * rows + table.paddingTop + table.paddingBottom
         table.layoutParams = layoutParams
+    }
+
+    /**
+     * Fokus auf die laufende Sendung des aktuellen Kanals. Im Original kam der Fokus über die Genre-Leiste
+     * ins Raster; die ist im TCL-Layout ausgeblendet, sonst bliebe er auf dem Raster selbst hängen.
+     */
+    private fun focusCurrentProgram() {
+        val row = programGrid.findViewHolderForAdapterPosition(programGrid.selectedPosition)
+            ?.itemView?.findViewById<ProgramRow>(R.id.row) ?: return
+        (row.getCurrentProgramView() ?: row.getChildAt(0))?.requestFocus()
     }
 
     /** TCL: Titel, Zeit und Beschreibung der fokussierten Sendung oben statt in einer Detailzeile. */

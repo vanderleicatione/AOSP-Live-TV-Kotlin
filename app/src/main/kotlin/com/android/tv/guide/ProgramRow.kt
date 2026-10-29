@@ -152,7 +152,7 @@ class ProgramRow @JvmOverloads constructor(
         return result
     }
 
-    private fun getCurrentProgramView(): View? =
+    internal fun getCurrentProgramView(): View? =
         (0 until childCount).map { getChildAt(it) }.firstOrNull { (it as ProgramItemView).tableEntry?.isCurrentProgram == true }
 
     fun setChannel(channel: Channel?) { this.channel = channel }
