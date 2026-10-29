@@ -15,6 +15,7 @@ import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityManager.AccessibilityStateChangeListener
 import android.widget.TextView
 import androidx.leanback.widget.VerticalGridView
+import androidx.leanback.widget.ViewHolderTask
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.tv.ChannelTuner
@@ -227,7 +228,6 @@ class ProgramGuide(
         lastRequestedGenreId = GenreItems.ID_ALL_CHANNELS
         timeListAdapter.update(startUtcTime)
         timelineRow.resetScroll()
-        programGrid.selectedPosition = maxOf(programManager.getChannelIndex(channelTuner.currentChannel), 0)
         container.visibility = View.VISIBLE
         isActive = true
         // Genre-Leiste ist ausgeblendet (TCL-Layout): Fokus immer direkt ins Raster
@@ -325,9 +325,14 @@ class ProgramGuide(
      * ins Raster; die ist im TCL-Layout ausgeblendet, sonst bliebe er auf dem Raster selbst hängen.
      */
     private fun focusCurrentProgram() {
-        val row = programGrid.findViewHolderForAdapterPosition(programGrid.selectedPosition)
-            ?.itemView?.findViewById<ProgramRow>(R.id.row) ?: return
-        (row.getCurrentProgramView() ?: row.getChildAt(0))?.requestFocus()
+        val position = maxOf(programManager.getChannelIndex(channelTuner.currentChannel), 0)
+        // Die Zeile existiert evtl. noch nicht: Task läuft, sobald sie gelayoutet ist
+        programGrid.setSelectedPosition(position, object : ViewHolderTask() {
+            override fun run(viewHolder: RecyclerView.ViewHolder) {
+                val row = viewHolder.itemView.findViewById<ProgramRow>(R.id.row) ?: return
+                row.post { (row.getCurrentProgramView() ?: row.getChildAt(0))?.requestFocus() }
+            }
+        })
     }
 
     /** TCL: Titel, Zeit und Beschreibung der fokussierten Sendung oben statt in einer Detailzeile. */
