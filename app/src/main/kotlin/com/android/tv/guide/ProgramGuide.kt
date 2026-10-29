@@ -154,8 +154,7 @@ class ProgramGuide(
             }
             selectRow(view)
         }
-        // TCL: Fokus wandert durch die sichtbaren Zeilen, gescrollt wird erst am Rand
-        programGrid.focusScrollStrategy = VerticalGridView.FOCUS_SCROLL_ITEM
+        programGrid.focusScrollStrategy = VerticalGridView.FOCUS_SCROLL_ALIGNED
         programGrid.windowAlignmentOffset = selectionRow * rowHeight
         programGrid.windowAlignmentOffsetPercent = VerticalGridView.WINDOW_ALIGN_OFFSET_PERCENT_DISABLED
         programGrid.itemAlignmentOffset = 0
