@@ -90,8 +90,11 @@ object FeedGuide {
             channel.inputId.startsWith(INPUT_BROADCAST) -> "channelplus"
             else -> return null
         }
-        return source + "|" + channel.displayName?.trim()
+        return source + "|" + channel.displayName?.let(::cleanName)
     }
+
+    /** Antennen-Namen beginnen im TIF mit einem Steuerzeichen, das die TV (und der Feed) als "." zeigt. */
+    private fun cleanName(name: String) = name.trim { it.isWhitespace() || it.isISOControl() || it == '.' }
 
     fun feedId(channel: Channel): String? = key(channel)?.let { channels[it]?.id }
 
@@ -170,7 +173,7 @@ object FeedGuide {
                     val id = c.getString(0)
                     val file = File(logoDir, "$id.png")
                     val logo = if (file.exists()) Uri.fromFile(file).toString() else c.getString(2)
-                    map[id.substringBefore('.') + "|" + c.getString(1)] = FeedChannel(id, logo)
+                    map[id.substringBefore('.') + "|" + cleanName(c.getString(1))] = FeedChannel(id, logo)
                 }
             }
         } catch (e: Exception) {

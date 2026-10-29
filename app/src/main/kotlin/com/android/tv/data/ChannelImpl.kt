@@ -3,6 +3,7 @@ package com.android.tv.data
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import android.graphics.Bitmap
 import android.media.tv.TvContract
 import android.net.Uri
 import android.util.Log
@@ -160,7 +161,24 @@ class ChannelImpl private constructor() : Channel {
         maxHeight: Int,
         callback: ImageLoader.ImageLoaderCallback<*>,
     ) {
-        ImageLoader.loadBitmap(context, getLogoOrImageUriString(loadImageType), maxWidth, maxHeight, callback)
+        val feedLogo = if (loadImageType == LOAD_IMAGE_TYPE_CHANNEL_LOGO && channelLogoExist) FeedGuide.logoUri(this) else null
+        if (feedLogo == null) {
+            ImageLoader.loadBitmap(context, getLogoOrImageUriString(loadImageType), maxWidth, maxHeight, callback)
+            return
+        }
+        // TIF-Logo zuerst; lässt es sich nicht dekodieren (fremder Kanal), ab jetzt das aus dem Feed.
+        val appContext = context.applicationContext
+        ImageLoader.loadBitmap(appContext, getImageUriString(loadImageType), maxWidth, maxHeight,
+            object : ImageLoader.ImageLoaderCallback<Context>(appContext) {
+                override fun onBitmapLoaded(referent: Context, bitmap: Bitmap?) {
+                    if (bitmap != null) {
+                        callback.onBitmapLoaded(bitmap)
+                    } else {
+                        channelLogoExist = false
+                        ImageLoader.loadBitmap(referent, feedLogo, maxWidth, maxHeight, callback)
+                    }
+                }
+            })
     }
 
     /** Ohne lesbares TIF-Logo (fremde Kanäle ohne ACCESS_ALL_EPG_DATA) das Logo aus dem Feed. */
