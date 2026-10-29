@@ -147,7 +147,7 @@ class ChannelImpl private constructor() : Channel {
     }
 
     override fun prefetchImage(context: Context, loadImageType: Int, maxWidth: Int, maxHeight: Int) {
-        val uriString = getImageUriString(loadImageType)
+        val uriString = getLogoOrImageUriString(loadImageType)
         if (!uriString.isNullOrEmpty()) {
             ImageLoader.prefetchBitmap(context, uriString, maxWidth, maxHeight)
         }
@@ -160,11 +160,16 @@ class ChannelImpl private constructor() : Channel {
         maxHeight: Int,
         callback: ImageLoader.ImageLoaderCallback<*>,
     ) {
-        ImageLoader.loadBitmap(context, getImageUriString(loadImageType), maxWidth, maxHeight, callback)
+        ImageLoader.loadBitmap(context, getLogoOrImageUriString(loadImageType), maxWidth, maxHeight, callback)
     }
 
+    /** Ohne lesbares TIF-Logo (fremde Kanäle ohne ACCESS_ALL_EPG_DATA) das Logo aus dem Feed. */
+    private fun getLogoOrImageUriString(type: Int): String? =
+        if (type == LOAD_IMAGE_TYPE_CHANNEL_LOGO && !channelLogoExist) FeedGuide.logoUri(this)
+        else getImageUriString(type)
+
     override fun setChannelLogoExist(result: Boolean) { channelLogoExist = result }
-    override fun channelLogoExists(): Boolean = channelLogoExist
+    override fun channelLogoExists(): Boolean = channelLogoExist || FeedGuide.logoUri(this) != null
 
     override fun getAppLinkType(context: Context): Int {
         if (appLinkType == APP_LINK_TYPE_NOT_SET) initAppLinkTypeAndIntent(context)

@@ -18,6 +18,7 @@ import com.android.tv.common.util.Clock
 import com.android.tv.common.util.SharedPreferencesUtils
 import com.android.tv.common.ui.setup.animation.SetupAnimationHelper
 import com.android.tv.data.ChannelDataManager
+import com.android.tv.data.FeedGuide
 import com.android.tv.data.PreviewDataManager
 import com.android.tv.data.ProgramDataManager
 import com.android.tv.dvr.DvrDataManager
@@ -89,6 +90,7 @@ class TvApplication : Application(), TvSingletons, Starter {
         }
         Log.i(TAG, "Starting TV app $versionName")
         SetupAnimationHelper.initialize(this)
+        FeedGuide.init(this)
         startManagersIfNeeded()
         Log.i(TAG, "Started TV app $versionName")
     }

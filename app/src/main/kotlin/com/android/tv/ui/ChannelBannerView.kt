@@ -97,9 +97,11 @@ class ChannelBannerView @JvmOverloads constructor(
     private lateinit var previousChannelView: View
     private lateinit var previousChannelNumberView: TextView
     private lateinit var previousChannelNameView: TextView
+    private lateinit var previousChannelLogoView: ImageView
     private lateinit var nextChannelView: View
     private lateinit var nextChannelNumberView: TextView
     private lateinit var nextChannelNameView: TextView
+    private lateinit var nextChannelLogoView: ImageView
 
     private var currentChannel: Channel? = null
     private var currentChannelLogoExists = false
@@ -115,6 +117,8 @@ class ChannelBannerView @JvmOverloads constructor(
     private val showDurationMillis = resources.getInteger(R.integer.channel_banner_show_duration).toLong()
     private val channelLogoImageViewWidth = resources.getDimensionPixelSize(R.dimen.channel_banner_channel_logo_width)
     private val channelLogoImageViewHeight = resources.getDimensionPixelSize(R.dimen.channel_banner_channel_logo_height)
+    private val adjacentLogoWidth = resources.getDimensionPixelSize(R.dimen.tcl_channel_list_logo_width)
+    private val adjacentLogoHeight = resources.getDimensionPixelSize(R.dimen.tcl_channel_list_logo_height)
     private val programDescriptionTextViewWidth = resources.getDimensionPixelSize(R.dimen.channel_banner_program_description_width)
     private val channelBannerTextColor = resources.getColor(R.color.tcl_banner_text_color, null)
     private val channelBannerDimTextColor = resources.getColor(R.color.channel_banner_dim_text_color, null)
@@ -163,9 +167,11 @@ class ChannelBannerView @JvmOverloads constructor(
         previousChannelView = findViewById(R.id.channel_banner_previous)
         previousChannelNumberView = findViewById(R.id.channel_banner_previous_number)
         previousChannelNameView = findViewById(R.id.channel_banner_previous_name)
+        previousChannelLogoView = findViewById(R.id.channel_banner_previous_logo)
         nextChannelView = findViewById(R.id.channel_banner_next)
         nextChannelNumberView = findViewById(R.id.channel_banner_next_number)
         nextChannelNameView = findViewById(R.id.channel_banner_next_name)
+        nextChannelLogoView = findViewById(R.id.channel_banner_next_logo)
         programDescriptionFadeInAnimator.setTarget(programDescriptionTextView)
         programDescriptionFadeOutAnimator.setTarget(programDescriptionTextView)
         programDescriptionFadeOutAnimator.addListener(object : AnimatorListenerAdapter() {
@@ -236,17 +242,27 @@ class ChannelBannerView @JvmOverloads constructor(
 
     /** TCL-Stil: vorheriger Kanal über, nächster unter der Karte (unsichtbar, wenn es keinen anderen gibt). */
     fun setAdjacentChannels(previous: Channel?, next: Channel?) {
-        bindAdjacentChannel(previousChannelView, previousChannelNumberView, previousChannelNameView, previous)
-        bindAdjacentChannel(nextChannelView, nextChannelNumberView, nextChannelNameView, next)
+        bindAdjacentChannel(previousChannelView, previousChannelNumberView, previousChannelNameView, previousChannelLogoView, previous)
+        bindAdjacentChannel(nextChannelView, nextChannelNumberView, nextChannelNameView, nextChannelLogoView, next)
     }
 
-    private fun bindAdjacentChannel(view: View, number: TextView, name: TextView, channel: Channel?) {
+    private fun bindAdjacentChannel(view: View, number: TextView, name: TextView, logo: ImageView, channel: Channel?) {
         if (channel == null || channel.id == currentChannelProvider.get()?.id) {
             view.visibility = INVISIBLE
             return
         }
         number.text = channel.displayNumber
         name.text = channel.displayName
+        logo.setImageDrawable(null)
+        logo.tag = channel.id
+        if (channel.channelLogoExists()) {
+            channel.loadBitmap(context, Channel.LOAD_IMAGE_TYPE_CHANNEL_LOGO, adjacentLogoWidth, adjacentLogoHeight,
+                object : ImageLoaderCallback<ImageView>(logo) {
+                    override fun onBitmapLoaded(referent: ImageView, bitmap: Bitmap?) {
+                        if (referent.tag == channel.id) referent.setImageBitmap(bitmap)
+                    }
+                })
+        }
         view.visibility = VISIBLE
     }
 

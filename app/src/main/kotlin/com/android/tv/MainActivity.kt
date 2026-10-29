@@ -33,6 +33,7 @@ import com.android.tv.common.memory.MemoryManageable
 import com.android.tv.common.TvContentRatingCache
 import com.android.tv.common.ui.setup.OnActionClickListener
 import com.android.tv.data.ChannelDataManager
+import com.android.tv.data.FeedGuide
 import com.android.tv.data.ChannelImpl
 import com.android.tv.data.OnCurrentProgramUpdatedListener
 import com.android.tv.data.ProgramDataManager
@@ -383,6 +384,7 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
         super.onStart()
         screenOffIntentReceived = false
         isActivityStarted = true
+        FeedGuide.refreshIfStale()
         applyParentalControlSettings()
         val filter = IntentFilter().apply {
             addAction(TvInputManager.ACTION_PARENTAL_CONTROLS_ENABLED_CHANGED)

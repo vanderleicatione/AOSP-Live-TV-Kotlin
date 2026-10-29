@@ -93,6 +93,25 @@ class ProgramDataManager @Inject constructor(
         }
     }
 
+    init {
+        // Feed geladen/aktualisiert bzw. Kanäle geladen → Feed-Zuordnung neu, Programme neu laden.
+        FeedGuide.addListener { if (started) reload() }
+        channelDataManager.addListener(object : ChannelDataManager.Listener {
+            override fun onLoadFinished() { if (started) reload() }
+            override fun onChannelListUpdated() = Unit
+            override fun onChannelBrowsableChanged() = Unit
+        })
+    }
+
+    /** Kanal-ID → Feed-ID aller Kanäle, die der Feed kennt (Main-Thread). */
+    private fun feedIds(): Map<Long, String> {
+        val map = HashMap<Long, String>()
+        for (channel in channelDataManager.getChannelList()) FeedGuide.feedId(channel)?.let { map[channel.id] = it }
+        return map
+    }
+
+    private fun feedIdOf(channelId: Long): String? = channelDataManager.getChannel(channelId)?.let { FeedGuide.feedId(it) }
+
     internal fun setProgramPrefetchUpdateWait(ms: Long) { programPrefetchUpdateWaitMs = ms }
 
     fun start() {
@@ -268,9 +287,10 @@ class ProgramDataManager @Inject constructor(
             .appendQueryParameter(PARAM_START_TIME, time.toString())
             .appendQueryParameter(PARAM_END_TIME, time.toString())
             .build()
+        val feedIds = feedIds()
         programsUpdateJob = scope.launch {
             val programs = withContext(dbDispatcher) {
-                queryPrograms(uri, SORT_BY_CHANNEL_ID) { c ->
+                val tif = queryPrograms(uri, SORT_BY_CHANNEL_ID) { c ->
                     // Überlappende Einträge desselben Kanals verwerfen
                     val result = ArrayList<Program>()
                     var duplicateCount = 0
@@ -287,7 +307,10 @@ class ProgramDataManager @Inject constructor(
                     }
                     if (duplicateCount > 0) Log.w(TAG, "Found $duplicateCount overlapping programs")
                     result
-                }
+                } ?: return@withContext null
+                // Kanäle ohne laufende TIF-Sendung: aus dem Feed
+                val covered = tif.mapTo(HashSet()) { it.channelId }
+                tif + FeedGuide.programsAt(time, feedIds.filterKeys { it !in covered })
             }
             programsUpdateJob = null
             if (programs != null) {
@@ -312,11 +335,12 @@ class ProgramDataManager @Inject constructor(
     private fun updateOneCurrentProgram(channelId: Long) {
         programUpdateJobs.remove(channelId)?.cancel()
         val time = clock.currentTimeMillis()
+        val feedId = feedIdOf(channelId)
         val job = scope.launch {
             val program = withContext(dbDispatcher) {
                 queryPrograms(TvContract.buildProgramsUriForChannel(channelId, time, time), SORT_BY_TIME) { c ->
                     if (c.moveToNext()) ProgramImpl.fromCursor(c) else null
-                }
+                } ?: feedId?.let { FeedGuide.programsAt(time, mapOf(channelId to it)).firstOrNull() }
             }
             programUpdateJobs.remove(channelId)
             updateCurrentProgram(channelId, program)
@@ -330,8 +354,9 @@ class ProgramDataManager @Inject constructor(
         val time = clock.currentTimeMillis()
         val startTimeMs = Utils.floorTime(time - PROGRAM_GUIDE_SNAP_TIME_MS, PROGRAM_GUIDE_SNAP_TIME_MS)
         val endTimeMs = startTimeMs + TimeUnit.HOURS.toMillis(getFetchDuration())
+        val feedIds = feedIds()
         prefetchJob = scope.launch {
-            val result = withContext(dbDispatcher) { prefetchAll(startTimeMs, endTimeMs) }
+            val result = withContext(dbDispatcher) { prefetchAll(startTimeMs, endTimeMs, feedIds) }
             prefetchJob = null
             if (isProgramUpdatePaused()) return@launch
             val nextDelay: Long
@@ -353,7 +378,9 @@ class ProgramDataManager @Inject constructor(
     }
 
     /** DB-Thread. Liefert null bei Misserfolg (bis zu 3 Versuche) oder Pause. */
-    private suspend fun prefetchAll(startTimeMs: Long, endTimeMs: Long): MutableMap<Long, ArrayList<Program>>? {
+    private suspend fun prefetchAll(
+        startTimeMs: Long, endTimeMs: Long, feedIds: Map<Long, String>,
+    ): MutableMap<Long, ArrayList<Program>>? {
         val uri = Programs.CONTENT_URI.buildUpon()
             .appendQueryParameter(PARAM_START_TIME, startTimeMs.toString())
             .appendQueryParameter(PARAM_END_TIME, endTimeMs.toString())
@@ -391,6 +418,9 @@ class ProgramDataManager @Inject constructor(
                     }
                     if (duplicateCount > 0) Log.w(TAG, "Found $duplicateCount duplicate programs")
                 }
+                for ((channelId, feed) in FeedGuide.programsBetween(startTimeMs, endTimeMs, feedIds)) {
+                    programMap[channelId] = FeedGuide.merge(programMap[channelId].orEmpty(), feed)
+                }
                 return programMap
             } catch (e: CancellationException) {
                 throw e
@@ -406,11 +436,14 @@ class ProgramDataManager @Inject constructor(
     }
 
     private fun runSingleChannelPrefetch(channelId: Long, startTimeMs: Long, endTimeMs: Long) {
+        val feedId = feedIdOf(channelId)
         scope.launch {
             val programs = withContext(dbDispatcher) {
-                queryPrograms(TvContract.buildProgramsUriForChannel(channelId, startTimeMs, endTimeMs), SORT_BY_TIME) { c ->
+                val tif = queryPrograms(TvContract.buildProgramsUriForChannel(channelId, startTimeMs, endTimeMs), SORT_BY_TIME) { c ->
                     ArrayList<Program>().apply { while (c.moveToNext()) add(ProgramImpl.fromCursor(c)) }
-                }
+                } ?: return@withContext null
+                if (feedId == null) tif
+                else FeedGuide.merge(tif, FeedGuide.programsBetween(startTimeMs, endTimeMs, mapOf(channelId to feedId))[channelId].orEmpty())
             } ?: return@launch
             channelIdProgramCache[channelId] = programs
             notifyChannelUpdated()

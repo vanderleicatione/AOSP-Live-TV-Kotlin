@@ -55,6 +55,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.2.0")
     implementation("androidx.palette:palette-ktx:1.0.0")
     implementation("androidx.tvprovider:tvprovider:1.0.0")
+    implementation("androidx.work:work-runtime:2.9.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("com.google.dagger:hilt-android:2.54")
