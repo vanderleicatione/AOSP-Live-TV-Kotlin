@@ -40,7 +40,7 @@
             android:layout_marginStart="@dimen/tcl_space_12"
             android:layout_marginEnd="@dimen/tcl_space_12"
             android:layout_marginBottom="@dimen/tcl_space_4"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="@font/tcl_montserrat_semibold"
             android:textColor="@color/tcl_color_text_primary"
             android:textAppearance="@style/TextAppearance.Tcl.Caption" />
 

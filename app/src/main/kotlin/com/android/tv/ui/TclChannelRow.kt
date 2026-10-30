@@ -3,6 +3,7 @@ package com.android.tv.ui
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
+import android.graphics.drawable.Animatable
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -21,7 +22,7 @@ class TclChannelRow(val view: View) {
     private val logo: ImageView? = view.findViewById(R.id.tcl_row_logo)
     private val number: TextView? = view.findViewById(R.id.tcl_row_number)
     private val name: TextView? = view.findViewById(R.id.tcl_row_name)
-    private val playing: View? = view.findViewById(R.id.tcl_row_playing)
+    private val playing: ImageView? = view.findViewById(R.id.tcl_row_playing)
     private val program: TextView? = view.findViewById(R.id.tcl_row_program)
 
     fun bind(channel: Channel, program: Program?, isPlaying: Boolean) {
@@ -29,6 +30,7 @@ class TclChannelRow(val view: View) {
         number?.text = channel.displayNumber
         name?.text = channel.displayName
         playing?.visibility = if (isPlaying) View.VISIBLE else View.GONE
+        (playing?.drawable as? Animatable)?.let { if (isPlaying) it.start() else it.stop() }
         this.program?.let {
             val lp = it.layoutParams as ViewGroup.MarginLayoutParams
             lp.marginStart = res.getDimensionPixelSize(

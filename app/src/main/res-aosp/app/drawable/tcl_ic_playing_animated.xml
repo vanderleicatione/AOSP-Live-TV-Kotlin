@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Animated playing marker for the channel list, like TCL's playing_red.json Lottie: the three red bars of
+     tcl_ic_playing bounce from the bottom. Started by TclChannelRow.bind. -->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="@dimen/tcl_icon_small"
+            android:height="@dimen/tcl_icon_small"
+            android:viewportWidth="16"
+            android:viewportHeight="16">
+            <group android:name="bar1" android:pivotY="14">
+                <path android:fillColor="@color/tcl_color_accent_live" android:pathData="M2,2h2.5v12h-2.5z" />
+            </group>
+            <group android:name="bar2" android:pivotY="14">
+                <path android:fillColor="@color/tcl_color_accent_live" android:pathData="M6.75,2h2.5v12h-2.5z" />
+            </group>
+            <group android:name="bar3" android:pivotY="14">
+                <path android:fillColor="@color/tcl_color_accent_live" android:pathData="M11.5,2h2.5v12h-2.5z" />
+            </group>
+        </vector>
+    </aapt:attr>
+    <target android:name="bar1">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="scaleY" android:valueFrom="0.67" android:valueTo="0.25"
+                android:duration="400" android:repeatCount="infinite" android:repeatMode="reverse" />
+        </aapt:attr>
+    </target>
+    <target android:name="bar2">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="scaleY" android:valueFrom="1" android:valueTo="0.4"
+                android:duration="500" android:repeatCount="infinite" android:repeatMode="reverse" />
+        </aapt:attr>
+    </target>
+    <target android:name="bar3">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="scaleY" android:valueFrom="0.5" android:valueTo="1"
+                android:duration="350" android:repeatCount="infinite" android:repeatMode="reverse" />
+        </aapt:attr>
+    </target>
+</animated-vector>

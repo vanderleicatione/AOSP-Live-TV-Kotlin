@@ -80,7 +80,7 @@
         <item name="android:paddingStart">@dimen/tcl_space_32</item>
         <item name="android:paddingEnd">@dimen/tcl_space_32</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/tcl_montserrat_semibold</item>
         <item name="android:singleLine">true</item>
         <item name="android:textColor">@color/tcl_color_text_primary</item>
         <item name="android:textAppearance">@style/TextAppearance.Tcl.Title</item>
@@ -155,14 +155,14 @@
         <item name="android:layout_marginStart">@dimen/tcl_space_12</item>
         <item name="android:layout_marginEnd">@dimen/tcl_space_12</item>
         <item name="android:duplicateParentState">true</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/tcl_montserrat_semibold</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
         <item name="android:textColor">@color/tcl_option_text</item>
         <item name="android:textAppearance">@style/TextAppearance.Tcl.Body</item>
     </style>
     <style name="Widget.Tcl.MenuCard.Value" parent="Widget.Tcl.MenuCard.Label">
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">@font/tcl_montserrat_semibold</item>
         <item name="android:textColor">@color/tcl_option_text_secondary</item>
         <item name="android:textAppearance">@style/TextAppearance.Tcl.Caption</item>
     </style>

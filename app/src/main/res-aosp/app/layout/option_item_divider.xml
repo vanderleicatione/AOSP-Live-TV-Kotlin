@@ -32,7 +32,7 @@
         android:layout_alignParentStart="true"
         android:paddingStart="@dimen/tcl_space_16"
         android:paddingEnd="@dimen/tcl_space_16"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="@font/tcl_montserrat_semibold"
         android:textColor="@color/tcl_color_text_tertiary"
         android:textAppearance="@style/TextAppearance.Tcl.Label" />
 

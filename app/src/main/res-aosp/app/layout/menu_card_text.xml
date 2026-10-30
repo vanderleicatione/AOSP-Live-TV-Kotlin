@@ -28,7 +28,7 @@
         android:maxLines="2"
         android:ellipsize="end"
         android:duplicateParentState="true"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="@font/tcl_montserrat_semibold"
         android:textColor="@color/tcl_option_text"
         android:textAppearance="@style/TextAppearance.Tcl.Caption" />
 
@@ -41,7 +41,7 @@
         android:singleLine="true"
         android:ellipsize="end"
         android:duplicateParentState="true"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="@font/tcl_montserrat_semibold"
         android:textColor="@color/tcl_option_text"
         android:textAppearance="@style/TextAppearance.Tcl.Caption" />
 </merge>
