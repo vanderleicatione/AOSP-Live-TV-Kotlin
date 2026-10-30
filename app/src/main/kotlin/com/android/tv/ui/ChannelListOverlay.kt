@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Space
 import androidx.leanback.widget.VerticalGridView
 import androidx.recyclerview.widget.RecyclerView
 import com.android.tv.ChannelTuner
@@ -109,13 +110,12 @@ class ChannelListOverlay(
             item.setOnClickListener { grid.requestFocus() }
             typeRail.addView(item)
         }
-        // Zahnrad unter den Kategorien: öffnet das Menü auf der Zeile mit den Optionen.
+        // Zahnrad ganz unten im Trilho (Abstandhalter dazwischen): öffnet das Menü auf der Zeile mit den Optionen.
+        typeRail.addView(Space(activity), LinearLayout.LayoutParams(0, 0, 1f))
         val settings = inflater.inflate(R.layout.tcl_rail_item, typeRail, false)
         settings.contentDescription = activity.getString(R.string.tcl_channel_list_settings)
         settings.findViewById<ImageView>(R.id.channel_type_icon).setImageResource(R.drawable.tcl_ic_settings)
         settings.nextFocusRightId = R.id.channel_list_grid
-        (settings.layoutParams as ViewGroup.MarginLayoutParams).topMargin =
-            res.getDimensionPixelSize(R.dimen.tcl_space_24)
         settings.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) scheduleHide() }
         settings.setOnClickListener {
             hide()
@@ -131,7 +131,7 @@ class ChannelListOverlay(
             val selected = item.tag == category
             if (selected) selectedRailItemId = item.id
             // TCL: gewählte Kategorie voll deckend, die anderen mit 60 % ("withalpha").
-            item.findViewById<View>(R.id.channel_type_icon).alpha = if (selected) 1f else unselectedAlpha
+            item.findViewById<View>(R.id.channel_type_icon)?.alpha = if (selected) 1f else unselectedAlpha
         }
     }
 

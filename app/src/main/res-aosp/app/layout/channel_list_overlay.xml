@@ -14,9 +14,9 @@
         <LinearLayout
             android:id="@+id/channel_list_types"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/tcl_space_20"
-            android:paddingEnd="@dimen/tcl_rail_padding_end"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="@dimen/tcl_space_8"
+            android:paddingVertical="@dimen/tcl_space_20"
             android:orientation="vertical" />
     </FrameLayout>
 

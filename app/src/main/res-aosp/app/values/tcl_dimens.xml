@@ -32,9 +32,7 @@
 
     <!-- TclRail (TCL item_channel_type): 58dp column, 42dp items, icon at 15/12dp. -->
     <dimen name="tcl_rail_width">58dp</dimen>
-    <dimen name="tcl_rail_padding_end">25dp</dimen>
     <dimen name="tcl_rail_item_height">42dp</dimen>
-    <dimen name="tcl_rail_icon_margin_start">15dp</dimen>
 
     <!-- TclPanel: channel column next to the rail. -->
     <dimen name="tcl_panel_width">280dp</dimen>

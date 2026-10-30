@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- TclRailItem, as TCL's item_channel_type: 42dp tall, 18dp icon at 15dp/12dp. -->
+<!-- TclRailItem, as TCL's item_channel_type: 42dp square box, 8dp from both rail edges, 18dp icon centered. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/Widget.Tcl.RailItem">
 
@@ -7,8 +7,7 @@
         android:id="@+id/channel_type_icon"
         android:layout_width="@dimen/tcl_icon_rail"
         android:layout_height="@dimen/tcl_icon_rail"
-        android:layout_marginStart="@dimen/tcl_rail_icon_margin_start"
-        android:layout_marginTop="@dimen/tcl_space_12"
+        android:layout_gravity="center"
         android:duplicateParentState="true"
         android:tint="@color/tcl_channel_type_icon" />
 </FrameLayout>
