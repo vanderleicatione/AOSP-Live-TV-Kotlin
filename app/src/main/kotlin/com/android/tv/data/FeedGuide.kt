@@ -84,27 +84,25 @@ object FeedGuide {
     /** Main-Thread; wird nach jedem Laden/Aktualisieren des Feeds aufgerufen. */
     fun addListener(listener: Runnable) { listeners.add(listener) }
 
-    fun isFeedSource(channel: Channel) =
-        channel.inputId.startsWith(INPUT_ANTENNA) || channel.inputId.startsWith(INPUT_BROADCAST) ||
-            channel.inputId.startsWith(INPUT_OPENTV)
-
-    private fun key(channel: Channel): String? {
-        val source = when {
-            channel.inputId.startsWith(INPUT_ANTENNA) -> "antena"
-            channel.inputId.startsWith(INPUT_BROADCAST) -> "channelplus"
-            channel.inputId.startsWith(INPUT_OPENTV) -> "opentv"
-            else -> return null
+    /** Bekannte Quellen nur in ihrer eigenen Feed-Liste; jede andere (Canais+ …) per Name in allen, Internet zuerst. */
+    private fun lookup(channel: Channel): FeedChannel? {
+        val name = channel.displayName?.let(::cleanName) ?: return null
+        val sources = when {
+            channel.inputId.startsWith(INPUT_ANTENNA) -> listOf("antena")
+            channel.inputId.startsWith(INPUT_BROADCAST) -> listOf("channelplus")
+            channel.inputId.startsWith(INPUT_OPENTV) -> listOf("opentv")
+            else -> listOf("opentv", "channelplus", "antena")
         }
-        return source + "|" + channel.displayName?.let(::cleanName)
+        return sources.firstNotNullOfOrNull { channels["$it|$name"] }
     }
 
     /** Antennen-Namen beginnen im TIF mit einem Steuerzeichen, das die TV (und der Feed) als "." zeigt. */
     private fun cleanName(name: String) = name.trim { it.isWhitespace() || it.isISOControl() || it == '.' }
 
-    fun feedId(channel: Channel): String? = key(channel)?.let { channels[it]?.id }
+    fun feedId(channel: Channel): String? = lookup(channel)?.id
 
     /** Logo aus dem Feed: lokale Datei, solange sie noch nicht geladen ist die URL. */
-    fun logoUri(channel: Channel): String? = key(channel)?.let { channels[it]?.logoUri }
+    fun logoUri(channel: Channel): String? = lookup(channel)?.logoUri
 
     // ---- Programme (DB-Thread) ----
 

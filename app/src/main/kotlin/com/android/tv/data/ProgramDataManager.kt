@@ -110,7 +110,7 @@ class ProgramDataManager @Inject constructor(
         for (channel in channelDataManager.getChannelList()) {
             val feedId = FeedGuide.feedId(channel)
             if (feedId != null) map[channel.id] = feedId
-            else if (FeedGuide.isFeedSource(channel)) unmatched.add("${channel.inputId}|${channel.displayName}")
+            else unmatched.add("${channel.inputId}|${channel.displayName}")
         }
         if (map.size != lastFeedMatchCount) {
             lastFeedMatchCount = map.size
