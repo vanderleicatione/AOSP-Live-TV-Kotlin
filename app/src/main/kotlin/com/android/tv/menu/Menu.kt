@@ -134,7 +134,6 @@ class Menu(
         private val PRELOAD_VIEW_IDS = mapOf(
             R.layout.menu_card_guide to 1,
             R.layout.menu_card_setup to 1,
-            R.layout.menu_card_dvr to 1,
             R.layout.menu_card_app_link to 1,
             R.layout.menu_card_channel to ChannelsRow.MAX_COUNT_FOR_RECENT_CHANNELS,
             R.layout.menu_card_action to 7,

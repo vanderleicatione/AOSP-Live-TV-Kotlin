@@ -54,7 +54,6 @@ class GlobalKeyReceiver : BroadcastReceiver() {
         lastEventTime = event.eventTime
         val app = appContext as TvApplication
         when (event.keyCode) {
-            KeyEvent.KEYCODE_DVR -> app.handleDvrKey()
             KeyEvent.KEYCODE_GUIDE -> app.handleGuideKey()
             KeyEvent.KEYCODE_TV -> app.handleTvKey()
             KeyEvent.KEYCODE_TV_INPUT -> app.handleTvInputKey()

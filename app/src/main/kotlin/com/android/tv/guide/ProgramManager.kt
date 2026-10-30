@@ -7,9 +7,6 @@ import com.android.tv.data.GenreItems
 import com.android.tv.data.ProgramDataManager
 import com.android.tv.data.api.Channel
 import com.android.tv.data.api.Program
-import com.android.tv.dvr.DvrDataManager
-import com.android.tv.dvr.DvrScheduleManager
-import com.android.tv.dvr.data.ScheduledRecording
 import com.android.tv.util.TvInputManagerHelper
 import com.android.tv.util.Utils
 import java.util.concurrent.TimeUnit
@@ -17,15 +14,13 @@ import kotlin.math.max
 
 /**
  * Datenmodell der Programmübersicht: Kanäle (mit Genre-Filter), Zeitfenster und die Einträge je
- * Kanal (Sendungen, Lücken, gesperrte Kanäle, geplante Aufnahmen).
+ * Kanal (Sendungen, Lücken, gesperrte Kanäle).
  */
 @MainThread
 class ProgramManager(
     private val tvInputManagerHelper: TvInputManagerHelper,
     private val channelDataManager: ChannelDataManager,
     private val programDataManager: ProgramDataManager,
-    private val dvrDataManager: DvrDataManager?,
-    private val dvrScheduleManager: DvrScheduleManager?,
 ) {
     interface Listener {
         fun onGenresUpdated()
@@ -67,14 +62,6 @@ class ProgramManager(
     private val tableEntriesUpdatedListeners = ArraySet<TableEntriesUpdatedListener>()
     private val tableEntryChangedListeners = ArraySet<TableEntryChangedListener>()
 
-    private val dvrLoadedListener = object : DvrDataManager.OnDvrScheduleLoadFinishedListener {
-        override fun onDvrScheduleLoadFinished() {
-            val dvr = dvrDataManager ?: return
-            if (channelDataLoaded) dvr.getAllScheduledRecordings().forEach { scheduledRecordingListener.onScheduledRecordingAdded(it) }
-            dvr.removeDvrScheduleLoadFinishedListener(this)
-        }
-    }
-
     private val channelDataManagerListener = object : ChannelDataManager.Listener {
         override fun onLoadFinished() {
             channelDataLoaded = true
@@ -96,45 +83,15 @@ class ProgramManager(
         }
     }
 
-    private val scheduledRecordingListener = object : DvrDataManager.ScheduledRecordingListener {
-        override fun onScheduledRecordingAdded(vararg scheduledRecordings: ScheduledRecording) =
-            scheduledRecordings.forEach { replaceSchedule(it, it) }
-
-        override fun onScheduledRecordingRemoved(vararg scheduledRecordings: ScheduledRecording) =
-            scheduledRecordings.forEach { replaceSchedule(it, null) }
-
-        override fun onScheduledRecordingStatusChanged(vararg scheduledRecordings: ScheduledRecording) =
-            scheduledRecordings.forEach { replaceSchedule(it, it) }
-
-        private fun replaceSchedule(schedule: ScheduledRecording, newSchedule: ScheduledRecording?) {
-            val old = getTableEntry(schedule) ?: return
-            updateEntry(old, TableEntry(old.channelId, old.program, newSchedule, old.entryStartUtcMillis, old.entryEndUtcMillis, old.isBlocked))
-        }
-    }
-
-    private val onConflictStateChangeListener = DvrScheduleManager.OnConflictStateChangeListener { _, schedules ->
-        schedules.forEach { schedule -> getTableEntry(schedule)?.let { notifyTableEntryUpdated(it) } }
-    }
-
     /** Beim Öffnen/Schließen der Programmübersicht an-/abmelden (und Prefetch pausieren). */
     internal fun programGuideVisibilityChanged(visible: Boolean) {
         programDataManager.setPauseProgramUpdate(visible)
         if (visible) {
             channelDataManager.addListener(channelDataManagerListener)
             programDataManager.addCallback(programDataManagerCallback)
-            dvrDataManager?.let {
-                if (!it.isDvrScheduleLoadFinished) it.addDvrScheduleLoadFinishedListener(dvrLoadedListener)
-                it.addScheduledRecordingListener(scheduledRecordingListener)
-            }
-            dvrScheduleManager?.addOnConflictStateChangeListener(onConflictStateChangeListener)
         } else {
             channelDataManager.removeListener(channelDataManagerListener)
             programDataManager.removeCallback(programDataManagerCallback)
-            dvrDataManager?.let {
-                it.removeDvrScheduleLoadFinishedListener(dvrLoadedListener)
-                it.removeScheduledRecordingListener(scheduledRecordingListener)
-            }
-            dvrScheduleManager?.removeOnConflictStateChangeListener(onConflictStateChangeListener)
         }
     }
 
@@ -253,16 +210,16 @@ class ProgramManager(
 
     private fun fillToEnd(channelId: Long, entries: MutableList<TableEntry>) {
         if (entries.isEmpty()) {
-            entries.add(TableEntry(channelId, null, null, startTime, endUtcMillis, false))
+            entries.add(TableEntry(channelId, null, startTime, endUtcMillis, false))
             return
         }
         val last = entries.last()
         if (endUtcMillis > last.entryEndUtcMillis) {
-            entries.add(TableEntry(channelId, null, null, last.entryEndUtcMillis, endUtcMillis, false))
+            entries.add(TableEntry(channelId, null, last.entryEndUtcMillis, endUtcMillis, false))
         } else if (last.entryEndUtcMillis == Long.MAX_VALUE) {
             // Gesperrter Kanal: bis zum Ende strecken
             entries.removeAt(entries.size - 1)
-            entries.add(TableEntry(last.channelId, last.program, last.scheduledRecording, last.entryStartUtcMillis, endUtcMillis, last.isBlocked))
+            entries.add(TableEntry(last.channelId, last.program, last.entryStartUtcMillis, endUtcMillis, last.isBlocked))
         }
     }
 
@@ -285,19 +242,6 @@ class ProgramManager(
         notifyGenresUpdated()
     }
 
-    private fun getTableEntry(scheduledRecording: ScheduledRecording): TableEntry? =
-        getTableEntry(scheduledRecording.channelId, scheduledRecording.programId)
-
-    private fun getTableEntry(channelId: Long, entryId: Long): TableEntry? =
-        channelIdEntriesMap[channelId]?.firstOrNull { it.id == entryId }
-
-    private fun updateEntry(old: TableEntry, newEntry: TableEntry) {
-        val entries = channelIdEntriesMap[old.channelId] ?: return
-        val index = entries.indexOf(old)
-        if (index < 0) return // Bugfix: Eintrag inzwischen ersetzt (Original: Absturz)
-        entries[index] = newEntry
-        notifyTableEntryUpdated(newEntry)
-    }
 
     private fun setTimeRange(fromUtcMillis: Long, toUtcMillis: Long) {
         if (this.fromUtcMillis != fromUtcMillis || this.toUtcMillis != toUtcMillis) {
@@ -313,7 +257,7 @@ class ProgramManager(
         // Bugfix: Kanal kann inzwischen fehlen (Original: NPE)
         val channelLocked = parentalControlsEnabled && channelDataManager.getChannel(channelId)?.isLocked == true
         if (channelLocked) {
-            entries.add(TableEntry(channelId, null, null, startTime, Long.MAX_VALUE, true))
+            entries.add(TableEntry(channelId, null, startTime, Long.MAX_VALUE, true))
         } else {
             var lastProgramEndTime = startTime
             for (program in programDataManager.getPrograms(channelId, startTime)) {
@@ -321,12 +265,11 @@ class ProgramManager(
                 val programStartTime = max(program.startTimeUtcMillis, startTime)
                 val programEndTime = program.endTimeUtcMillis
                 if (programStartTime > lastProgramEndTime) {
-                    entries.add(TableEntry(channelId, null, null, lastProgramEndTime, programStartTime, false))
+                    entries.add(TableEntry(channelId, null, lastProgramEndTime, programStartTime, false))
                     lastProgramEndTime = programStartTime
                 }
                 if (programEndTime > lastProgramEndTime) {
-                    val scheduledRecording = dvrDataManager?.getScheduledRecordingForProgramId(program.id)
-                    entries.add(TableEntry(channelId, program, scheduledRecording, lastProgramEndTime, programEndTime, false))
+                    entries.add(TableEntry(channelId, program, lastProgramEndTime, programEndTime, false))
                     lastProgramEndTime = programEndTime
                 }
             }
@@ -335,7 +278,7 @@ class ProgramManager(
             val second = entries[1]
             if (second.entryStartUtcMillis < startTime + FIRST_ENTRY_MIN_DURATION) {
                 entries.removeAt(0)
-                entries[0] = TableEntry(second.channelId, second.program, second.scheduledRecording, startTime,
+                entries[0] = TableEntry(second.channelId, second.program, startTime,
                     second.entryEndUtcMillis, second.isBlocked)
             }
         }
@@ -348,11 +291,10 @@ class ProgramManager(
     private fun notifyTableEntriesUpdated() = tableEntriesUpdatedListeners.toList().forEach { it.onTableEntriesUpdated(null) }
     private fun notifyTableEntryUpdated(entry: TableEntry) = tableEntryChangedListeners.toList().forEach { it.onTableEntryChanged(entry) }
 
-    /** Eintrag im Raster: Sendung oder Lücke, ggf. gesperrt/mit Aufnahme. */
+    /** Eintrag im Raster: Sendung oder Lücke, ggf. gesperrt. */
     class TableEntry internal constructor(
         @JvmField val channelId: Long,
         @JvmField val program: Program?,
-        @JvmField val scheduledRecording: ScheduledRecording?,
         @JvmField val entryStartUtcMillis: Long,
         @JvmField val entryEndUtcMillis: Long,
         val isBlocked: Boolean,
@@ -377,10 +319,5 @@ class ProgramManager(
         private const val TAG = "ProgramManager"
         internal val FIRST_ENTRY_MIN_DURATION = TimeUnit.MINUTES.toMillis(1)
         private const val INVALID_ID = -1L
-
-        @JvmStatic
-        fun createTableEntryForTest(channelId: Long, program: Program?, scheduledRecording: ScheduledRecording?,
-            entryStartUtcMillis: Long, entryEndUtcMillis: Long, isBlocked: Boolean) =
-            TableEntry(channelId, program, scheduledRecording, entryStartUtcMillis, entryEndUtcMillis, isBlocked)
     }
 }

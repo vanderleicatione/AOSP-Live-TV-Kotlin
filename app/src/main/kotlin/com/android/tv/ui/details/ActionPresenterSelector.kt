@@ -1,4 +1,4 @@
-package com.android.tv.dvr.ui.browse
+package com.android.tv.ui.details
 
 import android.text.TextUtils
 import android.view.LayoutInflater

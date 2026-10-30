@@ -9,7 +9,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.media.tv.TvContentRating
 import android.media.tv.TvInputInfo
-import android.text.format.DateUtils
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
@@ -29,8 +28,6 @@ import com.android.tv.data.ProgramImpl
 import com.android.tv.data.StreamInfo
 import com.android.tv.data.api.Channel
 import com.android.tv.data.api.Program
-import com.android.tv.dvr.DvrManager
-import com.android.tv.dvr.data.ScheduledRecording
 import com.android.tv.features.TvFeatures
 import com.android.tv.ui.TvTransitionManager.TransitionLayout
 import com.android.tv.ui.hideable.AutoHideScheduler
@@ -57,8 +54,6 @@ class ChannelBannerView @JvmOverloads constructor(
         fun getOverlayManagerProvider(): Provider<TvOverlayManager>
         fun getTvInputManagerHelperSingleton(): TvInputManagerHelper
         fun getCurrentPlayingPositionProvider(): Provider<Long>
-        /** null ohne DVR. */
-        fun getDvrManagerSingleton(): DvrManager?
     }
 
     private val singletons: MySingletons = HasSingletons.get(context)
@@ -67,7 +62,6 @@ class ChannelBannerView @JvmOverloads constructor(
     private val currentPlayingPositionProvider = singletons.getCurrentPlayingPositionProvider()
     private val tvInputManagerHelper = singletons.getTvInputManagerHelperSingleton()
     private val tvOverlayManager = singletons.getOverlayManagerProvider()
-    private val dvrManager: DvrManager? = if (TvFeatures.isDvrEnabled(context)) singletons.getDvrManagerSingleton() else null
     private val accessibilityManager = context.getSystemService(AccessibilityManager::class.java)
 
     private val noProgram: Program = ProgramImpl.Builder()
@@ -115,7 +109,6 @@ class ChannelBannerView @JvmOverloads constructor(
     private val channelBannerTextColor = resources.getColor(R.color.tcl_color_text_primary, null)
     private val channelBannerDimTextColor = resources.getColor(R.color.channel_banner_dim_text_color, null)
     private val resizeAnimDuration = resources.getInteger(R.integer.channel_banner_fast_anim_duration).toLong()
-    private val recordingIconPadding = resources.getDimensionPixelOffset(R.dimen.channel_banner_recording_icon_padding)
     private val resizeInterpolator = AnimationUtils.loadInterpolator(context, android.R.interpolator.linear_out_slow_in)
     private val programDescriptionFadeInAnimator =
         AnimatorInflater.loadAnimator(context, R.animator.channel_banner_program_description_fade_in)
@@ -379,7 +372,7 @@ class ChannelBannerView @JvmOverloads constructor(
             updateProgramTextView(program)
         }
         updateProgramTimeInfo(program)
-        updateRecordingStatus(program)
+        updateProgressBar(program)
         updateProgramRatings(program)
 
         val isProgramChanged = program != last
@@ -486,54 +479,11 @@ class ChannelBannerView @JvmOverloads constructor(
         else -> (100 * (currTime - startTime) / (endTime - startTime)).toInt()
     }
 
-    private fun updateRecordingStatus(program: Program) {
-        val manager = dvrManager
-        if (manager == null) {
-            updateProgressBarAndRecIcon(program, null)
-            return
-        }
-        val currentRecording = currentChannel?.let { manager.getCurrentRecording(it.id) }
-        if (DEBUG) Log.d(TAG, if (currentRecording == null) "No Recording" else "Recording:$currentRecording")
-        updateProgressBarAndRecIcon(program,
-            if (currentRecording != null && isCurrentProgram(currentRecording, program)) currentRecording else null)
-    }
-
-    /** Fortschritt der Sendung; bei Aufnahme primär = Aufnahmebeginn, sekundär = aktuelle Position. */
-    private fun updateProgressBarAndRecIcon(program: Program, recording: ScheduledRecording?) {
-        val start = program.startTimeUtcMillis
-        val end = program.endTimeUtcMillis
-        val currentPosition = currentPlayingPositionProvider.get()
-        updateRecordingIndicator(recording)
-        if (recording != null) {
-            remainingTimeView.progress = getProgressPercent(recording.startTimeMs, start, end)
-            remainingTimeView.secondaryProgress = getProgressPercent(currentPosition, start, end)
-        } else {
-            remainingTimeView.progress = getProgressPercent(currentPosition, start, end)
-            remainingTimeView.secondaryProgress = 0
-        }
-    }
-
-    private fun updateRecordingIndicator(recording: ScheduledRecording?) {
-        if (recording == null) {
-            recordingIndicatorView.visibility = GONE
-            return
-        }
-        if (remainingTimeView.visibility == GONE) {
-            recordingIndicatorView.text = resources.getString(R.string.dvr_recording_till_format,
-                DateUtils.formatDateTime(context, recording.endTimeMs, DateUtils.FORMAT_SHOW_TIME))
-            recordingIndicatorView.compoundDrawablePadding = recordingIconPadding
-        } else {
-            recordingIndicatorView.text = ""
-            recordingIndicatorView.compoundDrawablePadding = 0
-        }
-        recordingIndicatorView.visibility = VISIBLE
-    }
-
-    private fun isCurrentProgram(recording: ScheduledRecording, program: Program): Boolean {
-        val currentPosition = currentPlayingPositionProvider.get()
-        return (recording.type == ScheduledRecording.TYPE_PROGRAM && recording.programId == program.id) ||
-            (recording.type == ScheduledRecording.TYPE_TIMED &&
-                currentPosition >= recording.startTimeMs && currentPosition <= recording.endTimeMs)
+    /** Fortschritt der Sendung (Aufnahme-Anzeige bleibt aus: DVR entfernt). */
+    private fun updateProgressBar(program: Program) {
+        recordingIndicatorView.visibility = GONE
+        remainingTimeView.progress = getProgressPercent(currentPlayingPositionProvider.get(), program.startTimeUtcMillis, program.endTimeUtcMillis)
+        remainingTimeView.secondaryProgress = 0
     }
 
     /** Passt die Bannerhöhe an; animiert, wenn das Banner bereits sichtbar ist. */

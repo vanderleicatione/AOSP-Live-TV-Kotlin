@@ -9,8 +9,6 @@ import com.android.tv.R
 import com.android.tv.TvSingletons
 import com.android.tv.data.ChannelImpl
 import com.android.tv.data.api.Channel
-import com.android.tv.dvr.DvrDataManager
-import com.android.tv.features.TvFeatures
 import com.android.tv.recommendation.Recommender
 
 /** Karten der Kanal-Zeile; mit Bedienungshilfen zusätzlich Kanal hoch/runter. */
@@ -21,8 +19,6 @@ class ChannelsRowAdapter(
     private val maxCount: Int,
 ) : ItemListRowView.ItemListAdapter<ChannelsRowItem>(context), AccessibilityStateChangeListener {
 
-    private val dvrDataManager: DvrDataManager? =
-        if (TvFeatures.isDvrEnabled(context)) TvSingletons.getSingletons(context).getDvrDataManager() else null
     private val channelChanger = context as ChannelChanger
     private val accessibilityManager = context.getSystemService(AccessibilityManager::class.java)
     private var showChannelUpDown = accessibilityManager.isEnabled
@@ -44,10 +40,6 @@ class ChannelsRowAdapter(
             R.layout.menu_card_down -> itemView.setOnClickListener { channelChanger.channelDown() }
             R.layout.menu_card_setup -> itemView.setOnClickListener { mainActivity.overlayManager.showSetupFragment() }
             R.layout.menu_card_app_link -> itemView.setOnClickListener(::onAppLinkClicked)
-            R.layout.menu_card_dvr -> {
-                itemView.setOnClickListener { mainActivity.overlayManager.showDvrManager() }
-                (itemView as SimpleCardView).setText(R.string.channels_item_dvr)
-            }
             else -> {
                 itemView.tag = itemList[position].channel
                 itemView.setOnClickListener(::onChannelClicked)
@@ -77,7 +69,6 @@ class ChannelsRowAdapter(
             items.add(ChannelsRowItem.DOWN_ITEM)
         }
         if (needToShowSetupItem()) items.add(ChannelsRowItem.SETUP_ITEM)
-        if (needToShowDvrItem()) items.add(ChannelsRowItem.DVR_ITEM)
         if (needToShowAppLinkItem()) {
             ChannelsRowItem.APP_LINK_ITEM.channel = ChannelImpl.Builder(mainActivity.currentChannel!!).build()
             items.add(ChannelsRowItem.APP_LINK_ITEM)
@@ -93,7 +84,6 @@ class ChannelsRowAdapter(
         if (updateItem(showChannelUpDown, ChannelsRowItem.UP_ITEM, currentIndex)) ++currentIndex
         if (updateItem(showChannelUpDown, ChannelsRowItem.DOWN_ITEM, currentIndex)) ++currentIndex
         if (updateItem(needToShowSetupItem(), ChannelsRowItem.SETUP_ITEM, currentIndex)) ++currentIndex
-        if (updateItem(needToShowDvrItem(), ChannelsRowItem.DVR_ITEM, currentIndex)) ++currentIndex
         if (updateItem(needToShowAppLinkItem(), ChannelsRowItem.APP_LINK_ITEM, currentIndex)) {
             val current = mainActivity.currentChannel!!
             if (!current.hasSameReadOnlyInfo(ChannelsRowItem.APP_LINK_ITEM.channel)) {
@@ -130,11 +120,6 @@ class ChannelsRowAdapter(
         val singletons = TvSingletons.getSingletons(context)
         return singletons.getSetupUtils().hasNewInput(singletons.getTvInputManagerHelper())
     }
-
-    /** DVR-Karte nur mit DVR und aufnahmefähigem Input. */
-    private fun needToShowDvrItem(): Boolean =
-        dvrDataManager != null &&
-            TvSingletons.getSingletons(context).getTvInputManagerHelper().getTvInputInfos(true, true).any { it.canRecord() }
 
     private fun needToShowAppLinkItem(): Boolean {
         val current = mainActivity.currentChannel ?: return false

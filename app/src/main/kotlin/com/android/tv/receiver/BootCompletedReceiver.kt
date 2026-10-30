@@ -35,7 +35,6 @@ class BootCompletedReceiver : BroadcastReceiver() {
             }
             OnboardingUtils.setFirstBootCompleted(context)
         }
-        TvSingletons.getSingletons(context).getRecordingScheduler()?.updateAndStartServiceIfNeeded()
     }
 
     companion object {

@@ -11,14 +11,10 @@ import android.text.style.TextAppearanceSpan
 import android.util.AttributeSet
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import com.android.tv.MainActivity
 import com.android.tv.R
 import com.android.tv.TvSingletons
 import com.android.tv.common.util.Clock
-import com.android.tv.dvr.data.ScheduledRecording
-import com.android.tv.dvr.ui.DvrUiHelper
-import com.android.tv.features.TvFeatures
 import com.android.tv.guide.ProgramManager.TableEntry
 import com.android.tv.ui.TclChannelRow
 import com.android.tv.util.Utils
@@ -28,7 +24,7 @@ import kotlin.math.min
 
 /**
  * Eintrag in der Programmübersicht: Titel/Folge, Fortschritt der laufenden Sendung (sekündlich),
- * Aufnahme-Symbol; Klick tunt (laufend) bzw. plant/entfernt eine Aufnahme (Zukunft, mit DVR).
+ * Klick tunt (laufend) bzw. öffnet die Details (Zukunft).
  */
 class ProgramItemView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyle: Int = 0,
@@ -37,7 +33,6 @@ class ProgramItemView @JvmOverloads constructor(
     private val singletons = TvSingletons.getSingletons(context)
     private val clock: Clock = singletons.getClock()
     private val channelDataManager = singletons.getChannelDataManager()
-    private val dvrManager = singletons.getDvrManager()
     private var programGuide: ProgramGuide? = null
     var tableEntry: TableEntry? = null
         private set
@@ -81,23 +76,8 @@ class ProgramItemView @JvmOverloads constructor(
         } else if (entry.isGap || entry.program == null) {
             return
         } else {
-            // TCL: OK auf einer nicht laufenden Sendung öffnet die Details; aufnehmbare Sendungen (DVR) wie bisher
-            val manager = if (TvFeatures.isDvrEnabled(context)) singletons.getDvrManager() else null
-            if (manager != null && entry.entryStartUtcMillis > clock.currentTimeMillis() && manager.isProgramRecordable(entry.program)) {
-                if (entry.scheduledRecording == null) {
-                    // DvrFlags.startEarlyEndLateEnabled() ist im AOSP-Build false
-                    val inputId = channel?.inputId ?: return // Bugfix: Kanal fehlt (Original: NPE)
-                    DvrUiHelper.checkStorageStatusAndShowErrorMessage(tvActivity, inputId) {
-                        DvrUiHelper.requestRecordingFutureProgram(tvActivity, entry.program, false)
-                    }
-                } else {
-                    manager.removeScheduledRecording(entry.scheduledRecording)
-                    Toast.makeText(context, resources.getString(R.string.dvr_schedules_deletion_info, entry.program.title),
-                        Toast.LENGTH_SHORT).show()
-                }
-            } else {
-                programGuide?.showProgramDetail(entry)
-            }
+            // TCL: OK auf einer nicht laufenden Sendung öffnet die Details
+            programGuide?.showProgramDetail(entry)
         }
     }
 
@@ -185,25 +165,15 @@ class ProgramItemView @JvmOverloads constructor(
     }
 
     private fun updateIcons() {
-        var iconResId = 0
-        val schedule = tableEntry?.scheduledRecording
-        if (isEntryWideEnough() && schedule != null) {
-            iconResId = if (dvrManager?.isConflicting(schedule) == true) R.drawable.quantum_ic_warning_white_18
-            else when (schedule.state) {
-                ScheduledRecording.STATE_RECORDING_NOT_STARTED -> R.drawable.ic_scheduled_recording
-                ScheduledRecording.STATE_RECORDING_IN_PROGRESS -> R.drawable.ic_recording_program
-                else -> 0
-            }
-        }
         // TCL: rote Balken vor der laufenden Sendung des eingestellten Kanals
         val entry = tableEntry
         val playingResId = if (entry != null && isEntryWideEnough() && entry.isCurrentProgram &&
             entry.channelId == (context as MainActivity).currentChannelId) R.drawable.tcl_ic_playing else 0
-        setCompoundDrawablePadding(if (iconResId != 0 || playingResId != 0) iconPadding else 0)
-        setCompoundDrawablesRelativeWithIntrinsicBounds(playingResId, 0, iconResId, 0)
+        setCompoundDrawablePadding(if (playingResId != 0) iconPadding else 0)
+        setCompoundDrawablesRelativeWithIntrinsicBounds(playingResId, 0, 0, 0)
     }
 
-    /** Vorlesetext: Nummer, Titel, Zeit, Folge, Aufnahme-Status, Sperre/Beschreibung. */
+    /** Vorlesetext: Nummer, Titel, Zeit, Folge, Sperre/Beschreibung. */
     private fun updateContentDescription(title: String) {
         val entry = tableEntry ?: return
         val sb = StringBuilder()
@@ -215,15 +185,6 @@ class ProgramItemView @JvmOverloads constructor(
             program.getEpisodeContentDescription(context)?.takeIf { it.isNotEmpty() }?.let { sb.append(' ').append(it) }
         } else {
             sb.append(' ').append(Utils.getDurationString(context, clock, entry.entryStartUtcMillis, entry.entryEndUtcMillis, true))
-        }
-        entry.scheduledRecording?.let { schedule ->
-            val extra = if (dvrManager?.isConflicting(schedule) == true) resources.getString(R.string.dvr_epg_program_recording_conflict)
-            else when (schedule.state) {
-                ScheduledRecording.STATE_RECORDING_NOT_STARTED -> resources.getString(R.string.dvr_epg_program_recording_scheduled)
-                ScheduledRecording.STATE_RECORDING_IN_PROGRESS -> resources.getString(R.string.dvr_epg_program_recording_in_progress)
-                else -> null
-            }
-            extra?.let { sb.append(' ').append(it) }
         }
         if (entry.isBlocked) {
             sb.append(' ').append(resources.getString(R.string.program_guide_content_locked))

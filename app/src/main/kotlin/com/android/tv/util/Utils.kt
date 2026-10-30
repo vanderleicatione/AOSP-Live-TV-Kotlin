@@ -55,8 +55,6 @@ object Utils {
     private const val PREF_KEY_LAST_WATCHED_CHANNEL_ID_FOR_INPUT = "last_watched_channel_id_for_input_"
     private const val PREF_KEY_LAST_WATCHED_CHANNEL_URI = "last_watched_channel_uri"
     private const val PREF_KEY_LAST_WATCHED_TUNER_INPUT_ID = "last_watched_tuner_input_id"
-    private const val PREF_KEY_RECORDING_FAILED_REASONS = "recording_failed_reasons"
-    private const val PREF_KEY_FAILED_SCHEDULED_RECORDING_INFO_SET = "failed_scheduled_recording_info_set"
 
     private const val VIDEO_SD_WIDTH = 704
     private const val VIDEO_SD_HEIGHT = 480
@@ -67,7 +65,6 @@ object Utils {
     private const val VIDEO_ULTRA_HD_WIDTH = 2048
     private const val VIDEO_ULTRA_HD_HEIGHT = 1536
 
-    private const val RECORDING_FAILED_REASON_NONE = 0L
     private val HALF_MINUTE_MS = TimeUnit.SECONDS.toMillis(30)
     private val ONE_DAY_MS = TimeUnit.DAYS.toMillis(1)
 
@@ -120,31 +117,6 @@ object Utils {
     }
 
     @JvmStatic
-    fun setRecordingFailedReason(context: Context, reason: Int) {
-        val reasons = getRecordingFailedReasons(context) or (1L shl reason)
-        prefs(context).edit().putLong(PREF_KEY_RECORDING_FAILED_REASONS, reasons).apply()
-    }
-
-    @JvmStatic
-    fun addFailedScheduledRecordingInfo(context: Context, scheduledRecordingInfo: String) {
-        // Kopie: das von getStringSet() gelieferte Set darf nicht verändert werden (Bug im Original).
-        val set = HashSet(getFailedScheduledRecordingInfoSet(context))
-        set.add(scheduledRecordingInfo)
-        prefs(context).edit().putStringSet(PREF_KEY_FAILED_SCHEDULED_RECORDING_INFO_SET, set).apply()
-    }
-
-    @JvmStatic
-    fun clearFailedScheduledRecordingInfoSet(context: Context) {
-        prefs(context).edit().remove(PREF_KEY_FAILED_SCHEDULED_RECORDING_INFO_SET).apply()
-    }
-
-    @JvmStatic
-    fun clearRecordingFailedReason(context: Context, reason: Int) {
-        val reasons = getRecordingFailedReasons(context) and (1L shl reason).inv()
-        prefs(context).edit().putLong(PREF_KEY_RECORDING_FAILED_REASONS, reasons).apply()
-    }
-
-    @JvmStatic
     fun getLastWatchedChannelId(context: Context): Long =
         prefs(context).getLong(PREF_KEY_LAST_WATCHED_CHANNEL_ID, Channel.INVALID_ID)
 
@@ -159,17 +131,6 @@ object Utils {
     @JvmStatic
     fun getLastWatchedTunerInputId(context: Context): String? =
         prefs(context).getString(PREF_KEY_LAST_WATCHED_TUNER_INPUT_ID, null)
-
-    private fun getRecordingFailedReasons(context: Context): Long =
-        prefs(context).getLong(PREF_KEY_RECORDING_FAILED_REASONS, RECORDING_FAILED_REASON_NONE)
-
-    @JvmStatic
-    fun getFailedScheduledRecordingInfoSet(context: Context): Set<String> =
-        prefs(context).getStringSet(PREF_KEY_FAILED_SCHEDULED_RECORDING_INFO_SET, emptySet()) ?: emptySet()
-
-    @JvmStatic
-    fun hasRecordingFailedReason(context: Context, reason: Int): Boolean =
-        getRecordingFailedReasons(context) and (1L shl reason) != 0L
 
     @JvmStatic
     fun isChannelUriForInput(uri: Uri?): Boolean =

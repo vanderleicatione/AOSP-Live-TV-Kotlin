@@ -32,8 +32,6 @@ import com.android.tv.data.ChannelDataManager
 import com.android.tv.data.GenreItems
 import com.android.tv.data.ProgramDataManager
 import com.android.tv.data.api.Channel
-import com.android.tv.dvr.DvrDataManager
-import com.android.tv.dvr.DvrScheduleManager
 import com.android.tv.ui.HardwareLayerAnimatorListenerAdapter
 import com.android.tv.ui.TclChannelRow
 import com.android.tv.ui.ViewUtils
@@ -55,13 +53,11 @@ class ProgramGuide(
     tvInputManagerHelper: TvInputManagerHelper,
     channelDataManager: ChannelDataManager,
     programDataManager: ProgramDataManager,
-    dvrDataManager: DvrDataManager?,
-    dvrScheduleManager: DvrScheduleManager?,
     private val preShowRunnable: Runnable?,
     private val postHideRunnable: Runnable?,
 ) : ProgramGrid.ChildFocusListener, AccessibilityStateChangeListener {
 
-    val programManager = ProgramManager(tvInputManagerHelper, channelDataManager, programDataManager, dvrDataManager, dvrScheduleManager)
+    val programManager = ProgramManager(tvInputManagerHelper, channelDataManager, programDataManager)
     private val res = activity.resources
     private val widthPerHour = res.getDimensionPixelSize(R.dimen.program_guide_table_width_per_hour)
     private val viewPortMillis: Long

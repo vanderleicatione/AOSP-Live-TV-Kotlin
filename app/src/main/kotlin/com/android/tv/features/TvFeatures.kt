@@ -1,7 +1,6 @@
 package com.android.tv.features
 
 import android.content.Context
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import com.android.tv.R
@@ -29,9 +28,4 @@ object TvFeatures {
     @JvmStatic
     fun isUnhideEnabled(context: Context): Boolean =
         !com.android.tv.common.util.PermissionUtils.hasAccessAllEpg(context)
-
-    /** DVR: im Original nur für System-Apps (SystemAppFeature). */
-    @JvmStatic
-    fun isDvrEnabled(context: Context): Boolean =
-        context.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
 }

@@ -12,10 +12,7 @@ import com.android.tv.ChannelTuner
 import com.android.tv.MainActivity
 import com.android.tv.R
 import com.android.tv.data.api.Channel
-import com.android.tv.dialog.HalfSizedDialogFragment
 import com.android.tv.dialog.PinDialogFragment
-import com.android.tv.dvr.ui.DvrStopRecordingFragment
-import com.android.tv.dvr.ui.DvrUiHelper
 import com.android.tv.menu.Menu
 import com.android.tv.ui.KeypadChannelSwitchView
 import com.android.tv.ui.TunableTvView
@@ -197,12 +194,6 @@ class KeyHandler(
             }
             when (keyCode) {
                 KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                    if (!tvView.isVideoOrAudioAvailable &&
-                        tvView.videoUnavailableReason == TunableTvView.VIDEO_UNAVAILABLE_REASON_NO_RESOURCE
-                    ) {
-                        DvrUiHelper.startSchedulesActivityForTuneConflict(activity, channelTuner.currentChannel)
-                        return true
-                    }
                     showPinDialogFragment()
                     return true
                 }
@@ -241,40 +232,12 @@ class KeyHandler(
                     overlayManager.showBanner()
                     return true
                 }
-                KeyEvent.KEYCODE_MEDIA_RECORD, KeyEvent.KEYCODE_V -> {
-                    handleRecordKey()
-                    return true
-                }
+                // Aufnahme-Taste schlucken (DVR entfernt)
+                KeyEvent.KEYCODE_MEDIA_RECORD, KeyEvent.KEYCODE_V -> return true
             }
         }
         if (keyCode == KeyEvent.KEYCODE_WINDOW) return true // PiP-Taste bei geladenen Kanälen schlucken
         return null
-    }
-
-    /** Aufnahme-Taste: aktuelle Sendung aufnehmen bzw. laufende Aufnahme stoppen (nur mit DVR). */
-    private fun handleRecordKey() {
-        val currentChannel: Channel = activity.currentChannel ?: return
-        val dvrManager = activity.dvrManager ?: return
-        if (dvrManager.getCurrentRecording(currentChannel.id) == null) {
-            if (!dvrManager.isChannelRecordable(currentChannel)) {
-                Toast.makeText(activity, R.string.dvr_msg_cannot_record_program, Toast.LENGTH_SHORT).show()
-            } else {
-                val program = activity.programDataManager.getCurrentProgram(currentChannel.id)
-                DvrUiHelper.checkStorageStatusAndShowErrorMessage(activity, currentChannel.inputId) {
-                    DvrUiHelper.requestRecordingCurrentProgram(activity, currentChannel, program, false)
-                }
-            }
-        } else {
-            DvrUiHelper.showStopRecordingDialog(
-                activity, currentChannel.id, DvrStopRecordingFragment.REASON_USER_STOP,
-                object : HalfSizedDialogFragment.OnActionClickListener {
-                    override fun onActionClick(actionId: Long) {
-                        if (actionId == DvrStopRecordingFragment.ACTION_STOP) {
-                            dvrManager.getCurrentRecording(currentChannel.id)?.let { dvrManager.stopRecording(it) }
-                        }
-                    }
-                })
-        }
     }
 
     /** PIN-Dialog zum Entsperren – nur mit MODIFY_PARENTAL_CONTROLS (System-Recht), wie im Original. */

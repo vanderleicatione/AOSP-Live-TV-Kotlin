@@ -20,14 +20,6 @@ import com.android.tv.common.ui.setup.animation.SetupAnimationHelper
 import com.android.tv.data.ChannelDataManager
 import com.android.tv.data.FeedGuide
 import com.android.tv.data.ProgramDataManager
-import com.android.tv.dvr.DvrDataManager
-import com.android.tv.dvr.DvrManager
-import com.android.tv.dvr.DvrScheduleManager
-import com.android.tv.dvr.DvrStorageStatusManager
-import com.android.tv.dvr.DvrWatchedPositionManager
-import com.android.tv.dvr.RecordingStorageStatusManager
-import com.android.tv.dvr.recorder.RecordingScheduler
-import com.android.tv.dvr.ui.browse.DvrBrowseActivity
 import com.android.tv.features.TvFeatures
 import com.android.tv.modules.DbDispatcher
 import com.android.tv.util.SetupUtils
@@ -51,9 +43,6 @@ class TvApplication : Application(), TvSingletons, Starter {
     @Inject lateinit var tvInputManagerHelper: Lazy<TvInputManagerHelper>
     @Inject lateinit var channelDataManager: Lazy<ChannelDataManager>
     @Inject lateinit var programDataManager: Lazy<ProgramDataManager>
-    @Inject lateinit var dvrManager: Lazy<DvrManager>
-    @Inject lateinit var dvrDataManager: Lazy<DvrDataManager>
-    @Inject lateinit var inputSessionManager: Lazy<InputSessionManager>
     @Inject lateinit var injectedMainActivityWrapper: MainActivityWrapper
     @Inject lateinit var injectedSetupUtils: SetupUtils
     @Inject lateinit var injectedClock: Clock
@@ -62,10 +51,6 @@ class TvApplication : Application(), TvSingletons, Starter {
     var versionName = ""
         private set
     private var selectInputActivity: SelectInputActivity? = null
-    private var dvrScheduleManager: DvrScheduleManager? = null
-    private var dvrWatchedPositionManager: DvrWatchedPositionManager? = null
-    private var recordingScheduler: RecordingScheduler? = null
-    private var dvrStorageStatusManager: RecordingStorageStatusManager? = null
     private var started = false
     private var managersStarted = false
 
@@ -109,10 +94,6 @@ class TvApplication : Application(), TvSingletons, Starter {
             override fun onInputAdded(inputId: String) = handleInputCountChanged()
             override fun onInputRemoved(inputId: String) = handleInputCountChanged()
         })
-        if (TvFeatures.isDvrEnabled(this)) {
-            dvrScheduleManager = DvrScheduleManager(this)
-            recordingScheduler = RecordingScheduler.createScheduler(this)
-        }
     }
 
     override fun getTvInputManagerHelper(): TvInputManagerHelper = tvInputManagerHelper.get()
@@ -123,21 +104,7 @@ class TvApplication : Application(), TvSingletons, Starter {
     override fun getClock(): Clock = injectedClock
     override fun getDbDispatcher(): CoroutineDispatcher = injectedDbDispatcher
     override fun getSetupUtils(): SetupUtils = injectedSetupUtils
-    override fun getInputSessionManager(): InputSessionManager = inputSessionManager.get()
     override fun getMainActivityWrapper(): MainActivityWrapper = injectedMainActivityWrapper
-
-    override fun getDvrManager(): DvrManager? =
-        if (TvFeatures.isDvrEnabled(this) && dvrScheduleManager != null) dvrManager.get() else null
-
-    override fun getDvrDataManager(): DvrDataManager = dvrDataManager.get()
-    override fun getDvrScheduleManager(): DvrScheduleManager? = dvrScheduleManager
-    override fun getRecordingScheduler(): RecordingScheduler? = recordingScheduler
-
-    override fun getDvrWatchedPositionManager(): DvrWatchedPositionManager =
-        dvrWatchedPositionManager ?: DvrWatchedPositionManager(this).also { dvrWatchedPositionManager = it }
-
-    override fun getRecordingStorageStatusManager(): RecordingStorageStatusManager =
-        dvrStorageStatusManager ?: DvrStorageStatusManager(this).also { dvrStorageStatusManager = it }
 
     fun setSelectInputActivity(activity: SelectInputActivity?) { selectInputActivity = activity }
 
@@ -155,9 +122,6 @@ class TvApplication : Application(), TvSingletons, Starter {
         if (!injectedMainActivityWrapper.isResumed) startMainActivity(null)
     }
 
-    fun handleDvrKey() {
-        startActivity(Intent(this, DvrBrowseActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
 
     /** Input-Taste: Eingangsauswahl (alle Tuner-Inputs zählen als einer). */
     fun handleTvInputKey() {

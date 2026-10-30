@@ -6,24 +6,15 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.TextView
-import android.widget.Toast
 import com.android.tv.MainActivity
 import com.android.tv.R
 import com.android.tv.TimeShiftManager
-import com.android.tv.TvSingletons
 import com.android.tv.common.SoftPreconditions
-import com.android.tv.dialog.HalfSizedDialogFragment
-import com.android.tv.dvr.DvrDataManager
-import com.android.tv.dvr.DvrManager
-import com.android.tv.dvr.data.ScheduledRecording
-import com.android.tv.dvr.ui.DvrStopRecordingFragment
-import com.android.tv.dvr.ui.DvrUiHelper
-import com.android.tv.features.TvFeatures
 import com.android.tv.ui.TunableTvView
 
 /**
  * Wiedergabe-Zeile: Zeitleiste der aktuellen Sendung, Position, Knöpfe (Sprung, Spulen,
- * Play/Pause) und Aufnahme-Knopf (mit DVR).
+ * Play/Pause). Der Aufnahme-Knopf bleibt ausgeblendet (DVR entfernt).
  */
 class PlayControlsRowView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0,
@@ -35,8 +26,6 @@ class PlayControlsRowView @JvmOverloads constructor(
     private val timeFormat = DateFormat.getTimeFormat(context)
     private val normalButtonMargin = resources.getDimensionPixelSize(R.dimen.play_controls_button_normal_margin)
     private val compactButtonMargin = resources.getDimensionPixelSize(R.dimen.play_controls_button_compact_margin)
-    private val dvrDataManager: DvrDataManager?
-    private val dvrManager: DvrManager?
     private val mainActivity = context as MainActivity
     private val unavailableMessage = resources.getString(R.string.play_controls_unavailable)
 
@@ -57,47 +46,6 @@ class PlayControlsRowView @JvmOverloads constructor(
     private var programStartTimeMs = 0L
     private var programEndTimeMs = 0L
     private var useCompactLayout = false
-
-    private val scheduledRecordingListener = object : DvrDataManager.ScheduledRecordingListener {
-        override fun onScheduledRecordingAdded(vararg scheduledRecordings: ScheduledRecording) {}
-        override fun onScheduledRecordingRemoved(vararg scheduledRecordings: ScheduledRecording) {}
-        override fun onScheduledRecordingStatusChanged(vararg scheduledRecordings: ScheduledRecording) {
-            val currentChannel = mainActivity.currentChannel
-            if (currentChannel != null && isShown && scheduledRecordings.any { it.channelId == currentChannel.id }) {
-                updateRecordButton()
-            }
-        }
-    }
-
-    init {
-        if (TvFeatures.isDvrEnabled(context)) {
-            val singletons = TvSingletons.getSingletons(context)
-            dvrDataManager = singletons.getDvrDataManager()
-            dvrManager = singletons.getDvrManager()
-        } else {
-            dvrDataManager = null
-            dvrManager = null
-        }
-    }
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        val manager = dvrDataManager ?: return
-        manager.addScheduledRecordingListener(scheduledRecordingListener)
-        if (!manager.isDvrScheduleLoadFinished) {
-            manager.addDvrScheduleLoadFinishedListener(object : DvrDataManager.OnDvrScheduleLoadFinishedListener {
-                override fun onDvrScheduleLoadFinished() {
-                    manager.removeDvrScheduleLoadFinishedListener(this)
-                    if (isShown) updateRecordButton()
-                }
-            })
-        }
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        dvrDataManager?.removeScheduledRecordingListener(scheduledRecordingListener)
-    }
 
     override fun getContentsViewId() = R.id.play_controls
 
@@ -146,36 +94,6 @@ class PlayControlsRowView @JvmOverloads constructor(
                 timeShiftManager.jumpToNext()
                 updateControls(true)
             }
-        }
-        initializeButton(recordButton, R.drawable.ic_record_start, R.string.channels_item_record_start,
-            resources.getColor(R.color.play_controls_recording_icon_color_on_focus, null), ::onRecordButtonClicked)
-    }
-
-    private fun isCurrentChannelRecording(): Boolean {
-        val currentChannel = mainActivity.currentChannel
-        return currentChannel != null && dvrManager?.getCurrentRecording(currentChannel.id) != null
-    }
-
-    /** Aufnahme der laufenden Sendung starten bzw. stoppen (mit Rückfrage). */
-    private fun onRecordButtonClicked() {
-        val currentChannel = mainActivity.currentChannel
-        val manager = dvrManager
-        if (!isCurrentChannelRecording()) {
-            if (manager == null || currentChannel == null || !manager.isChannelRecordable(currentChannel)) {
-                Toast.makeText(mainActivity, R.string.dvr_msg_cannot_record_channel, Toast.LENGTH_SHORT).show()
-            } else {
-                val program = mainActivity.programDataManager.getCurrentProgram(currentChannel.id)
-                DvrUiHelper.checkStorageStatusAndShowErrorMessage(mainActivity, currentChannel.inputId) {
-                    DvrUiHelper.requestRecordingCurrentProgram(mainActivity, currentChannel, program, true)
-                }
-            }
-        } else if (currentChannel != null && manager != null) {
-            DvrUiHelper.showStopRecordingDialog(mainActivity, currentChannel.id, DvrStopRecordingFragment.REASON_USER_STOP,
-                HalfSizedDialogFragment.OnActionClickListener { actionId ->
-                    if (actionId == DvrStopRecordingFragment.ACTION_STOP) {
-                        manager.getCurrentRecording(currentChannel.id)?.let { manager.stopRecording(it) }
-                    }
-                })
         }
     }
 
@@ -402,20 +320,8 @@ class PlayControlsRowView @JvmOverloads constructor(
     }
 
     private fun updateRecordButton() {
-        if (!isEnabled) {
-            recordButton.visibility = GONE
-            return
-        }
-        val manager = dvrManager
-        val currentChannel = mainActivity.currentChannel
-        if (manager == null || currentChannel == null || !manager.isChannelRecordable(currentChannel)) {
-            recordButton.visibility = GONE
-            updateButtonMargin()
-            return
-        }
-        recordButton.visibility = VISIBLE
-        updateButtonMargin()
-        recordButton.setImageResId(if (isCurrentChannelRecording()) R.drawable.ic_record_stop else R.drawable.ic_record_start)
+        recordButton.visibility = GONE
+        if (isEnabled) updateButtonMargin()
     }
 
     /** Ab 6 Knöpfen kompaktere Abstände. */

@@ -1,6 +1,5 @@
 package com.android.tv.ui
 
-import android.content.Intent
 import android.media.tv.TvContentRating
 import android.os.Bundle
 import android.os.Handler
@@ -17,21 +16,18 @@ import com.android.tv.MainActivity
 import com.android.tv.R
 import com.android.tv.TimeShiftManager
 import com.android.tv.TvOptionsManager
-import com.android.tv.TvSingletons
 import com.android.tv.common.ui.setup.OnActionClickListener
 import com.android.tv.common.ui.setup.SetupFragment
 import com.android.tv.common.ui.setup.SetupMultiPaneFragment
 import com.android.tv.data.ChannelDataManager
 import com.android.tv.data.ProgramDataManager
 import com.android.tv.data.StreamInfo
-import com.android.tv.dialog.DvrHistoryDialogFragment
 import com.android.tv.dialog.FullscreenDialogFragment
 import com.android.tv.dialog.HalfSizedDialogFragment
 import com.android.tv.dialog.InteractiveAppDialogFragment
 import com.android.tv.dialog.PinDialogFragment
 import com.android.tv.dialog.RecentlyWatchedDialogFragment
 import com.android.tv.dialog.SafeDismissDialogFragment
-import com.android.tv.dvr.ui.browse.DvrBrowseActivity
 import com.android.tv.features.TvFeatures
 import com.android.tv.guide.ProgramGuide
 import com.android.tv.license.LicenseDialogFragment
@@ -119,11 +115,8 @@ class TvOverlayManager(
                 onOverlayClosed(OVERLAY_TYPE_SIDE_FRAGMENT)
             },
         )
-        val singletons = TvSingletons.getSingletons(mainActivity)
-        val dvrDataManager = if (TvFeatures.isDvrEnabled(mainActivity)) singletons.getDvrDataManager() else null
         programGuide = ProgramGuide(
             mainActivity, channelTuner, inputManager, channelDataManager, programDataManager,
-            dvrDataManager, singletons.getDvrScheduleManager(),
             { onOverlayOpened(OVERLAY_TYPE_GUIDE) },
             { onOverlayClosed(OVERLAY_TYPE_GUIDE) },
         )
@@ -282,17 +275,12 @@ class TvOverlayManager(
         closeFragment(if (removeFragment) FRAGMENT_TAG_NEW_SOURCES else null)
     }
 
-    fun showDvrManager() = mainActivity.startActivity(Intent(mainActivity, DvrBrowseActivity::class.java))
-
     fun showIntroDialog() = showDialogFragment(
         FullscreenDialogFragment.DIALOG_TAG,
         FullscreenDialogFragment.newInstance(R.layout.intro_dialog, INTRO_TRACKER_LABEL), false)
 
     fun showRecentlyWatchedDialog() =
         showDialogFragment(RecentlyWatchedDialogFragment.DIALOG_TAG, RecentlyWatchedDialogFragment(), false)
-
-    fun showDvrHistoryDialog() =
-        showDialogFragment(DvrHistoryDialogFragment.DIALOG_TAG, DvrHistoryDialogFragment(), false)
 
     fun showBanner() = transitionManager.goToChannelBannerScene()
 
@@ -662,7 +650,6 @@ class TvOverlayManager(
 
         private val AVAILABLE_DIALOG_TAGS = setOf(
             RecentlyWatchedDialogFragment.DIALOG_TAG,
-            DvrHistoryDialogFragment.DIALOG_TAG,
             PinDialogFragment.DIALOG_TAG,
             FullscreenDialogFragment.DIALOG_TAG,
             LicenseDialogFragment.DIALOG_TAG,

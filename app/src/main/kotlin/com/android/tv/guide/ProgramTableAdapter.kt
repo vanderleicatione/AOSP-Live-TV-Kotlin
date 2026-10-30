@@ -26,10 +26,6 @@ import com.android.tv.R
 import com.android.tv.TvSingletons
 import com.android.tv.data.api.Channel
 import com.android.tv.data.api.Program
-import com.android.tv.dvr.DvrDataManager
-import com.android.tv.dvr.DvrManager
-import com.android.tv.dvr.data.ScheduledRecording
-import com.android.tv.features.TvFeatures
 import com.android.tv.ui.HardwareLayerAnimatorListenerAdapter
 import com.android.tv.ui.TclChannelRow
 import com.android.tv.util.TvInputManagerHelper
@@ -50,8 +46,6 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
 
     private val accessibilityManager = context.getSystemService(AccessibilityManager::class.java)
     private val tvInputManagerHelper: TvInputManagerHelper = TvSingletons.getSingletons(context).getTvInputManagerHelper()
-    private val dvrManager: DvrManager?
-    private val dvrDataManager: DvrDataManager?
     private val programManager = programGuide.programManager
     private val handler = Handler(Looper.getMainLooper())
     private val programListAdapters = ArrayList<ProgramListAdapter>()
@@ -71,27 +65,12 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
     private val detailPadding = res.getDimensionPixelOffset(R.dimen.program_guide_table_detail_padding).toFloat()
     // TCL: Detailzeile hat Höhe 0 (Details oben); ihr Text-Update löste je Taste ein Layout des ganzen Rasters aus
     private val hasDetailRow = res.getDimensionPixelSize(R.dimen.program_guide_table_detail_height) > 0
-    private val programRecordableText = res.getString(R.string.dvr_epg_program_recordable)
-    private val recordingScheduledText = res.getString(R.string.dvr_epg_program_recording_scheduled)
-    private val recordingConflictText = res.getString(R.string.dvr_epg_program_recording_conflict)
-    private val recordingFailedText = res.getString(R.string.dvr_epg_program_recording_failed)
-    private val recordingInProgressText = res.getString(R.string.dvr_epg_program_recording_in_progress)
-    private val dvrPaddingStartWithTrack = res.getDimensionPixelOffset(R.dimen.program_guide_table_detail_dvr_margin_start)
-    private val dvrPaddingStartWithOutTrack = res.getDimensionPixelOffset(R.dimen.program_guide_table_detail_dvr_margin_start_without_track)
     private val episodeTitleStyle = TextAppearanceSpan(null, 0,
         res.getDimensionPixelSize(R.dimen.program_guide_table_detail_episode_title_text_size),
         ColorStateList.valueOf(res.getColor(R.color.program_guide_table_detail_episode_title_text_color, null)), null)
     private var recyclerView: RecyclerView? = null
 
     init {
-        if (TvFeatures.isDvrEnabled(context)) {
-            val singletons = TvSingletons.getSingletons(context)
-            dvrManager = singletons.getDvrManager()
-            dvrDataManager = singletons.getDvrDataManager()
-        } else {
-            dvrManager = null
-            dvrDataManager = null
-        }
         recycledViewPool.setMaxRecycledViews(R.layout.program_guide_table_item,
             res.getInteger(R.integer.max_recycled_view_pool_epg_table_item))
         programManager.addListener(object : ProgramManager.ListenerAdapter() {
@@ -174,9 +153,6 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
         private val descriptionView: TextView = detailView.findViewById(R.id.desc)
         private val aspectRatioView: TextView = detailView.findViewById(R.id.aspect_ratio)
         private val resolutionView: TextView = detailView.findViewById(R.id.resolution)
-        private val dvrIconView: ImageView = detailView.findViewById(R.id.dvr_icon)
-        private val dvrTextIconView: TextView = detailView.findViewById(R.id.dvr_text_icon)
-        private val dvrStatusView: TextView = detailView.findViewById(R.id.dvr_status)
         private val dvrIndicator: ViewGroup = container.findViewById(R.id.dvr_indicator)
         internal var channel: Channel? = null
             private set
@@ -337,10 +313,10 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
                     }
                 }
                 updateTextView(timeView, program.getDurationString(ctx))
-                var trackMetaDataVisible = updateTextView(aspectRatioView, Utils.getAspectRatioString(program.videoWidth, program.videoHeight))
+                updateTextView(aspectRatioView, Utils.getAspectRatioString(program.videoWidth, program.videoHeight))
                 val level = Utils.getVideoDefinitionLevelFromSize(program.videoWidth, program.videoHeight)
-                trackMetaDataVisible = updateTextView(resolutionView, Utils.getVideoDefinitionLevelString(ctx, level)) or trackMetaDataVisible
-                updateDvrIndicator(program, trackMetaDataVisible)
+                updateTextView(resolutionView, Utils.getVideoDefinitionLevelString(ctx, level))
+                dvrIndicator.visibility = View.GONE
                 // Kritiker-Bewertungen: UiFlags.enableCriticRatings() ist im AOSP-Build false
                 blockView.visibility = View.GONE
                 updateTextView(descriptionView, program.description)
@@ -355,49 +331,6 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
                 aspectRatioView.visibility = View.GONE
                 resolutionView.visibility = View.GONE
             }
-        }
-
-        private fun updateDvrIndicator(program: Program, trackMetaDataVisible: Boolean) {
-            val manager = dvrManager
-            if (manager == null || !manager.isProgramRecordable(program)) {
-                dvrIndicator.visibility = View.GONE
-                return
-            }
-            val schedule = dvrDataManager?.getScheduledRecordingForProgramId(program.id)
-            var statusText = programRecordableText
-            var iconResId = 0
-            if (schedule != null) {
-                if (manager.isConflicting(schedule)) {
-                    iconResId = R.drawable.ic_warning_white_12dp
-                    statusText = recordingConflictText
-                } else {
-                    when (schedule.state) {
-                        ScheduledRecording.STATE_RECORDING_IN_PROGRESS -> {
-                            iconResId = R.drawable.ic_recording_program
-                            statusText = recordingInProgressText
-                        }
-                        ScheduledRecording.STATE_RECORDING_NOT_STARTED -> {
-                            iconResId = R.drawable.ic_scheduled_white
-                            statusText = recordingScheduledText
-                        }
-                        ScheduledRecording.STATE_RECORDING_FAILED -> {
-                            iconResId = R.drawable.ic_warning_white_12dp
-                            statusText = recordingFailedText
-                        }
-                    }
-                }
-            }
-            if (iconResId == 0) {
-                dvrIconView.visibility = View.GONE
-                dvrTextIconView.visibility = View.VISIBLE
-            } else {
-                dvrTextIconView.visibility = View.GONE
-                dvrIconView.setImageResource(iconResId)
-                dvrIconView.visibility = View.VISIBLE
-            }
-            dvrIndicator.setPaddingRelative(if (trackMetaDataVisible) dvrPaddingStartWithTrack else dvrPaddingStartWithOutTrack, 0, 0, 0)
-            dvrIndicator.visibility = View.VISIBLE
-            dvrStatusView.text = statusText
         }
 
         /** Input-Logo nur in der ersten Zeile eines Inputs. */

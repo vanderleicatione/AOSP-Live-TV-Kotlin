@@ -1,4 +1,4 @@
-package com.android.tv.dvr.ui.browse
+package com.android.tv.ui.details
 
 import android.content.Context
 import android.media.tv.TvContract
@@ -7,10 +7,11 @@ import com.android.tv.R
 import com.android.tv.TvSingletons
 import com.android.tv.data.api.Channel
 import com.android.tv.data.api.Program
-import com.android.tv.dvr.data.RecordedProgram
-import com.android.tv.dvr.data.ScheduledRecording
-import com.android.tv.dvr.data.SeriesRecording
-import com.android.tv.dvr.ui.DvrUiHelper
+import android.text.Html
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.TextAppearanceSpan
 
 /** Inhalt der Detailansicht (Titel, Zeiten, Beschreibung, Bild-URIs). */
 class DetailsContent private constructor() {
@@ -79,10 +80,9 @@ class DetailsContent private constructor() {
         internal fun setChannelId(channelId: Long) = apply { this.channelId = channelId }
         internal fun setPosterArtUri(posterArtUri: String?) = apply { this.posterArtUri = posterArtUri }
         internal fun setThumbnailUri(thumbnailUri: String?) = apply { this.thumbnailUri = thumbnailUri }
-        internal fun setShowErrorMessage(showErrorMessage: Boolean) = apply { detailsContent.showErrorMessage = showErrorMessage }
 
         private fun createStyledTitle(context: Context, channel: Channel?) {
-            val title = DvrUiHelper.getStyledTitleWithEpisodeNumber(
+            val title = getStyledTitleWithEpisodeNumber(
                 context, programTitle, seasonNumber, episodeNumber,
                 R.style.text_appearance_card_view_episode_number)
             detailsContent.title = if (TextUtils.isEmpty(title)) {
@@ -133,22 +133,6 @@ class DetailsContent private constructor() {
         const val INVALID_TIME = -1L
 
         @JvmStatic
-        internal fun createFromRecordedProgram(context: Context, recordedProgram: RecordedProgram): DetailsContent =
-            Builder()
-                .setChannelId(recordedProgram.channelId)
-                .setProgramTitle(recordedProgram.title)
-                .setSeasonNumber(recordedProgram.seasonNumber)
-                .setEpisodeNumber(recordedProgram.episodeNumber)
-                .setStartTimeUtcMillis(recordedProgram.startTimeUtcMillis)
-                .setEndTimeUtcMillis(recordedProgram.endTimeUtcMillis)
-                .setDescription(
-                    if (TextUtils.isEmpty(recordedProgram.longDescription)) recordedProgram.description
-                    else recordedProgram.longDescription)
-                .setPosterArtUri(recordedProgram.posterArtUri)
-                .setThumbnailUri(recordedProgram.thumbnailUri)
-                .build(context)
-
-        @JvmStatic
         fun createFromProgram(context: Context, program: Program): DetailsContent =
             Builder()
                 .setChannelId(program.channelId)
@@ -164,61 +148,26 @@ class DetailsContent private constructor() {
                 .setThumbnailUri(program.thumbnailUri)
                 .build(context)
 
-        @JvmStatic
-        internal fun createFromSeriesRecording(context: Context, seriesRecording: SeriesRecording): DetailsContent =
-            Builder()
-                .setChannelId(seriesRecording.channelId)
-                .setTitle(seriesRecording.title)
-                .setDescription(
-                    if (TextUtils.isEmpty(seriesRecording.longDescription)) seriesRecording.description
-                    else seriesRecording.longDescription)
-                .setPosterArtUri(seriesRecording.posterUri)
-                .setThumbnailUri(seriesRecording.photoUri)
-                .build(context)
-
-        @JvmStatic
-        internal fun createFromScheduledRecording(context: Context, scheduledRecording: ScheduledRecording): DetailsContent {
-            val channel = TvSingletons.getSingletons(context).getChannelDataManager()
-                .getChannel(scheduledRecording.channelId)
-            var description: String? =
-                if (scheduledRecording.state == ScheduledRecording.STATE_RECORDING_FAILED) {
-                    getErrorMessage(context, scheduledRecording)
-                } else if (!TextUtils.isEmpty(scheduledRecording.programDescription)) {
-                    scheduledRecording.programDescription
-                } else {
-                    scheduledRecording.programLongDescription
-                }
-            if (TextUtils.isEmpty(description)) description = channel?.description
-            return Builder()
-                .setChannelId(scheduledRecording.channelId)
-                .setProgramTitle(scheduledRecording.programTitle)
-                .setSeasonNumber(scheduledRecording.seasonNumber)
-                .setEpisodeNumber(scheduledRecording.episodeNumber)
-                .setStartTimeUtcMillis(scheduledRecording.startTimeMs)
-                .setEndTimeUtcMillis(scheduledRecording.endTimeMs)
-                .setDescription(description)
-                .setPosterArtUri(scheduledRecording.programPosterArtUri)
-                .setThumbnailUri(scheduledRecording.programThumbnailUri)
-                .setShowErrorMessage(scheduledRecording.state == ScheduledRecording.STATE_RECORDING_FAILED)
-                .build(context)
-        }
-
-        private fun getErrorMessage(context: Context, recording: ScheduledRecording): String {
-            val reason = recording.failedReason ?: ScheduledRecording.FAILED_REASON_OTHER
-            return when (reason) {
-                ScheduledRecording.FAILED_REASON_PROGRAM_ENDED_BEFORE_RECORDING_STARTED ->
-                    context.getString(R.string.dvr_recording_failed_not_started)
-                ScheduledRecording.FAILED_REASON_RESOURCE_BUSY ->
-                    context.getString(R.string.dvr_recording_failed_resource_busy)
-                ScheduledRecording.FAILED_REASON_INPUT_UNAVAILABLE ->
-                    context.getString(R.string.dvr_recording_failed_input_unavailable, recording.inputId)
-                ScheduledRecording.FAILED_REASON_INPUT_DVR_UNSUPPORTED ->
-                    context.getString(R.string.dvr_recording_failed_input_dvr_unsupported)
-                ScheduledRecording.FAILED_REASON_INSUFFICIENT_SPACE ->
-                    context.getString(R.string.dvr_recording_failed_insufficient_space)
-                // OTHER, NOT_FINISHED, SCHEDULER_STOPPED, INVALID_CHANNEL, MESSAGE_NOT_SENT, CONNECTION_FAILED
-                else -> context.getString(R.string.dvr_recording_failed_system_failure, reason)
+        /** "Titel · S1 F2" mit eigenem Stil für die Folgennummer (Span aus dem HTML-String). */
+        private fun getStyledTitleWithEpisodeNumber(context: Context, title: String?, seasonNumber: String?, episodeNumber: String?, styleResId: Int): CharSequence {
+            if (title.isNullOrEmpty()) return ""
+            val builder = if (seasonNumber.isNullOrEmpty() || seasonNumber == "0") {
+                SpannableStringBuilder.valueOf(
+                    if (episodeNumber.isNullOrEmpty()) SpannableStringBuilder.valueOf(title)
+                    else Html.fromHtml(context.getString(R.string.program_title_with_episode_number_no_season, title, episodeNumber), Html.FROM_HTML_MODE_LEGACY))
+            } else {
+                SpannableStringBuilder.valueOf(Html.fromHtml(context.getString(R.string.program_title_with_episode_number, title, seasonNumber, episodeNumber),
+                    Html.FROM_HTML_MODE_LEGACY))
             }
+            val spans = builder.getSpans(0, builder.length, Any::class.java)
+            if (spans.isNotEmpty()) {
+                if (styleResId != 0) {
+                    builder.setSpan(TextAppearanceSpan(context, styleResId), builder.getSpanStart(spans[0]), builder.getSpanEnd(spans[0]),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                builder.removeSpan(spans[0])
+            }
+            return SpannableString(builder)
         }
     }
 }

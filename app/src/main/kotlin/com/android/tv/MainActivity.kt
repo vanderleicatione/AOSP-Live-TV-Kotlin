@@ -43,8 +43,6 @@ import com.android.tv.data.api.Program
 import com.android.tv.dialog.InteractiveAppDialogFragment.OnInteractiveAppCheckedListener
 import com.android.tv.dialog.PinDialogFragment
 import com.android.tv.dialog.PinDialogFragment.OnPinCheckedListener
-import com.android.tv.dvr.DvrManager
-import com.android.tv.dvr.ui.DvrUiHelper
 import com.android.tv.common.singletons.HasSingletons
 import com.android.tv.common.util.PermissionUtils
 import com.android.tv.features.TvFeatures
@@ -111,7 +109,6 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
         private set
     lateinit var timeShiftManager: TimeShiftManager
         private set
-    var dvrManager: DvrManager? = null
         private set
     lateinit var tvView: TunableTvView
         private set
@@ -252,7 +249,6 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
         memoryManageables.add(programDataManager)
         memoryManageables.add(ImageCache.getInstance())
         memoryManageables.add(TvContentRatingCache.getInstance())
-        if (TvFeatures.isDvrEnabled(this)) dvrManager = TvSingletons.getSingletons(this).getDvrManager()
 
         timeShiftManager = TimeShiftManager(this, tvView, programDataManager) { _, program ->
             mediaSessionWrapper.update(tvView.isBlocked, currentChannel, program)
@@ -409,12 +405,6 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
         otherActivityLaunched = false
         audioManagerHelper.requestAudioFocus()
 
-        val failedInfo = Utils.getFailedScheduledRecordingInfoSet(applicationContext)
-        if (Utils.hasRecordingFailedReason(applicationContext, TvInputManager.RECORDING_ERROR_INSUFFICIENT_SPACE) &&
-            failedInfo.isNotEmpty()
-        ) {
-            runAfterAttachedToWindow { DvrUiHelper.showDvrInsufficientSpaceErrorDialog(this, failedInfo) }
-        }
         if (channelTuner.areAllChannelsLoaded()) {
             setupUtils.markNewChannelsBrowsableIfEnabled()
             tuningController.resumeTvIfNeeded()
@@ -740,7 +730,6 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
         override fun getOverlayManagerProvider() = Provider { overlayManager }
         override fun getTvInputManagerHelperSingleton() = tvInputManagerHelper
         override fun getCurrentPlayingPositionProvider() = Provider { currentPlayingPosition }
-        override fun getDvrManagerSingleton() = TvSingletons.getSingletons(applicationContext).getDvrManager()
     }
 
     companion object {

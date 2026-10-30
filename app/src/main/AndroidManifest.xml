@@ -19,8 +19,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
-    <!-- Neu: DvrRecordingService nutzt ab Android 14 den Typ specialUse. -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Ab Android 11 sind fremde Pakete sonst unsichtbar (siehe TvInputManagerHelper, Partner, SetupUtils). -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
@@ -37,8 +35,6 @@
     <uses-permission android:name="com.android.providers.tv.permission.ACCESS_ALL_EPG_DATA"/>
     <uses-permission android:name="com.android.providers.tv.permission.ACCESS_WATCHED_PROGRAMS"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <!-- Neu: exakte DVR-Wecker (RecordingScheduler fällt sonst auf nicht-exakte zurück). -->
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
 
     <uses-feature android:name="android.hardware.usb.host" android:required="false"/>
     <uses-feature android:name="android.software.leanback" android:required="true"/>
@@ -158,67 +154,6 @@
              android:configChanges="keyboard|keyboardHidden"
              android:exported="true"
              android:theme="@style/Theme.TV.Dvr.Browse.Details"/>
-
-        <!-- DVR -->
-        <activity android:name="com.android.tv.dvr.ui.browse.DvrBrowseActivity"
-             android:configChanges="keyboard|keyboardHidden"
-             android:launchMode="singleTask"
-             android:theme="@style/Theme.Leanback.Browse"
-             android:exported="true">
-            <intent-filter>
-                <action android:name="android.media.tv.action.VIEW_RECORDING_SCHEDULES"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="vnd.android.cursor.dir/recorded_program"/>
-            </intent-filter>
-        </activity>
-        <activity android:name="com.android.tv.dvr.ui.playback.DvrPlaybackActivity"
-             android:configChanges="keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|orientation"
-             android:launchMode="singleTask"
-             android:theme="@style/Theme.Leanback"
-             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="vnd.android.cursor.item/recorded_program"/>
-            </intent-filter>
-        </activity>
-        <activity android:name="com.android.tv.dvr.ui.DvrRecordingSettingsActivity"
-             android:configChanges="keyboard|keyboardHidden"
-             android:exported="false"
-             android:theme="@style/Theme.TV.Dvr.Series.Settings.GuidedStep"/>
-        <activity android:name="com.android.tv.dvr.ui.DvrSeriesSettingsActivity"
-             android:configChanges="keyboard|keyboardHidden"
-             android:exported="false"
-             android:theme="@style/Theme.TV.Dvr.Series.Settings.GuidedStep"/>
-        <activity android:name="com.android.tv.dvr.ui.DvrSeriesDeletionActivity"
-             android:configChanges="keyboard|keyboardHidden"
-             android:exported="false"
-             android:theme="@style/Theme.TV.Dvr.Series.Deletion.GuidedStep"/>
-        <activity android:name="com.android.tv.dvr.ui.DvrSeriesScheduledDialogActivity"
-             android:exported="false"
-             android:theme="@style/Theme.TV.dialog.HalfSizedDialog"/>
-        <activity android:name="com.android.tv.dvr.ui.list.DvrSchedulesActivity"
-             android:configChanges="keyboard|keyboardHidden"
-             android:exported="false"
-             android:theme="@style/Theme.Leanback.Details"/>
-        <activity android:name="com.android.tv.dvr.ui.list.DvrHistoryActivity"
-             android:configChanges="keyboard|keyboardHidden"
-             android:exported="false"
-             android:theme="@style/Theme.Leanback.Details"/>
-
-        <service android:name="com.android.tv.dvr.recorder.DvrRecordingService"
-             android:foregroundServiceType="specialUse"
-             android:exported="false"
-             android:label="@string/dvr_service_name">
-            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Aufnahme von TV-Sendungen (DVR)"/>
-        </service>
-        <receiver android:name="com.android.tv.dvr.recorder.DvrStartRecordingReceiver"
-             android:exported="false"/>
 
         <receiver android:name="com.android.tv.receiver.BootCompletedReceiver"
              android:exported="true">

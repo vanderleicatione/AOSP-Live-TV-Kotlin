@@ -4,12 +4,6 @@ import android.content.Context
 import com.android.tv.common.util.Clock
 import com.android.tv.data.ChannelDataManager
 import com.android.tv.data.ProgramDataManager
-import com.android.tv.dvr.DvrDataManager
-import com.android.tv.dvr.DvrManager
-import com.android.tv.dvr.DvrScheduleManager
-import com.android.tv.dvr.DvrWatchedPositionManager
-import com.android.tv.dvr.recorder.RecordingScheduler
-import com.android.tv.dvr.RecordingStorageStatusManager
 import com.android.tv.util.SetupUtils
 import com.android.tv.util.TvInputManagerHelper
 import dagger.Module
@@ -26,15 +20,7 @@ interface TvSingletons {
     fun getClock(): Clock
     fun getDbDispatcher(): CoroutineDispatcher
     fun getSetupUtils(): SetupUtils
-    fun getInputSessionManager(): InputSessionManager
     fun getMainActivityWrapper(): MainActivityWrapper
-    /** null ohne DVR. */
-    fun getDvrManager(): DvrManager?
-    fun getDvrDataManager(): DvrDataManager
-    fun getDvrScheduleManager(): DvrScheduleManager?
-    fun getDvrWatchedPositionManager(): DvrWatchedPositionManager
-    fun getRecordingScheduler(): RecordingScheduler?
-    fun getRecordingStorageStatusManager(): RecordingStorageStatusManager
 
     companion object {
         @JvmStatic

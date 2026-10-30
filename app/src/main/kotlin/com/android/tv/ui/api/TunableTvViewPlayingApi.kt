@@ -1,6 +1,6 @@
 package com.android.tv.ui.api
 
-/** Gemeinsame Wiedergabe-API von TunableTvView und DvrTvView. */
+/** Wiedergabe-API von TunableTvView (früher auch DvrTvView). */
 interface TunableTvViewPlayingApi {
     val isPlaying: Boolean
     fun setStreamVolume(volume: Float)

@@ -17,7 +17,6 @@ import android.media.tv.TvView.OnUnhandledInputEventListener
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
-import android.text.format.DateUtils
 import android.util.AttributeSet
 import android.util.Log
 import android.view.KeyEvent
@@ -28,10 +27,7 @@ import android.view.accessibility.AccessibilityManager
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
-import com.android.tv.InputSessionManager
-import com.android.tv.InputSessionManager.TvViewSession
 import com.android.tv.R
-import com.android.tv.TvSingletons
 import com.android.tv.common.CommonConstants
 import com.android.tv.common.compat.TvInputConstantCompat
 import com.android.tv.common.compat.TvViewCompat.TvInputCallbackCompat
@@ -58,8 +54,7 @@ import kotlinx.coroutines.withContext
  * Port von com.android.tv.ui.TunableTvView: TvView mit Sperr-/Ladebildschirm, Stumm-Logik,
  * Stream-Infos und Timeshift.
  *
- * Mit DVR (im Original nur als System-App) läuft das Tunen über InputSessionManager, damit
- * Aufnahmen Tuner freigeben können. Keine Kindersicherungs-Rechte (System-Recht).
+ * Keine Kindersicherungs-Rechte (System-Recht). Ohne DVR kein InputSessionManager (Tuner-Teilung mit Aufnahmen).
  * Entfallen: Analytics-Tracker (AOSP-Stub), setMain() (System-API), Poster-Bild beim Tunen
  * (nur für den eingebauten Tuner).
  */
@@ -86,9 +81,6 @@ class TunableTvView @JvmOverloads constructor(
     private val accessibilityManager = context.getSystemService(AccessibilityManager::class.java)
     private val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    private val inputSessionManager: InputSessionManager? =
-        if (TvFeatures.isDvrEnabled(context)) TvSingletons.getSingletons(context).getInputSessionManager() else null
-    private var tvViewSession: TvViewSession? = null
 
     lateinit var tvView: AppLayerTvView
         private set
@@ -271,11 +263,7 @@ class TunableTvView @JvmOverloads constructor(
         this.programDataManager = programDataManager
         inputManagerHelper = tvInputManagerHelper
         this.tvIAppView = tvIAppView
-        if (inputSessionManager != null) {
-            tvViewSession = inputSessionManager.createTvViewSession(tvView, this, callback)
-        } else {
-            tvView.setCallback(callback)
-        }
+        tvView.setCallback(callback)
     }
 
     fun start() { started = true }
@@ -284,7 +272,7 @@ class TunableTvView @JvmOverloads constructor(
     fun warmUpInput(inputId: String?, channelUri: Uri?) {
         if (!started && inputId != null && channelUri != null) {
             lastCaptionEnabled = null
-            tvViewSession?.tune(inputId, channelUri) ?: tvView.tune(inputId, channelUri)
+            tvView.tune(inputId, channelUri)
             videoUnavailableReason = TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING
             updateBlockScreenAndMuting()
         }
@@ -298,10 +286,6 @@ class TunableTvView @JvmOverloads constructor(
     }
 
     fun release() {
-        inputSessionManager?.let { manager ->
-            tvViewSession?.let { manager.releaseTvViewSession(it) }
-            tvViewSession = null
-        }
         scope.cancel()
     }
 
@@ -311,11 +295,9 @@ class TunableTvView @JvmOverloads constructor(
         updateBlockScreenAndMuting()
     }
 
-    fun resetByRecording() = resetInternal()
-
     private fun resetInternal() {
         lastCaptionEnabled = null
-        tvViewSession?.reset() ?: tvView.reset()
+        tvView.reset()
         currentChannel = null
         inputInfo = null
         canReceiveInputEvent = false
@@ -374,7 +356,7 @@ class TunableTvView @JvmOverloads constructor(
         setTimeShiftAvailable(false)
         videoUnavailableReason = TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING
         lastCaptionEnabled = null
-        tvViewSession?.tune(channel, params, listener) ?: tvView.tune(info.id, channel.uri, params)
+        tvView.tune(info.id, channel.uri, params)
         if (needSurfaceSizeUpdate && fixedSurfaceWidth > 0 && fixedSurfaceHeight > 0) {
             surfaceView?.holder?.setFixedSize(fixedSurfaceWidth, fixedSurfaceHeight)
                 ?: Log.w(TAG, "Failed to set fixed size for surface view: Null surface view")
@@ -556,24 +538,11 @@ class TunableTvView @JvmOverloads constructor(
                 TvInputManager.VIDEO_UNAVAILABLE_REASON_WEAK_SIGNAL -> res.getString(R.string.tvview_msg_weak_signal)
                 CommonConstants.VIDEO_UNAVAILABLE_REASON_NOT_CONNECTED ->
                     res.getString(R.string.msg_channel_unavailable_not_connected)
-                VIDEO_UNAVAILABLE_REASON_NO_RESOURCE -> getTuneConflictMessage()
+                VIDEO_UNAVAILABLE_REASON_NO_RESOURCE -> null
                 else -> ""
             }
         }
         return null
-    }
-
-    /** "Tuner belegt bis HH:MM" während einer Aufnahme (nur mit DVR). */
-    private fun getTuneConflictMessage(): String? {
-        val inputId = targetInputId ?: return null
-        val manager = inputSessionManager ?: return null
-        val timeMs = manager.getEarliestRecordingSessionEndTimeMs(inputId) ?: return null
-        val input = inputManagerHelper.getTvInputInfo(inputId) ?: return null
-        return resources.getQuantityString(
-            R.plurals.tvview_msg_input_no_resource,
-            input.tunerCount,
-            DateUtils.formatDateTime(context, timeMs, DateUtils.FORMAT_SHOW_TIME),
-        )
     }
 
     /** Beendet Bild-in-Bild, wenn dort nichts Sinnvolles angezeigt werden kann. */
