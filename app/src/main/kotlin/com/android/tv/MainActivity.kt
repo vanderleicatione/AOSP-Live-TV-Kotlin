@@ -204,7 +204,7 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
         val isPassthroughInput = intent.data?.let { TvContract.isChannelUriForPassthroughInput(it) } == true
         val tuneToPassthroughInput = Intent.ACTION_VIEW == intent.action && isPassthroughInput
         val channelLoadedAndNoChannelAvailable = channelDataManager.isDbLoadFinished && channelDataManager.channelCount <= 0
-        if ((OnboardingUtils.isFirstRunWithCurrentVersion(this) || channelLoadedAndNoChannelAvailable) && !tuneToPassthroughInput) {
+        if (channelLoadedAndNoChannelAvailable && !tuneToPassthroughInput) {
             startOnboardingActivity()
             return
         }

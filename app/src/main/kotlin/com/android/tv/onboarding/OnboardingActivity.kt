@@ -21,7 +21,7 @@ import com.android.tv.data.ChannelDataManager
 import com.android.tv.util.OnboardingUtils
 import com.android.tv.util.SetupUtils
 
-/** Ersteinrichtung: Willkommen → Kanalquellen; fragt READ_TV_LISTINGS an. */
+/** Ersteinrichtung: Kanalquellen (ohne Willkommen-Animation); fragt READ_TV_LISTINGS an. */
 class OnboardingActivity : SetupActivity() {
 
     private lateinit var channelDataManager: ChannelDataManager
@@ -59,7 +59,7 @@ class OnboardingActivity : SetupActivity() {
 
     override fun onCreateInitialFragment(): Fragment? {
         if (!hasListingsPermission()) return null // erst nach der Berechtigung
-        return if (OnboardingUtils.isFirstRunWithCurrentVersion(this)) WelcomeFragment() else SetupSourcesFragment()
+        return SetupSourcesFragment()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -93,11 +93,6 @@ class OnboardingActivity : SetupActivity() {
 
     override fun executeAction(category: String, actionId: Int, params: Bundle?): Boolean {
         when (category) {
-            WelcomeFragment.ACTION_CATEGORY -> if (actionId == WelcomeFragment.ACTION_NEXT) {
-                OnboardingUtils.setFirstRunWithCurrentVersionCompleted(this)
-                showFragment(SetupSourcesFragment(), false)
-                return true
-            }
             SetupSourcesFragment.ACTION_CATEGORY -> when (actionId) {
                 SetupSourcesFragment.ACTION_ONLINE_STORE -> {
                     showMerchantCollection()

@@ -9,8 +9,6 @@ import androidx.preference.PreferenceManager
 object OnboardingUtils {
     // Schreibfehler "onbaording" aus dem Original – Schlüssel müssen gleich bleiben
     private const val PREF_KEY_IS_FIRST_BOOT = "pref_onbaording_is_first_boot"
-    private const val PREF_KEY_ONBOARDING_VERSION_CODE = "pref_onbaording_versionCode"
-    private const val ONBOARDING_VERSION = 1
 
     /** UiFlags.moreChannelsUrl() ist im AOSP-Build leer. */
     private const val MORE_CHANNELS_URL = ""
@@ -27,13 +25,4 @@ object OnboardingUtils {
 
     @JvmStatic
     fun setFirstBootCompleted(context: Context) = prefs(context).edit().putBoolean(PREF_KEY_IS_FIRST_BOOT, false).apply()
-
-    /** true, wenn das Onboarding dieser Version noch nicht gezeigt wurde. */
-    @JvmStatic
-    fun isFirstRunWithCurrentVersion(context: Context): Boolean =
-        prefs(context).getInt(PREF_KEY_ONBOARDING_VERSION_CODE, 0) != ONBOARDING_VERSION
-
-    @JvmStatic
-    fun setFirstRunWithCurrentVersionCompleted(context: Context) =
-        prefs(context).edit().putInt(PREF_KEY_ONBOARDING_VERSION_CODE, ONBOARDING_VERSION).apply()
 }
