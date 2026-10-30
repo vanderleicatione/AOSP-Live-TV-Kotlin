@@ -69,6 +69,8 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
     private val detailGrayedTextColor = res.getColor(R.color.program_guide_table_detail_title_grayed_text_color, null)
     private val animationDuration = res.getInteger(R.integer.program_guide_table_detail_fade_anim_duration).toLong()
     private val detailPadding = res.getDimensionPixelOffset(R.dimen.program_guide_table_detail_padding).toFloat()
+    // TCL: Detailzeile hat Höhe 0 (Details oben); ihr Text-Update löste je Taste ein Layout des ganzen Rasters aus
+    private val hasDetailRow = res.getDimensionPixelSize(R.dimen.program_guide_table_detail_height) > 0
     private val programRecordableText = res.getString(R.string.dvr_epg_program_recordable)
     private val recordingScheduledText = res.getString(R.string.dvr_epg_program_recording_scheduled)
     private val recordingConflictText = res.getString(R.string.dvr_epg_program_recording_conflict)
@@ -258,7 +260,7 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
         override fun onChildFocus(oldFocus: View?, newFocus: View?) {
             // TCL: Kanalzelle der Zeile mit Fokus heller
             channelHeaderView.isSelected = newFocus != null
-            if (newFocus == null) return
+            if (newFocus == null || !hasDetailRow) return
             selectedEntry = when {
                 // Mit Screenreader kann der Kanal-Kopf fokussiert sein
                 newFocus === channelHeaderView -> (programRow.getChildAt(0) as? ProgramItemView)?.tableEntry ?: return
@@ -316,6 +318,7 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
         }
 
         internal fun updateDetailView() {
+            if (!hasDetailRow) return
             val entry = selectedEntry ?: return
             criticScoresLayout.removeAllViews()
             val program = entry.program

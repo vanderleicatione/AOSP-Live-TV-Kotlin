@@ -224,13 +224,14 @@ class ProgramGuide(
     override fun onRequestChildFocus(oldFocus: View?, newFocus: View?) {
         if (oldFocus == null || newFocus == null) return
         val selectionRowOffset = selectionRow * rowHeight
-        if (oldFocus.top < newFocus.top) {
-            programGrid.windowAlignmentOffset = selectionRowOffset + rowHeight + detailHeight
-            programGrid.itemAlignmentOffsetPercent = 100f
-        } else if (oldFocus.top > newFocus.top) {
-            programGrid.windowAlignmentOffset = selectionRowOffset
-            programGrid.itemAlignmentOffsetPercent = 0f
+        // Nur bei Änderung setzen: jeder Setter löst ein Layout des ganzen Rasters aus
+        val (offset, percent) = when {
+            oldFocus.top < newFocus.top -> selectionRowOffset + rowHeight + detailHeight to 100f
+            oldFocus.top > newFocus.top -> selectionRowOffset to 0f
+            else -> return
         }
+        if (programGrid.windowAlignmentOffset != offset) programGrid.windowAlignmentOffset = offset
+        if (programGrid.itemAlignmentOffsetPercent != percent) programGrid.itemAlignmentOffsetPercent = percent
     }
 
     /** Zeigt die Programmübersicht; [runnableAfterAnimatorReady] läuft, bevor die Einblend-Animation startet. */
@@ -487,6 +488,11 @@ class ProgramGuide(
     private fun selectRow(row: View?) {
         if (row == null || row === selectedRow) return
         val old = selectedRow
+        if (detailHeight == 0) {
+            // TCL: keine Detailzeile (Details oben). Ihre Animationen lösten bei jeder Taste ein Layout des ganzen Rasters aus.
+            selectedRow = row
+            return
+        }
         if (old == null || programGrid.getChildAdapterPosition(old) == RecyclerView.NO_POSITION) {
             old?.findViewById<View>(R.id.detail)?.visibility = View.GONE
             val detailView = row.findViewById<View>(R.id.detail)
