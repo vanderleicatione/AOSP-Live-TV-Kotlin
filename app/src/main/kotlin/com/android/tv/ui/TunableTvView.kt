@@ -349,7 +349,7 @@ class TunableTvView @JvmOverloads constructor(
         setTimeShiftAvailable(false)
         videoUnavailableReason = TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING
         lastCaptionEnabled = null
-        Log.i(TAG, "tune ${channel.displayNumber}", Throwable("caller"))
+        Log.i(TAG, "tune ${channel.displayNumber}")
         tvView.tune(info.id, channel.uri, params)
         if (needSurfaceSizeUpdate && fixedSurfaceWidth > 0 && fixedSurfaceHeight > 0) {
             surfaceView?.holder?.setFixedSize(fixedSurfaceWidth, fixedSurfaceHeight)
