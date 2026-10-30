@@ -68,4 +68,102 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:orientation">horizontal</item>
     </style>
+    <!-- Options side panel (1.5b): TclPanel on the right, as wide as TCL dialog_universal_option. -->
+    <style name="Widget.Tcl.Panel.Side">
+        <item name="android:layout_width">@dimen/tcl_side_panel_width</item>
+        <item name="android:layout_gravity">end</item>
+    </style>
+    <style name="Widget.Tcl.Panel.Title" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/side_panel_header_height</item>
+        <item name="android:paddingTop">@dimen/side_panel_header_padding_top</item>
+        <item name="android:paddingStart">@dimen/tcl_space_32</item>
+        <item name="android:paddingEnd">@dimen/tcl_space_32</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/tcl_color_text_primary</item>
+        <item name="android:textAppearance">@style/TextAppearance.Tcl.Title</item>
+    </style>
+
+    <!-- TclOptionRow on the side panel (1.5b): grows for the description; children copy its state. -->
+    <style name="Widget.Tcl.OptionRow.Item">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/tcl_option_row_height</item>
+        <item name="android:paddingStart">@dimen/tcl_space_16</item>
+        <item name="android:paddingEnd">@dimen/tcl_space_16</item>
+    </style>
+    <style name="Widget.Tcl.OptionRow.Text" parent="">
+        <item name="android:minHeight">@dimen/tcl_option_row_height</item>
+        <item name="android:paddingTop">@dimen/tcl_space_8</item>
+        <item name="android:paddingBottom">@dimen/tcl_space_8</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:duplicateParentState">true</item>
+        <item name="android:focusable">false</item>
+    </style>
+    <style name="Widget.Tcl.OptionRow.Title" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:duplicateParentState">true</item>
+        <item name="android:focusable">false</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/tcl_option_text</item>
+        <item name="android:textAppearance">@style/TextAppearance.Tcl.Body</item>
+    </style>
+    <style name="Widget.Tcl.OptionRow.Description" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/tcl_space_4</item>
+        <item name="android:duplicateParentState">true</item>
+        <item name="android:focusable">false</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/tcl_option_text_secondary</item>
+        <item name="android:textAppearance">@style/TextAppearance.Tcl.Caption</item>
+    </style>
+    <!-- Check box, radio button or switch at the start / end of the row (TCL left icon slot). -->
+    <style name="Widget.Tcl.OptionRow.Control" parent="">
+        <item name="android:layout_width">@dimen/tcl_option_row_control</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@null</item>
+        <item name="android:clickable">false</item>
+        <item name="android:duplicateParentState">true</item>
+        <item name="android:buttonTint">@color/tcl_option_control</item>
+    </style>
+    <style name="Widget.Tcl.OptionRow.Switch" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@null</item>
+        <item name="android:clickable">false</item>
+        <item name="android:duplicateParentState">true</item>
+        <item name="android:thumbTint">@color/tcl_option_control</item>
+        <item name="android:trackTint">@color/tcl_option_switch_track</item>
+    </style>
+    <style name="Widget.Tcl.OptionRow.Divider" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/tcl_divider</item>
+        <item name="android:layout_marginTop">@dimen/tcl_space_8</item>
+        <item name="android:layout_marginBottom">@dimen/tcl_space_8</item>
+        <item name="android:background">@color/tcl_color_divider</item>
+    </style>
+
+    <!-- Menu cards (1.5b): TCL focus on the AOSP cards. -->
+    <style name="Widget.Tcl.MenuCard.Label" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">@dimen/tcl_space_12</item>
+        <item name="android:layout_marginEnd">@dimen/tcl_space_12</item>
+        <item name="android:duplicateParentState">true</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/tcl_option_text</item>
+        <item name="android:textAppearance">@style/TextAppearance.Tcl.Body</item>
+    </style>
+    <style name="Widget.Tcl.MenuCard.Value" parent="Widget.Tcl.MenuCard.Label">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/tcl_option_text_secondary</item>
+        <item name="android:textAppearance">@style/TextAppearance.Tcl.Caption</item>
+    </style>
 </resources>

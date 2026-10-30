@@ -14,36 +14,17 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    style="@style/Widget.Tcl.OptionRow.Text"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:minHeight="@dimen/option_item_height"
-    android:paddingTop="@dimen/option_item_common_padding_top"
-    android:paddingBottom="@dimen/option_item_common_padding_bottom"
-    android:gravity="center_vertical"
-    android:focusable="false" >
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@string/option_item_text_font"
-        android:textSize="@dimen/option_item_text_size"
-        android:textColor="@color/option_item_text_color"
-        android:singleLine="true"
-        android:focusable="false" />
+        style="@style/Widget.Tcl.OptionRow.Title" />
     <TextView
         android:id="@+id/description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/option_item_text_margin_top"
-        android:fontFamily="@string/option_item_secondary_text_font"
-        android:textSize="@dimen/option_item_secondary_text_size"
-        android:textColor="@color/option_item_secondary_text_color"
-        android:maxLines="@integer/option_item_description_max_lines"
-        android:ellipsize="end"
-        android:focusable="false" />
+        style="@style/Widget.Tcl.OptionRow.Description"
+        android:maxLines="@integer/option_item_description_max_lines" />
 
 </LinearLayout>

@@ -23,7 +23,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="@dimen/menu_margin_top"
-    android:background="@drawable/menu_background"
+    android:background="@drawable/tcl_menu_background"
     android:visibility="gone">
 
     <!-- Temporary TextView's are used for the animation. -->

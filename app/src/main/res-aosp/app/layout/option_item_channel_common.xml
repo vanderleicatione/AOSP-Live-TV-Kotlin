@@ -14,54 +14,37 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    style="@style/Widget.Tcl.OptionRow.Text"
     android:layout_width="0dp"
-    android:layout_height="match_parent"
-    android:minHeight="@dimen/option_item_height"
-    android:paddingTop="@dimen/option_item_common_padding_top"
-    android:paddingBottom="@dimen/option_item_common_padding_bottom"
-    android:gravity="center_vertical"
-    android:focusable="false" >
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/channel_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@string/option_item_text_font"
-        android:textSize="@dimen/option_item_text_size"
-        android:textColor="@color/option_item_text_color"
-        android:singleLine="true"
-        android:focusable="false" />
+        style="@style/Widget.Tcl.OptionRow.Title" />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/option_item_text_margin_top"
+        android:layout_marginTop="@dimen/tcl_space_4"
+        android:duplicateParentState="true"
         android:focusable="false" >
 
         <TextView
             android:id="@+id/channel_number"
+            style="@style/Widget.Tcl.OptionRow.Description"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@string/option_item_secondary_text_font"
-            android:textSize="@dimen/option_item_secondary_text_size"
-            android:textColor="@color/option_item_text_color"
+            android:layout_marginTop="0dp"
             android:singleLine="true"
-            android:focusable="false" />
+            android:textColor="@color/tcl_option_text" />
 
         <TextView
             android:id="@+id/program_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/option_item_channel_check_spacing"
-            android:fontFamily="@string/option_item_secondary_text_font"
-            android:textSize="@dimen/option_item_secondary_text_size"
-            android:textColor="@color/option_item_secondary_text_color"
-            android:singleLine="true"
-            android:focusable="false" />
+            style="@style/Widget.Tcl.OptionRow.Description"
+            android:layout_marginTop="0dp"
+            android:layout_marginStart="@dimen/tcl_space_8"
+            android:singleLine="true" />
 
     </LinearLayout>
 

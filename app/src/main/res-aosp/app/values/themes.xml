@@ -64,6 +64,8 @@
 
     <style name="Theme.TV.GuidedStep" parent="Theme.Setup.GuidedStep">
         <item name="guidedActionsBackground">@color/setup_actions_background</item>
+        <!-- Channel sources (1.5b): focused action on the EPG's selected-cell surface. -->
+        <item name="guidedActionsSelectorDrawable">@drawable/tcl_setup_item_bg</item>
     </style>
 
     <style name="Theme.TV.Dvr.GuidedStep" parent="Theme.Setup.GuidedStep">

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Channel sources (1.5b): focused action, the selected-cell surface of the EPG. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <solid android:color="@color/tcl_color_surface_cell_selected" />
+            <corners android:radius="@dimen/tcl_radius_cell" />
+        </shape>
+    </item>
+    <item android:drawable="@color/tcl_color_clear" />
+</selector>

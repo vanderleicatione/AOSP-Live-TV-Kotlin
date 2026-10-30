@@ -14,27 +14,18 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingStart="@dimen/side_panel_padding_start"
-    android:paddingEnd="@dimen/side_panel_padding_end"
-    android:focusable="true"
-    android:background="?android:attr/selectableItemBackground" >
+    style="@style/Widget.Tcl.OptionRow.Item">
 
     <CheckBox
         android:id="@+id/check_box"
-        android:layout_width="@dimen/option_item_compound_button_width"
-        android:layout_height="match_parent"
-        android:button="@drawable/btn_lock_material_anim"
-        android:background="@null"
-        android:clickable="false" />
+        style="@style/Widget.Tcl.OptionRow.Control"
+        android:button="@drawable/btn_lock_material_anim" />
 
     <include layout="@layout/option_item_channel_common"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/tcl_space_12"
         android:layout_weight="1" />
 
 </LinearLayout>

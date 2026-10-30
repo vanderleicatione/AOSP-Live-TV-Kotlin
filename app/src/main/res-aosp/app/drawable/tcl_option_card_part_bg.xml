@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Options (1.5b): one part of a two-part menu card (image or text); the card clips the corners. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true" android:drawable="@color/tcl_color_focus_bg" />
+    <item android:drawable="@color/tcl_color_surface_cell" />
+</selector>

@@ -14,33 +14,18 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- Options side panel (1.5b): TclPanel on the right, no coloured header. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/side_panel"
-    android:layout_width="@dimen/side_panel_width"
-    android:layout_height="match_parent"
-    android:layout_gravity="end"
+    style="@style/Widget.Tcl.Panel.Side"
     android:elevation="@dimen/side_panel_elevation"
-    android:background="@color/side_panel_background"
     android:translationX="@dimen/side_panel_enter_offset_x"
     android:alpha="0.0"
     android:visibility="gone">
 
-    <!-- Background for header -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/side_panel_header_height"
-        android:elevation="@dimen/side_panel_header_elevation"
-        android:background="@color/side_panel_header_background" />
-
-    <!-- This fragment container needs to have at least the same elevation as the above FrameLayout
-         for the header background. Otherwise, header text in the fragment won't be drawn, as it's
-         under the above FrameLayout. This container won't draw any shadow though, as it have
-         transparent background. -->
     <FrameLayout
         android:id="@+id/side_fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:elevation="@dimen/side_panel_header_elevation" />
+        android:layout_height="match_parent" />
 
 </FrameLayout>

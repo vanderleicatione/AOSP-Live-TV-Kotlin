@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Options (1.5b): switch track; red when on (TCL element_tcl_card_red). -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:color="@color/tcl_color_accent_live" />
+    <item android:state_focused="true" android:color="@color/tcl_color_on_focus_secondary" />
+    <item android:color="@color/tcl_color_text_tertiary" />
+</selector>

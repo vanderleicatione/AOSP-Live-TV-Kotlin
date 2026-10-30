@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Options (1.5b): menu scrim, the AOSP gradient on the TCL blacks. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:centerColor="@color/tcl_black_60"
+        android:centerY="0.5"
+        android:endColor="@color/tcl_black_100"
+        android:startColor="@color/tcl_black_0" />
+</shape>

@@ -26,7 +26,7 @@
     <color name="tvactivity_background_on_shrunken_tvview">#111111</color>
 
     <!-- Main menu -->
-    <color name="menu_row_title">#FFEEEEEE</color>
+    <color name="menu_row_title">@color/tcl_color_text_primary</color>
 
     <!-- Play controls -->
     <color name="play_controls_time_text_color">#26C6DA</color>
@@ -49,11 +49,11 @@
     <color name="app_link_card_icon_color_filter">@color/card_meta_text_color_enabled</color>
 
     <!-- Channel card -->
-    <color name="channel_card">#455A64</color>
+    <color name="channel_card">@color/tcl_color_surface_cell</color>
     <color name="channel_card_guide">#0288D1</color>
-    <color name="channel_card_meta_background">#384248</color>
-    <color name="channel_card_progress_bar_background">#1AEEEEEE</color>
-    <color name="channel_card_progress_bar_foreground">#00FFFF</color>
+    <color name="channel_card_meta_background">@color/tcl_color_surface_cell</color>
+    <color name="channel_card_progress_bar_background">@color/tcl_color_progress_track</color>
+    <color name="channel_card_progress_bar_foreground">@color/tcl_color_progress</color>
 
     <!-- Guide card -->
     <color name="guide_card_meta_background">#0176BC</color>
@@ -142,13 +142,13 @@
     <color name="setup_title">#EEEEEE</color>
     <color name="setup_description">#B3EEEEEE</color>
     <!-- Add alpha value to common_tv_background -->
-    <color name="setup_background">#E70288D1</color>
+    <color name="setup_background">@color/tcl_color_surface_rail</color>
     <!-- Add alpha value to common_setup_action_background -->
-    <color name="setup_actions_background">#B30374BF</color>
+    <color name="setup_actions_background">@color/tcl_color_surface_panel</color>
     <!-- Add alpha value to common_setup_done_container_background -->
     <color name="setup_done_button_container_background">#8004549D</color>
     <color name="setup_sub_actions_background">#4004549D</color>
-    <color name="setup_category">#3EC2FF</color>
+    <color name="setup_category">@color/tcl_color_text_secondary</color>
 
     <!-- DVR -->
     <color name="dvr_card_info">#37474F</color>

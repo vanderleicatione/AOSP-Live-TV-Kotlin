@@ -14,24 +14,24 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- Menu card (1.5b): TCL light focus on the icon and the text. -->
 <com.android.tv.menu.SimpleCardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/card_layout_width"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:focusable="true"
     android:clickable="true">
-
     <ImageView
         android:layout_width="@dimen/card_image_layout_width"
         android:layout_height="@dimen/card_image_layout_height"
-        android:background="@color/channel_card_guide"
-        android:paddingBottom="16dp"
-        android:paddingEnd="30dp"
-        android:paddingStart="30dp"
-        android:paddingTop="16dp"
-        android:src="@drawable/ic_setup_channels" />
-
+        android:background="@drawable/tcl_option_card_part_bg"
+        android:duplicateParentState="true"
+        android:paddingBottom="@dimen/tcl_space_16"
+        android:paddingEnd="@dimen/tcl_space_32"
+        android:paddingStart="@dimen/tcl_space_32"
+        android:paddingTop="@dimen/tcl_space_16"
+        android:src="@drawable/ic_setup_channels"
+        android:tint="@color/tcl_option_control" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="@dimen/card_meta_layout_height"
@@ -40,10 +40,10 @@
         android:paddingTop="@dimen/card_meta_padding_top"
         android:singleLine="true"
         android:ellipsize="end"
-        android:fontFamily="@string/condensed_font"
-        android:textColor="@color/card_meta_text_color"
-        android:background="@color/guide_card_meta_background"
+        android:background="@drawable/tcl_option_card_part_bg"
+        android:duplicateParentState="true"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/tcl_option_text"
         android:text="@string/channels_item_setup"
-        android:textSize="12sp" />
-
+        android:textAppearance="@style/TextAppearance.Tcl.Caption" />
 </com.android.tv.menu.SimpleCardView>

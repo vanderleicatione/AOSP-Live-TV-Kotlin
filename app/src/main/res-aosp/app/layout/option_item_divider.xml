@@ -14,31 +14,26 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:focusable="false"
-    android:background="?android:attr/selectableItemBackground" >
+    android:focusable="false">
 
     <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/option_item_divider_height"
-        android:layout_marginTop="@dimen/option_item_divider_margin_top"
-        android:layout_marginBottom="@dimen/option_item_divider_margin_bottom"
-        android:layout_alignParentTop="true"
-        android:background="@color/option_item_divider_color" />
+        android:id="@+id/divider_line"
+        style="@style/Widget.Tcl.OptionRow.Divider"
+        android:layout_alignParentTop="true" />
 
     <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/option_item_divider_text_margin_top"
+        android:layout_below="@id/divider_line"
         android:layout_alignParentStart="true"
-        android:paddingStart="@dimen/side_panel_padding_start"
-        android:paddingEnd="@dimen/side_panel_padding_end"
-        android:fontFamily="@string/option_item_divider_font"
-        android:textSize="@dimen/option_item_divider_text_size"
-        android:textColor="@color/option_item_divider_text_color" />
+        android:paddingStart="@dimen/tcl_space_16"
+        android:paddingEnd="@dimen/tcl_space_16"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/tcl_color_text_tertiary"
+        android:textAppearance="@style/TextAppearance.Tcl.Label" />
 
 </RelativeLayout>

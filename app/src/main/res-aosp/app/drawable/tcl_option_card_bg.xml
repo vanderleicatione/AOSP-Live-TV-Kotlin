@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Options (1.5b): menu cards; the same light focus as the channel list, a dim cell otherwise. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <solid android:color="@color/tcl_color_focus_bg" />
+            <corners android:radius="@dimen/tcl_radius_cell" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="@color/tcl_color_surface_cell" />
+            <corners android:radius="@dimen/tcl_radius_cell" />
+        </shape>
+    </item>
+</selector>

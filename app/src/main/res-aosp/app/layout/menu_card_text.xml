@@ -27,9 +27,10 @@
         android:paddingTop="@dimen/card_meta_padding_top"
         android:maxLines="2"
         android:ellipsize="end"
-        android:fontFamily="@string/condensed_font"
-        android:textColor="@color/card_meta_text_color"
-        android:textSize="12sp" />
+        android:duplicateParentState="true"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/tcl_option_text"
+        android:textAppearance="@style/TextAppearance.Tcl.Caption" />
 
     <TextView android:id="@+id/card_text"
         android:layout_width="match_parent"
@@ -39,7 +40,8 @@
         android:paddingTop="@dimen/card_meta_padding_top"
         android:singleLine="true"
         android:ellipsize="end"
-        android:fontFamily="@string/condensed_font"
-        android:textColor="@color/card_meta_text_color"
-        android:textSize="12sp" />
+        android:duplicateParentState="true"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/tcl_option_text"
+        android:textAppearance="@style/TextAppearance.Tcl.Caption" />
 </merge>

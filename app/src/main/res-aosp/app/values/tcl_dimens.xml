@@ -96,6 +96,10 @@
     <dimen name="tcl_option_row_icon">15dp</dimen>
     <dimen name="tcl_option_row_icon_margin_start">13dp</dimen>
     <dimen name="tcl_option_row_text_margin_start">23dp</dimen>
+    <!-- Options side panel (1.5b): TCL dialog_universal_option is 342dp wide; the check/radio/switch
+         slot is TCL element_item_small_left_icon (32dp). -->
+    <dimen name="tcl_side_panel_width">342dp</dimen>
+    <dimen name="tcl_option_row_control">32dp</dimen>
 
     <!-- Rail: unselected categories at 60% (TCL "withalpha"). -->
     <item name="tcl_alpha_unselected" format="float" type="dimen">0.6</item>
