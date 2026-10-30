@@ -2,6 +2,7 @@ package com.android.tv.guide
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.graphics.drawable.StateListDrawable
@@ -168,9 +169,10 @@ class ProgramItemView @JvmOverloads constructor(
         // TCL: rote Balken vor der laufenden Sendung des eingestellten Kanals
         val entry = tableEntry
         val playingResId = if (entry != null && isEntryWideEnough() && entry.isCurrentProgram &&
-            entry.channelId == (context as MainActivity).currentChannelId) R.drawable.tcl_ic_playing else 0
+            entry.channelId == (context as MainActivity).currentChannelId) R.drawable.tcl_ic_playing_animated else 0
         setCompoundDrawablePadding(if (playingResId != 0) iconPadding else 0)
         setCompoundDrawablesRelativeWithIntrinsicBounds(playingResId, 0, 0, 0)
+        (compoundDrawablesRelative[0] as? Animatable)?.start()
     }
 
     /** Vorlesetext: Nummer, Titel, Zeit, Folge, Sperre/Beschreibung. */

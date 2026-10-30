@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Animated playing marker for the channel list, like TCL's playing_red.json Lottie: the three red bars of
-     tcl_ic_playing bounce from the bottom. Started by TclChannelRow.bind. -->
+<!-- Animated playing marker for the channel list, like TCL's playing_red.json Lottie: three red bars (#FA2C25)
+     that bounce from the bottom. Started by TclChannelRow.bind and ProgramItemView. -->
 <animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt">
     <aapt:attr name="android:drawable">
