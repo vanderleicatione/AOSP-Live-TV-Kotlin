@@ -5,7 +5,6 @@ import android.media.tv.TvTrackInfo
 import com.android.tv.TvOptionsManager
 import com.android.tv.common.customization.CustomAction
 import com.android.tv.data.DisplayMode
-import com.android.tv.features.TvFeatures
 import com.android.tv.ui.sidepanel.ClosedCaptionFragment
 import com.android.tv.ui.sidepanel.DisplayModeFragment
 import com.android.tv.ui.sidepanel.MultiAudioFragment
@@ -13,8 +12,8 @@ import com.android.tv.util.OnboardingUtils
 import javax.inject.Inject
 
 /**
- * Optionen-Zeile: Untertitel, Bildformat, Bild-in-Bild, Tonspur, (Weitere Kanäle), Einstellungen.
- * Entfällt: Entwickleroptionen (nur ENG-Build/Entwicklerfunktionen).
+ * Optionen-Zeile: Untertitel, Bildformat, Tonspur, (Weitere Kanäle), Einstellungen.
+ * Entfällt: Entwickleroptionen (nur ENG-Build/Entwicklerfunktionen) und Bild-in-Bild (TV ohne PiP).
  */
 class TvOptionsRowAdapter(context: Context, customActions: List<CustomAction>?) :
     CustomizableOptionsRowAdapter(context, customActions) {
@@ -28,13 +27,11 @@ class TvOptionsRowAdapter(context: Context, customActions: List<CustomAction>?) 
         val actionList = ArrayList<MenuAction>()
         actionList.add(MenuAction.SELECT_CLOSED_CAPTION_ACTION)
         actionList.add(MenuAction.SELECT_DISPLAY_MODE_ACTION)
-        if (TvFeatures.isPictureInPictureEnabled(mainActivity)) actionList.add(MenuAction.SYSTEMWIDE_PIP_ACTION)
         actionList.add(MenuAction.SELECT_AUDIO_LANGUAGE_ACTION)
         // "Weitere Kanäle" nur mit Store-URL (im AOSP-Build leer)
         if (OnboardingUtils.createOnlineStoreIntent() != null) actionList.add(MenuAction.MORE_CHANNELS_ACTION)
         actionList.add(MenuAction.SETTINGS_ACTION)
         updateClosedCaptionAction()
-        updatePipAction()
         updateMultiAudioAction()
         updateDisplayModeAction()
         return actionList
@@ -42,16 +39,11 @@ class TvOptionsRowAdapter(context: Context, customActions: List<CustomAction>?) 
 
     override fun updateActions() {
         if (updateClosedCaptionAction()) notifyItemChanged(getItemPosition(MenuAction.SELECT_CLOSED_CAPTION_ACTION))
-        if (updatePipAction()) notifyItemChanged(getItemPosition(MenuAction.SYSTEMWIDE_PIP_ACTION))
         if (updateMultiAudioAction()) notifyItemChanged(getItemPosition(MenuAction.SELECT_AUDIO_LANGUAGE_ACTION))
         if (updateDisplayModeAction()) notifyItemChanged(getItemPosition(MenuAction.SELECT_DISPLAY_MODE_ACTION))
     }
 
     private fun updateClosedCaptionAction() = updateActionDescription(MenuAction.SELECT_CLOSED_CAPTION_ACTION)
-
-    private fun updatePipAction(): Boolean =
-        containsItem(MenuAction.SYSTEMWIDE_PIP_ACTION) &&
-            MenuAction.setEnabled(MenuAction.SYSTEMWIDE_PIP_ACTION, !mainActivity.isScreenBlockedByResourceConflictOrParentalControl())
 
     /** Tonspur-Auswahl nur bei mehr als einer Spur. */
     private fun updateMultiAudioAction(): Boolean {
@@ -77,7 +69,6 @@ class TvOptionsRowAdapter(context: Context, customActions: List<CustomAction>?) 
         when (type) {
             TvOptionsManager.OPTION_CLOSED_CAPTIONS -> sideFragmentManager.show(ClosedCaptionFragment())
             TvOptionsManager.OPTION_DISPLAY_MODE -> sideFragmentManager.show(DisplayModeFragment())
-            TvOptionsManager.OPTION_SYSTEMWIDE_PIP -> mainActivity.enterPictureInPictureMode()
             TvOptionsManager.OPTION_MULTI_AUDIO -> sideFragmentManager.show(MultiAudioFragment())
             TvOptionsManager.OPTION_MORE_CHANNELS -> mainActivity.showMerchantCollection()
             TvOptionsManager.OPTION_SETTINGS -> mainActivity.showSettingsFragment()

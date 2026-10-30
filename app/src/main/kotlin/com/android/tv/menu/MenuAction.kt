@@ -32,8 +32,6 @@ class MenuAction private constructor(
             MenuAction(R.string.options_item_closed_caption, TvOptionsManager.OPTION_CLOSED_CAPTIONS, R.drawable.ic_tvoption_cc)
         @JvmField val SELECT_DISPLAY_MODE_ACTION =
             MenuAction(R.string.options_item_display_mode, TvOptionsManager.OPTION_DISPLAY_MODE, R.drawable.ic_tvoption_aspect)
-        @JvmField val SYSTEMWIDE_PIP_ACTION =
-            MenuAction(R.string.options_item_pip, TvOptionsManager.OPTION_SYSTEMWIDE_PIP, R.drawable.ic_tvoption_pip)
         @JvmField val SELECT_AUDIO_LANGUAGE_ACTION =
             MenuAction(R.string.options_item_multi_audio, TvOptionsManager.OPTION_MULTI_AUDIO, R.drawable.ic_tvoption_multi_track)
         @JvmField val MORE_CHANNELS_ACTION =
