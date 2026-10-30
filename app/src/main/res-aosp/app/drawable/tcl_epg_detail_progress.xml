@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TCL epg_detail_seek_bar. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape>
+            <solid android:color="#66F0F0F2" />
+            <corners android:radius="1dp" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <solid android:color="#FFE7211A" />
+                <corners android:radius="1dp" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>

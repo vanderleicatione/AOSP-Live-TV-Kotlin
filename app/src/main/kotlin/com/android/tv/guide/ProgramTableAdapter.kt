@@ -185,7 +185,7 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
         private val inputLogoView: ImageView = container.findViewById(R.id.input_logo)
         private var isInputLogoVisible = false
         private val accessibilityStateChangeListener =
-            AccessibilityManager.AccessibilityStateChangeListener { enabled -> channelHeaderView.isFocusable = enabled }
+            AccessibilityManager.AccessibilityStateChangeListener { channelHeaderView.isFocusable = programGuide.isAccessibilityEnabled() }
 
         init {
             container.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
@@ -200,7 +200,7 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
                 }
             })
             // Kanal-Kopf nur für Screenreader fokussierbar
-            channelHeaderView.isFocusable = accessibilityManager.isEnabled
+            channelHeaderView.isFocusable = programGuide.isAccessibilityEnabled()
         }
 
         fun onBind(position: Int) {

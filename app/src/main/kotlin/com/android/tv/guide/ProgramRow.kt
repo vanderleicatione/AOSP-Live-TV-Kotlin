@@ -66,7 +66,9 @@ class ProgramRow @JvmOverloads constructor(
 
     /** Screenreader: bei Fokus am rechten Rand weiter scrollen. */
     internal fun focusSearchAccessibility(focused: View, direction: Int) {
+        if (!programGuide.isAccessibilityEnabled()) return
         val entry = (focused as ProgramItemView).tableEntry ?: return
+        if (entry.isGap) return // Lücken: nichts aufzudecken (wie in focusSearch)
         val toMillis = programManager.toUtcMillis
         if ((isDirectionEnd(direction) || direction == FOCUS_FORWARD) && entry.entryEndUtcMillis >= toMillis) {
             scrollByTime(entry.entryEndUtcMillis - toMillis + HALF_HOUR_MILLIS)

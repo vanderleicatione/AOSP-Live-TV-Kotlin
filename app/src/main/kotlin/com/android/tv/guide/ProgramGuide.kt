@@ -6,13 +6,20 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.text.format.DateFormat
+import android.text.format.DateUtils
+import android.view.KeyEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityManager.AccessibilityStateChangeListener
+import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.leanback.widget.VerticalGridView
 import androidx.preference.PreferenceManager
@@ -24,6 +31,7 @@ import com.android.tv.TvSingletons
 import com.android.tv.data.ChannelDataManager
 import com.android.tv.data.GenreItems
 import com.android.tv.data.ProgramDataManager
+import com.android.tv.data.api.Channel
 import com.android.tv.dvr.DvrDataManager
 import com.android.tv.dvr.DvrScheduleManager
 import com.android.tv.ui.HardwareLayerAnimatorListenerAdapter
@@ -31,6 +39,8 @@ import com.android.tv.ui.ViewUtils
 import com.android.tv.ui.hideable.AutoHideScheduler
 import com.android.tv.util.TvInputManagerHelper
 import com.android.tv.util.Utils
+import com.android.tv.util.images.ImageLoader
+import java.util.Date
 import java.util.concurrent.TimeUnit
 
 /**
@@ -73,6 +83,11 @@ class ProgramGuide(
     private val detailTitle: TextView = container.findViewById(R.id.program_guide_detail_title)
     private val detailTime: TextView = container.findViewById(R.id.program_guide_detail_time)
     private val detailDescription: TextView = container.findViewById(R.id.program_guide_detail_desc)
+    private val detailTags: ViewGroup = container.findViewById(R.id.program_guide_detail_tags)
+    private val detailScreen: View = container.findViewById(R.id.program_guide_detail_screen)
+    private var focusBeforeDetailScreen: View? = null
+    private val logoWidth = res.getDimensionPixelSize(R.dimen.channel_banner_channel_logo_width)
+    private val logoHeight = res.getDimensionPixelSize(R.dimen.channel_banner_channel_logo_height)
     private val clock = TvSingletons.getSingletons(activity).getClock()
     private val showAnimatorFull: Animator
     private val showAnimatorPartial: Animator
@@ -122,6 +137,8 @@ class ProgramGuide(
         viewPortMillis = gridWidth * HOUR_IN_MILLIS / widthPerHour
 
         container.viewTreeObserver.addOnGlobalFocusChangeListener(GlobalFocusChangeListener())
+        // Details offen: Pfeile/OK nicht ins Raster durchreichen (Zurück schließt über onBackPressed)
+        detailScreen.setOnKeyListener { _, keyCode, _ -> keyCode != KeyEvent.KEYCODE_BACK }
         sidePanelGridView.recycledViewPool.setMaxRecycledViews(R.layout.program_guide_side_panel_row,
             res.getInteger(R.integer.max_recycled_view_pool_epg_side_panel_row))
         sidePanelGridView.adapter = GenreListAdapter(activity, programManager, this)
@@ -262,6 +279,8 @@ class ProgramGuide(
             onLayoutListenerForShow = null
         }
         cancelHide()
+        detailScreen.visibility = View.GONE
+        focusBeforeDetailScreen = null
         programManager.programGuideVisibilityChanged(false)
         programManager.removeListener(programManagerListener)
         isActive = false
@@ -278,7 +297,10 @@ class ProgramGuide(
 
     fun scheduleHide() = autoHideScheduler.schedule(showDurationMillis)
     fun cancelHide() = autoHideScheduler.cancel()
-    fun onBackPressed() = hide()
+    /** Zurück schließt zuerst die Sendungsdetails, dann die Programmübersicht. */
+    fun onBackPressed() {
+        if (!hideProgramDetail()) hide()
+    }
 
     val isRunningAnimation: Boolean
         get() = showAnimatorPartial.isStarted || showAnimatorFull.isStarted || hideAnimatorPartial.isStarted || hideAnimatorFull.isStarted
@@ -308,7 +330,12 @@ class ProgramGuide(
 
     internal fun getTimelineRowScrollOffset(): Int = timelineRow.scrollOffset
 
-    internal fun isAccessibilityEnabled(): Boolean = accessibilityManager.isEnabled
+    /**
+     * Nur ein Screenreader (Touch-Exploration) zählt: Auf der TCL laufen immer Bedienungshilfe-Dienste
+     * (tvQuickActions, Limite), mit denen isEnabled stets true ist. Der Screenreader-Pfad scrollte dann bei
+     * jedem Fokus bis ans Ende des Eintrags – bei Lücken bis zum Rasterende, Tage später.
+     */
+    internal fun isAccessibilityEnabled(): Boolean = accessibilityManager.isEnabled && accessibilityManager.isTouchExplorationEnabled
 
     /** TCL: Tabelle unten mit höchstens [VISIBLE_ROWS] Zeilen (weniger Kanäle: entsprechend niedriger). */
     private fun updateGuidePosition() {
@@ -334,6 +361,54 @@ class ProgramGuide(
             program?.description.isNullOrEmpty() -> activity.getString(R.string.tcl_no_program_details)
             else -> program?.description
         }
+        GuideTags.bind(detailTags, GuideTags.of(activity, entry))
+    }
+
+    /** TCL fragment_epgdetail_pro: Kanal, Logo, Titel, Zeit mit Fortschritt, Etiketten und Beschreibung. */
+    internal fun showProgramDetail(entry: ProgramManager.TableEntry) {
+        val program = entry.program ?: return
+        val channel = activity.channelDataManager.getChannel(entry.channelId)
+        detailScreen.findViewById<TextView>(R.id.program_guide_detail_screen_channel).text =
+            listOfNotNull(channel?.displayNumber, channel?.displayName).joinToString("  ")
+        val logo = detailScreen.findViewById<ImageView>(R.id.program_guide_detail_screen_logo)
+        logo.setImageBitmap(null)
+        logo.visibility = View.GONE
+        channel?.loadBitmap(activity, Channel.LOAD_IMAGE_TYPE_CHANNEL_LOGO, logoWidth, logoHeight,
+            object : ImageLoader.ImageLoaderCallback<ImageView>(logo) {
+                override fun onBitmapLoaded(referent: ImageView, bitmap: Bitmap?) {
+                    if (bitmap == null || detailScreen.visibility != View.VISIBLE) return
+                    referent.setImageBitmap(bitmap)
+                    referent.visibility = View.VISIBLE
+                }
+            })
+        val title = program.title
+        detailScreen.findViewById<TextView>(R.id.program_guide_detail_screen_title).text =
+            if (title.isNullOrEmpty()) activity.getString(R.string.tcl_no_information) else title
+        val timeFormat = DateFormat.getTimeFormat(activity)
+        detailScreen.findViewById<TextView>(R.id.program_guide_detail_screen_start).text = timeFormat.format(Date(entry.entryStartUtcMillis))
+        detailScreen.findViewById<TextView>(R.id.program_guide_detail_screen_end).text = timeFormat.format(Date(entry.entryEndUtcMillis))
+        detailScreen.findViewById<TextView>(R.id.program_guide_detail_screen_date).text =
+            DateUtils.formatDateTime(activity, entry.entryStartUtcMillis, DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_WEEKDAY or DateUtils.FORMAT_ABBREV_ALL)
+        val now = System.currentTimeMillis()
+        detailScreen.findViewById<ProgressBar>(R.id.program_guide_detail_screen_progress).progress = when {
+            now <= entry.entryStartUtcMillis -> 0
+            now >= entry.entryEndUtcMillis -> 10000
+            else -> ((now - entry.entryStartUtcMillis) * 10000 / (entry.entryEndUtcMillis - entry.entryStartUtcMillis)).toInt()
+        }
+        GuideTags.bind(detailScreen.findViewById(R.id.program_guide_detail_screen_tags), GuideTags.of(activity, entry))
+        detailScreen.findViewById<TextView>(R.id.program_guide_detail_screen_desc).text =
+            if (program.description.isNullOrEmpty()) activity.getString(R.string.tcl_no_program_details) else program.description
+        focusBeforeDetailScreen = container.findFocus()
+        detailScreen.visibility = View.VISIBLE
+        detailScreen.requestFocus()
+    }
+
+    private fun hideProgramDetail(): Boolean {
+        if (detailScreen.visibility != View.VISIBLE) return false
+        detailScreen.visibility = View.GONE
+        focusBeforeDetailScreen?.requestFocus()
+        focusBeforeDetailScreen = null
+        return true
     }
 
     private fun createAnimator(sidePanelAnimResId: Int, sidePanelGridAnimResId: Int, tableAnimResId: Int): Animator {

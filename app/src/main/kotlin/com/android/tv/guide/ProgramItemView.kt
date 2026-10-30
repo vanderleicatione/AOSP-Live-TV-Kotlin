@@ -77,9 +77,12 @@ class ProgramItemView @JvmOverloads constructor(
                 tvActivity.tuneToChannel(channel)
                 tvActivity.hideOverlaysForTune()
             }, delay)
-        } else if (entry.program != null && TvFeatures.isDvrEnabled(context)) {
-            val manager = singletons.getDvrManager() ?: return
-            if (entry.entryStartUtcMillis > clock.currentTimeMillis() && manager.isProgramRecordable(entry.program)) {
+        } else if (entry.isGap || entry.program == null) {
+            return
+        } else {
+            // TCL: OK auf einer nicht laufenden Sendung öffnet die Details; aufnehmbare Sendungen (DVR) wie bisher
+            val manager = if (TvFeatures.isDvrEnabled(context)) singletons.getDvrManager() else null
+            if (manager != null && entry.entryStartUtcMillis > clock.currentTimeMillis() && manager.isProgramRecordable(entry.program)) {
                 if (entry.scheduledRecording == null) {
                     // DvrFlags.startEarlyEndLateEnabled() ist im AOSP-Build false
                     val inputId = channel?.inputId ?: return // Bugfix: Kanal fehlt (Original: NPE)
@@ -92,7 +95,7 @@ class ProgramItemView @JvmOverloads constructor(
                         Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(context, R.string.dvr_msg_cannot_record_program, Toast.LENGTH_SHORT).show()
+                programGuide?.showProgramDetail(entry)
             }
         }
     }
@@ -191,8 +194,12 @@ class ProgramItemView @JvmOverloads constructor(
                 else -> 0
             }
         }
-        setCompoundDrawablePadding(if (iconResId != 0) iconPadding else 0)
-        setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, iconResId, 0)
+        // TCL: rote Balken vor der laufenden Sendung des eingestellten Kanals
+        val entry = tableEntry
+        val playingResId = if (entry != null && isEntryWideEnough() && entry.isCurrentProgram &&
+            entry.channelId == (context as MainActivity).currentChannelId) R.drawable.tcl_ic_playing else 0
+        setCompoundDrawablePadding(if (iconResId != 0 || playingResId != 0) iconPadding else 0)
+        setCompoundDrawablesRelativeWithIntrinsicBounds(playingResId, 0, iconResId, 0)
     }
 
     /** Vorlesetext: Nummer, Titel, Zeit, Folge, Aufnahme-Status, Sperre/Beschreibung. */
