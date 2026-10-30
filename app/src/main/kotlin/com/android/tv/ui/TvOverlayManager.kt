@@ -37,7 +37,6 @@ import com.android.tv.menu.MenuView
 import com.android.tv.menu.TvOptionsRowAdapter
 import com.android.tv.onboarding.NewSourcesFragment
 import com.android.tv.onboarding.SetupSourcesFragment
-import com.android.tv.search.ProgramGuideSearchFragment
 import com.android.tv.ui.sidepanel.SideFragmentManager
 import com.android.tv.util.TvInputManagerHelper
 import java.util.LinkedList
@@ -59,7 +58,6 @@ class TvOverlayManager(
     private val inputBannerView: InputBannerViewBase,
     private val selectInputView: SelectInputView,
     sceneContainer: ViewGroup,
-    private val searchFragment: ProgramGuideSearchFragment,
     private val channelDataManager: ChannelDataManager,
     private val inputManager: TvInputManagerHelper,
     programDataManager: ProgramDataManager,
@@ -505,7 +503,7 @@ class TvOverlayManager(
     fun onKeyUp(keyCode: Int, event: KeyEvent): Int {
         if (isMediaStartKey(keyCode)) {
             if (currentDialog != null || programGuide.isActive || channelList.isActive || sideFragmentManager.isActive ||
-                searchFragment.isVisible || transitionManager.isKeypadChannelSwitchActive ||
+                transitionManager.isKeypadChannelSwitchActive ||
                 transitionManager.isSelectInputActive || isSetupFragmentActive || isNewSourcesFragmentActive
             ) return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED
             if (tvView.isScreenBlocked) return MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED

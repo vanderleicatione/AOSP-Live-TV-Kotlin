@@ -58,14 +58,6 @@
          android:supportsRtl="true"
          android:theme="@style/Theme.TV">
 
-        <provider android:name="com.android.tv.search.LocalSearchProvider"
-            android:authorities="com.android.tv.search"
-            android:enabled="true"
-            android:exported="true">
-            <meta-data android:name="SupportedSwitchActionType"
-                android:value="CHANNEL|TVINPUT"/>
-        </provider>
-
         <!-- Rating-System-Filter entfernt (Kindersicherung nicht portiert). -->
         <receiver android:name="com.android.tv.receiver.GlobalKeyReceiver"
              android:exported="true">
@@ -104,11 +96,7 @@
                 <action android:name="android.media.tv.action.SETUP_INPUTS"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
-            </intent-filter>
             <meta-data android:name="supports_leanback" android:value="true"/>
-            <meta-data android:name="android.app.searchable" android:resource="@xml/searchable"/>
         </activity>
         <activity android:name="com.android.tv.LauncherActivity"
              android:exported="false"

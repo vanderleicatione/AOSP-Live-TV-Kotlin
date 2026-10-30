@@ -103,7 +103,6 @@ class KeyHandler(
             MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED -> return true
             MainActivity.KEY_EVENT_HANDLER_RESULT_NOT_HANDLED -> return false
         }
-        if (activity.searchFragment.isVisible) return null
         if (!channelTuner.areAllChannelsLoaded()) return false
         if (isOkKey(keyCode) && !channelTuner.isCurrentChannelPassthrough) {
             // OK lang gedrückt: Programmübersicht wie bei TCL (OK selbst öffnet die Kanalliste, das Menü
@@ -166,13 +165,6 @@ class KeyHandler(
             MainActivity.KEY_EVENT_HANDLER_RESULT_DISPATCH_TO_OVERLAY -> return null
             MainActivity.KEY_EVENT_HANDLER_RESULT_HANDLED -> return true
             MainActivity.KEY_EVENT_HANDLER_RESULT_NOT_HANDLED -> return false
-        }
-        if (activity.searchFragment.isVisible) {
-            if (keyCode == KeyEvent.KEYCODE_BACK) {
-                activity.supportFragmentManager.popBackStack()
-                return true
-            }
-            return null
         }
         // Zurück im Vollbild verlässt die App nicht mehr (TCL-Verhalten); Overlays schließt es weiterhin oben.
         if (keyCode == KeyEvent.KEYCODE_BACK) return true

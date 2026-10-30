@@ -53,7 +53,6 @@ import com.android.tv.main.TrackController
 import com.android.tv.main.TuningController
 import com.android.tv.modules.DbDispatcher
 import com.android.tv.onboarding.OnboardingActivity
-import com.android.tv.search.ProgramGuideSearchFragment
 import com.android.tv.ui.ChannelBannerView
 import com.android.tv.ui.InputBannerViewBase
 import com.android.tv.ui.KeypadChannelSwitchView
@@ -116,7 +115,6 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
         private set
     lateinit var overlayManager: TvOverlayManager
         private set
-    lateinit var searchFragment: ProgramGuideSearchFragment
         private set
     lateinit var mediaSessionWrapper: MediaSessionWrapper
         private set
@@ -293,10 +291,9 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
                     TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_PROGRAM_GUIDE or TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_MENU or
                     TvOverlayManager.FLAG_HIDE_OVERLAYS_KEEP_FRAGMENT)
         })
-        searchFragment = ProgramGuideSearchFragment()
         overlayManager = TvOverlayManager(
             this, channelTuner, tvView, tvOptionsManager, keypadChannelSwitchView, channelBannerView,
-            inputBannerView, selectInputView, sceneContainer, searchFragment, channelDataManager,
+            inputBannerView, selectInputView, sceneContainer, channelDataManager,
             tvInputManagerHelper, programDataManager, tvOptionsRowAdapterFactory)
         accessibilityManager.addAccessibilityStateChangeListener(overlayManager)
 
@@ -609,13 +606,6 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
 
     fun needToKeepSetupScreenWhenHidingOverlay(): Boolean =
         tuningController.inputIdUnderSetup != null && tuningController.isSetupActivityCalledByPopup
-
-    fun showProgramGuideSearchFragment() {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, searchFragment)
-            .addToBackStack(null)
-            .commit()
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         // Keine Zustandssicherung – die Activity baut sich neu auf (wie im Original)
