@@ -188,12 +188,14 @@ class TunableTvView @JvmOverloads constructor(
         }
 
         override fun onVideoAvailable(inputId: String) {
+            Log.i(TAG, "onVideoAvailable ${currentChannel?.displayNumber}")
             videoUnavailableReason = VIDEO_UNAVAILABLE_REASON_NONE
             updateBlockScreenAndMuting()
             onTuneListener?.onStreamInfoChanged(this@TunableTvView, true)
         }
 
         override fun onVideoUnavailable(inputId: String, reason: Int) {
+            Log.i(TAG, "onVideoUnavailable reason=$reason ${currentChannel?.displayNumber} tuner=${currentChannel?.isPhysicalTunerChannel}")
             // Bugfix: Die TCL-Antenne meldet mitten im Abspielen kurz "Tuning/Buffering", während Bild (Hardware-
             // Ebene) und Ton weiterlaufen; der schwarze Sperrbildschirm würde das Bild verdecken. Nach dem ersten
             // Bild auf einem Tuner-Kanal diese Meldungen daher ignorieren.
@@ -347,6 +349,7 @@ class TunableTvView @JvmOverloads constructor(
         setTimeShiftAvailable(false)
         videoUnavailableReason = TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING
         lastCaptionEnabled = null
+        Log.i(TAG, "tune ${channel.displayNumber}")
         tvView.tune(info.id, channel.uri, params)
         if (needSurfaceSizeUpdate && fixedSurfaceWidth > 0 && fixedSurfaceHeight > 0) {
             surfaceView?.holder?.setFixedSize(fixedSurfaceWidth, fixedSurfaceHeight)
