@@ -373,10 +373,12 @@ class ProgramGuide(
         val logo = detailScreen.findViewById<ImageView>(R.id.program_guide_detail_screen_logo)
         logo.setImageBitmap(null)
         logo.visibility = View.GONE
+        logo.tag = channel?.id
+        // Aus dem Cache kommt das Logo sofort (synchron) zurück
         channel?.loadBitmap(activity, Channel.LOAD_IMAGE_TYPE_CHANNEL_LOGO, logoWidth, logoHeight,
             object : ImageLoader.ImageLoaderCallback<ImageView>(logo) {
                 override fun onBitmapLoaded(referent: ImageView, bitmap: Bitmap?) {
-                    if (bitmap == null || detailScreen.visibility != View.VISIBLE) return
+                    if (bitmap == null || referent.tag != channel.id) return
                     referent.setImageBitmap(bitmap)
                     referent.visibility = View.VISIBLE
                 }
