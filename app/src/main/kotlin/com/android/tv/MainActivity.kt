@@ -16,6 +16,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
+import android.os.SystemClock
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
@@ -71,6 +72,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlinx.coroutines.CoroutineDispatcher
+import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 /**
  * Hauptbildschirm (Live-TV). Port von com.android.tv.MainActivity, aufgeteilt in:
@@ -136,6 +139,7 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
     private val onActionClickListeners = LinkedHashSet<OnActionClickListener>()
     private val mySingletons = MySingletonsImpl()
 
+    private var clockOffsetMs = System.currentTimeMillis() - SystemClock.elapsedRealtime()
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
@@ -151,8 +155,12 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
                     tuningController.checkChannelLockNeeded(tvView, null)
                 }
                 Intent.ACTION_TIME_CHANGED -> {
-                    // Programme neu laden
-                    if (channelTuner.currentChannel != null) tuningController.tune(true)
+                    // Bugfix: Die TCL stellt die Uhr alle paar Sekunden um einige Sekunden zurück. Das alte Neu-Tunen
+                    // ließ die Antenne ohne erneutes onVideoAvailable zurück (schwarzer Sperrbildschirm, Ton läuft).
+                    // Nicht mehr tunen; Programme nur bei einem echten Sprung (> 1 min) neu laden.
+                    val offset = System.currentTimeMillis() - SystemClock.elapsedRealtime()
+                    if (abs(offset - clockOffsetMs) > TimeUnit.MINUTES.toMillis(1)) programDataManager.reload()
+                    clockOffsetMs = offset
                 }
             }
         }
