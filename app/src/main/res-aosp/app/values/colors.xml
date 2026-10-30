@@ -146,7 +146,7 @@
     <!-- Add alpha value to common_setup_action_background -->
     <color name="setup_actions_background">@color/tcl_color_surface_panel</color>
     <!-- Add alpha value to common_setup_done_container_background -->
-    <color name="setup_done_button_container_background">#8004549D</color>
+    <color name="setup_done_button_container_background">@color/tcl_color_surface_rail</color>
     <color name="setup_sub_actions_background">#4004549D</color>
     <color name="setup_category">@color/tcl_color_text_secondary</color>
 
