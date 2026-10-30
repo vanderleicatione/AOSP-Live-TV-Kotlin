@@ -7,7 +7,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.media.PlaybackParams
-import android.media.tv.AitInfo
 import android.media.tv.TvContentRating
 import android.media.tv.TvInputInfo
 import android.media.tv.TvInputManager
@@ -26,7 +25,6 @@ import android.view.View
 import android.view.accessibility.AccessibilityManager
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.annotation.RequiresApi
 import com.android.tv.R
 import com.android.tv.common.CommonConstants
 import com.android.tv.common.compat.TvInputConstantCompat
@@ -70,8 +68,6 @@ class TunableTvView @JvmOverloads constructor(
         fun onContentBlocked()
         fun onContentAllowed()
         fun onChannelSignalStrength()
-        @RequiresApi(33)
-        fun onAitInfoUpdated(inputId: String, aitInfo: AitInfo)
     }
 
     abstract class OnScreenBlockingChangedListener {
@@ -130,7 +126,6 @@ class TunableTvView @JvmOverloads constructor(
     private var actionAfterFade: Runnable? = null
     private var blockScreenType = BLOCK_SCREEN_TYPE_NORMAL
     var channelSignalStrength = 0; private set
-    private var tvIAppView: View? = null
 
     private val callback = object : TvInputCallbackCompat() {
         override fun onConnectionFailed(inputId: String) {
@@ -229,12 +224,6 @@ class TunableTvView @JvmOverloads constructor(
             onTuneListener?.onChannelSignalStrength()
         }
 
-        @RequiresApi(33)
-        override fun onAitInfoUpdated(inputId: String, aitInfo: AitInfo) {
-            if (!TvFeatures.hasTiaf()) return
-            if (DEBUG) Log.d(TAG, "onAitInfoUpdated: {inputId=$inputId, AitInfo=($aitInfo)}")
-            onTuneListener?.onAitInfoUpdated(inputId, aitInfo)
-        }
     }
 
     init {
@@ -251,18 +240,12 @@ class TunableTvView @JvmOverloads constructor(
         })
     }
 
-    /** Muss vor der Nutzung aufgerufen werden. [tvIAppView] nur ab Android 13 (TIAF). */
-    @JvmOverloads
-    fun initialize(
-        programDataManager: ProgramDataManager,
-        tvInputManagerHelper: TvInputManagerHelper,
-        tvIAppView: View? = null,
-    ) {
+    /** Muss vor der Nutzung aufgerufen werden. */
+    fun initialize(programDataManager: ProgramDataManager, tvInputManagerHelper: TvInputManagerHelper) {
         tvView = findViewById(R.id.tv_view)
         tvView.setUseSecureSurface(true) // Release-Build ohne Entwickler-Features
         this.programDataManager = programDataManager
         inputManagerHelper = tvInputManagerHelper
-        this.tvIAppView = tvIAppView
         tvView.setCallback(callback)
     }
 
@@ -459,7 +442,6 @@ class TunableTvView @JvmOverloads constructor(
         if (blockReason == VIDEO_UNAVAILABLE_REASON_NONE) {
             bufferingSpinnerView.visibility = GONE
             if (blockScreenView.visibility == VISIBLE) blockScreenView.fadeOut()
-            tvIAppView?.visibility = VISIBLE
             return
         }
         bufferingSpinnerView.visibility =
@@ -475,7 +457,6 @@ class TunableTvView @JvmOverloads constructor(
         } else {
             blockScreenView.setEmptyInputStatusBlockVisibility(false)
         }
-        tvIAppView?.visibility = INVISIBLE
         blockScreenView.setBackgroundImage(null)
         if (blockReason == VIDEO_UNAVAILABLE_REASON_SCREEN_BLOCKED) {
             blockScreenView.setIconVisibility(true)

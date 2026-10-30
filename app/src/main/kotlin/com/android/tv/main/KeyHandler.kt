@@ -61,7 +61,6 @@ class KeyHandler(
 
     /** Aus Activity.dispatchKeyEvent; [superDispatch] = Standardverarbeitung der Activity. */
     fun dispatchKeyEvent(event: KeyEvent, superDispatch: (KeyEvent) -> Boolean): Boolean {
-        if (activity.iAppManager?.dispatchKeyEvent(event) == true) return true
         // Bugfix: Guide-Taste der Fernbedienung öffnet/schließt die Programmübersicht. AOSP bekommt sie nur
         // als globale Taste (GLOBAL_BUTTON), die Android ausschließlich an die System-TV-App sendet.
         if (event.keyCode in GUIDE_KEYCODES) {

@@ -10,7 +10,6 @@ import android.widget.Toast
 import com.android.tv.R
 import com.android.tv.TvApplication
 import com.android.tv.TvSingletons
-import com.android.tv.features.TvFeatures
 import com.android.tv.license.LicenseSideFragment
 import com.android.tv.license.Licenses
 
@@ -82,12 +81,6 @@ class SettingsFragment : SideFragment<Item>() {
         if (Licenses.hasLicenses(requireContext())) {
             items.add(object : SubMenuItem(getString(R.string.settings_menu_licenses), sideFragmentManager) {
                 override fun getFragment(): SideFragment<*> = LicenseSideFragment()
-            })
-        }
-
-        if (TvFeatures.hasTiaf()) {
-            items.add(object : ActionItem(getString(R.string.interactive_app_settings)) {
-                override fun onSelected() = sideFragmentManager.show(InteractiveAppSettingsFragment(), false)
             })
         }
 

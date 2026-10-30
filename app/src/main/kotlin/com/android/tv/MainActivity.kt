@@ -12,7 +12,6 @@ import android.content.res.Configuration
 import android.media.tv.TvContract
 import android.media.tv.TvInputInfo
 import android.media.tv.TvInputManager
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -23,11 +22,9 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewStub
 import android.view.ViewTreeObserver
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
 import com.android.tv.common.memory.MemoryManageable
 import com.android.tv.common.TvContentRatingCache
@@ -40,13 +37,11 @@ import com.android.tv.data.ProgramDataManager
 import com.android.tv.data.WatchedHistoryManager
 import com.android.tv.data.api.Channel
 import com.android.tv.data.api.Program
-import com.android.tv.dialog.InteractiveAppDialogFragment.OnInteractiveAppCheckedListener
 import com.android.tv.dialog.PinDialogFragment
 import com.android.tv.dialog.PinDialogFragment.OnPinCheckedListener
 import com.android.tv.common.singletons.HasSingletons
 import com.android.tv.common.util.PermissionUtils
 import com.android.tv.features.TvFeatures
-import com.android.tv.interactive.IAppManager
 import com.android.tv.main.IntentHandler
 import com.android.tv.main.KeyHandler
 import com.android.tv.main.TrackController
@@ -69,7 +64,6 @@ import com.android.tv.util.GtvUtils
 import com.android.tv.util.OnboardingUtils
 import com.android.tv.util.SetupUtils
 import com.android.tv.util.TvInputManagerHelper
-import com.android.tv.util.TvSettings
 import com.android.tv.util.Utils
 import com.android.tv.util.ViewCache
 import com.android.tv.util.images.ImageCache
@@ -89,7 +83,7 @@ import kotlinx.coroutines.CoroutineDispatcher
  */
 @AndroidEntryPoint
 class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedListener, ChannelChanger,
-    HasSingletons<MainActivity.MySingletons>, OnInteractiveAppCheckedListener {
+    HasSingletons<MainActivity.MySingletons> {
 
     interface MySingletons : ChannelBannerView.MySingletons
 
@@ -120,7 +114,6 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
         private set
     lateinit var audioManagerHelper: AudioManagerHelper
         private set
-    var iAppManager: IAppManager? = null
         private set
     var captionSettings: CaptionSettings? = null
 
@@ -164,7 +157,6 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
                     // Programme neu laden
                     if (channelTuner.currentChannel != null) tuningController.tune(true)
                 }
-                ACTION_APP_LINK_COMMAND -> Unit // Original: "TODO: handle the command"
             }
         }
     }
@@ -219,10 +211,7 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
         setContentView(R.layout.activity_tv)
         contentView = findViewById(android.R.id.content)
         tvView = findViewById(R.id.main_tunable_tv_view)
-        // Bugfix: TvInteractiveAppView (API 33+) erst hier aus dem ViewStub inflaten,
-        // sonst crasht das Layout auf Geräten vor Android 13 (ClassNotFoundException).
-        val tvIAppView: View? = if (TvFeatures.hasTiaf()) findViewById<ViewStub>(R.id.tv_app_view_stub).inflate() else null
-        tvView.initialize(programDataManager, tvInputManagerHelper, tvIAppView)
+        tvView.initialize(programDataManager, tvInputManagerHelper)
 
         intentHandler = IntentHandler(this, dbDispatcher)
         channelTuner = ChannelTuner(channelDataManager, tvInputManagerHelper)
@@ -309,13 +298,6 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
             return
         }
         // SHOW_UPCOMING_CONFLICT_DIALOG ist im Original OFF → kein ConflictChecker
-        if (TvFeatures.hasTiaf()) iAppManager = IAppManager(this, tvView, handler)
-    }
-
-    @RequiresApi(33)
-    override fun onInteractiveAppChecked(checked: Boolean) {
-        TvSettings.setTvIAppOn(applicationContext, checked)
-        if (checked) iAppManager?.processHeldAitInfo()
     }
 
     fun startOnboardingActivity() {
@@ -383,7 +365,6 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
             addAction(Intent.ACTION_SCREEN_OFF)
             addAction(Intent.ACTION_SCREEN_ON)
             addAction(Intent.ACTION_TIME_CHANGED)
-            if (Build.VERSION.SDK_INT > 33) addAction(ACTION_APP_LINK_COMMAND)
         }
         registerReceiver(broadcastReceiver, filter, Context.RECEIVER_EXPORTED)
     }
@@ -461,7 +442,6 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
     private fun stopAll() {
         overlayManager.hideOverlays(TvOverlayManager.FLAG_HIDE_OVERLAYS_WITHOUT_ANIMATION)
         tuningController.stopTv("stopAll()")
-        iAppManager?.stop()
     }
 
     /** Öffnet die Einrichtung eines Inputs (über SetupPassthroughActivity). */
@@ -734,7 +714,5 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
         private const val REQUEST_CODE_START_SETUP_ACTIVITY = 1
         private const val REQUEST_CODE_NOW_PLAYING = 2
         private const val LAZY_INITIALIZATION_DELAY_MS = 1000L
-        // TvInteractiveAppManager.ACTION_APP_LINK_COMMAND (API 34)
-        private const val ACTION_APP_LINK_COMMAND = "android.media.tv.interactive.action.APP_LINK_COMMAND"
     }
 }
