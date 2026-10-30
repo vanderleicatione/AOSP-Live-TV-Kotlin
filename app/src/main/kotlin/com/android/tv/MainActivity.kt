@@ -102,18 +102,15 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
         private set
     lateinit var timeShiftManager: TimeShiftManager
         private set
-        private set
     lateinit var tvView: TunableTvView
         private set
     lateinit var contentView: View
         private set
     lateinit var overlayManager: TvOverlayManager
         private set
-        private set
     lateinit var mediaSessionWrapper: MediaSessionWrapper
         private set
     lateinit var audioManagerHelper: AudioManagerHelper
-        private set
         private set
     var captionSettings: CaptionSettings? = null
 
