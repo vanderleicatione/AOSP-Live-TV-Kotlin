@@ -34,7 +34,7 @@ import org.xmlpull.v1.XmlPullParser
 
 /**
  * Ersatz-Guide und -Logos aus dem eigenen Feed (epg-agregador, XMLTV gzip) für Kanäle, zu denen das TIF
- * nichts liefert: Antenne (keine EPG im TIF) und Logos aller Kanäle (ohne ACCESS_ALL_EPG_DATA liefert der
+ * nichts liefert: Antenne (keine EPG im TIF), OpenTV-Kanäle ohne EPG und Logos aller Kanäle (ohne ACCESS_ALL_EPG_DATA liefert der
  * TvProvider fremde Logos nicht). Zuordnung über den Anzeigenamen (trim) je Quelle, nicht über die Nummer.
  * Daten liegen in einer eigenen SQLite-DB, Logos als PNG im App-Speicher.
  */
@@ -48,6 +48,7 @@ object FeedGuide {
     private const val WORK_NAME = "feed_guide"
     private const val INPUT_ANTENNA = "com.tcl.tvinput/.TDTVInputService"
     private const val INPUT_BROADCAST = "com.tcl.channelplus/"
+    private const val INPUT_OPENTV = "app.opentv" // app.opentv.debug/… und app.opentv/…
 
     private class FeedChannel(val id: String, val logoUri: String?)
 
@@ -84,12 +85,14 @@ object FeedGuide {
     fun addListener(listener: Runnable) { listeners.add(listener) }
 
     fun isFeedSource(channel: Channel) =
-        channel.inputId.startsWith(INPUT_ANTENNA) || channel.inputId.startsWith(INPUT_BROADCAST)
+        channel.inputId.startsWith(INPUT_ANTENNA) || channel.inputId.startsWith(INPUT_BROADCAST) ||
+            channel.inputId.startsWith(INPUT_OPENTV)
 
     private fun key(channel: Channel): String? {
         val source = when {
             channel.inputId.startsWith(INPUT_ANTENNA) -> "antena"
             channel.inputId.startsWith(INPUT_BROADCAST) -> "channelplus"
+            channel.inputId.startsWith(INPUT_OPENTV) -> "opentv"
             else -> return null
         }
         return source + "|" + channel.displayName?.let(::cleanName)
