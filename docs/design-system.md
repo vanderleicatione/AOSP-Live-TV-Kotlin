@@ -1,6 +1,6 @@
 # Design system TCL do fork
 
-Os valores visuais (cor, tamanho, texto, tempo) ficam em **tokens**. As telas são montadas com **7 componentes**. Tudo usa Views e XML, como o resto do app: nada de Compose e nenhuma biblioteca nova.
+Os valores visuais (cor, tamanho, texto, tempo) ficam em **tokens**. As telas são montadas com **8 componentes**. Tudo usa Views e XML, como o resto do app: nada de Compose e nenhuma biblioteca nova.
 
 Os valores vêm do APK da TCL Live TV (`com.tcl.tv`, recursos decodificados), sem nada medido no olho. Quando a tela do fork já usava um valor diferente, ficou o valor da tela, porque a meta da 1.5a era **diferença zero**. Essas divergências estão anotadas abaixo.
 
@@ -57,6 +57,7 @@ O estilo define **só o tamanho**. Cor, peso (`sans-serif-medium`) e espaçament
 - **Raio:** `tcl_radius_cell` 6dp (foco, célula), `tcl_radius_panel` 8dp (banner), `tcl_radius_logo` 4dp, `tcl_radius_chip` 21dp, `tcl_radius_progress` 1dp.
 - **Logo:** `tcl_logo_small_*` 46×26dp (lista, vizinhos no banner) e `tcl_logo_large_*` 64×36dp (banner, detalhe).
 - **Componentes:** medidas exatas da TCL por componente (`tcl_rail_*`, `tcl_channel_row_*`, `tcl_banner_*`, `tcl_epg_*`, `tcl_dialog_*`, `tcl_chip_*`, `tcl_option_row_*`).
+- **Opções (1.5b):** `tcl_side_panel_width` 342dp (largura do `dialog_universal_option` da TCL) e `tcl_option_row_control` 32dp (espaço do check/rádio, `element_item_small_left_icon` da TCL).
 - **Alfa:** `tcl_alpha_unselected` 0.6 (categoria não escolhida no trilho).
 
 ### Tempo (`tcl_motion.xml`, em ms)
@@ -89,9 +90,14 @@ Cada componente é um layout `tcl_*.xml` ou um estilo `Widget.Tcl.*`. Só ganha 
 | **TclLogoCard** | `Widget.Tcl.LogoCard` / `.Framed`, `TclChannelRow.loadLogo()` | Logo encaixada, com ou sem o cartão escuro. Carrega do TIF e, se falhar, do feed | lista, banner, detalhe | `lista_todos.png`, `detalhe.png` |
 | **TclChip** | `layout/tcl_chip.xml`, `Widget.Tcl.Chip` | Etiquetas FHD/CC/áudio | topo do EPG e detalhe (`GuideTags`) | `epg.png` ("HD") |
 | **TclRail / TclRailItem** | `Widget.Tcl.Rail`, `layout/tcl_rail_item.xml` | Trilho de ícones com foco claro | lista lateral (Todos/Transmissão/Antena/IPTV e engrenagem) | `lista_transmissao.png` |
-| **TclPanel** | `Widget.Tcl.Panel` | Coluna escura de 280dp ao lado do trilho | lista lateral | `lista_todos.png` |
-| **TclOptionRow** | `layout/tcl_option_row.xml`, `Widget.Tcl.OptionRow` | Opção com o valor à direita, mesmo foco da lista | ainda não usado: é a base da 1.5b | — |
+| **TclPanel** | `Widget.Tcl.Panel`, `.Side`, `.Title` | Coluna escura: 280dp ao lado do trilho; 342dp à direita no painel de opções, com o título em `Title` | lista lateral; painéis de opções (`option_container`, `option_fragment`) | `lista_todos.png`, `opcoes_configuracoes.png` |
+| **TclOptionRow** | `Widget.Tcl.OptionRow` (+ `.Item`, `.Text`, `.Title`, `.Description`, `.Control`, `.Switch`, `.Divider`), `layout/tcl_option_row.xml`; cores `color/tcl_option_*` | Linha de opção com a barra clara de foco e texto escuro; check, rádio e chave tingidos (vermelho da TCL na chave ligada); item desligado em `text_tertiary` | todas as linhas dos painéis (`option_item_*`: ação, check, rádio, chave, canal, cadeado, divisória) | `opcoes_legenda.png`, `opcoes_configuracoes.png`, `opcoes_personalizar.png`, `opcoes_agrupar.png` |
+| **Cartão do menu** | `Widget.Tcl.MenuCard.Label` / `.Value`, `drawable/tcl_option_card_bg.xml`, `tcl_option_card_part_bg.xml`, `tcl_menu_background.xml` | Cartões do menu do AOSP com o foco da TCL (cartão claro, texto e ícone escuros) e célula escura fora do foco | menu (`menu_card_*`) | `menu.png`, `opcoes_menu.png` |
 | **TclDialog** | `Widget.Tcl.Dialog`, `Widget.Tcl.Dialog.Content` | Tela cheia sobre o vídeo, com máscara preta; segura as teclas | detalhe do programa no EPG | `detalhe.png` |
+
+**Como o `TclOptionRow` entrou nos painéis (1.5b):** as linhas continuam nos layouts `option_item_*` do AOSP, porque cada `Item` (`ActionItem`, `SwitchItem`, `ChannelCheckItem`…) acha as views pelos ids `title`, `description`, `check_box`… Trocar para `tcl_option_row.xml` exigiria mudar o código de todos os itens. Em vez disso, os layouts usam os estilos `Widget.Tcl.OptionRow.*` (mesma altura de 40dp, mesmo fundo de foco e mesmas cores). As views de dentro copiam o estado de foco da linha (`duplicateParentState`), e assim o texto fica escuro sobre a barra clara. O `tcl_option_row.xml` (título + valor à direita) continua disponível para telas novas.
+
+**Fontes de canais:** é a tela de configuração do leanback (`SetupSourcesFragment`), com tema próprio. Ela recebe as superfícies escuras (`setup_background`, `setup_actions_background` e a coluna do "Done" apontam para `tcl_color_surface_rail`/`_panel`) e o foco da célula selecionada do EPG (`drawable/tcl_setup_item_bg.xml` em `guidedActionsSelectorDrawable`). O texto continua branco, porque o leanback não passa o estado de foco para o título.
 
 **Onde o `TclChannelRow` não entrou:** a célula de canal do EPG (`program_guide_table_header_column_item`) continua com o binder do `ProgramTableAdapter`. Ela tem regras próprias que a linha não tem: canal bloqueado com cadeado, número menor com mais de 4 dígitos e logo invisível até carregar. Passar essas regras para o componente mudaria o comportamento, e a 1.5a não podia mudar nada. O texto da célula já usa os tokens.
 
@@ -102,7 +108,7 @@ Cada componente é um layout `tcl_*.xml` ou um estilo `Widget.Tcl.*`. Só ganha 
 - **Um controlador de telas:** tudo que aparece sobre o vídeo passa pelo `TvOverlayManager`, que decide quem fica visível, o Voltar e o auto-esconder. Nenhuma tela se abre sozinha.
 - **Dados → tela num lugar só:** cada componente tem um binder (ex.: `TclChannelRow.bind(channel, program, isPlaying)`). A mesma regra não se repete em 3 telas.
 - **Fontes de dados atrás de uma porta:** primeiro o TIF, depois o feed (`ProgramDataManager`, `FeedGuide`). A tela não sabe de onde veio o dado.
-- **Nada de valor solto:** cor, tamanho e espaço só por token. O passo **Design tokens** do CI (`.github/scripts/check-design-tokens.sh`) falha se aparecer `#…` ou `sp`/`dp`/`px` literal em `layout/tcl_*`, `channel_banner`, `channel_list_overlay`, `program_guide*`, `color/tcl_*`, `drawable/tcl_*` e `values/tcl_styles.xml`. Só `0dp` é permitido, porque significa "sem tamanho" ou "preencher". Os arquivos `values/tcl_*.xml` são a definição dos tokens e os arquivos antigos do AOSP ficam fora.
+- **Nada de valor solto:** cor, tamanho e espaço só por token. O passo **Design tokens** do CI (`.github/scripts/check-design-tokens.sh`) falha se aparecer `#…` ou `sp`/`dp`/`px` literal em `layout/tcl_*`, `channel_banner`, `channel_list_overlay`, `program_guide*`, os layouts das opções (`menu`, `menu_card_*`, `item_list`, `option_container`, `option_fragment` e os `option_item_*` usados), `color/tcl_*`, `drawable/tcl_*` e `values/tcl_styles.xml`. Só `0dp` é permitido, porque significa "sem tamanho" ou "preencher". Os arquivos `values/tcl_*.xml` são a definição dos tokens e os arquivos antigos do AOSP ficam fora.
 - **Nada de Compose nem biblioteca nova** sem necessidade medida.
 
 ## Capturas de referência
@@ -124,3 +130,18 @@ python docs/design-system/comparar.py docs/design-system/golden <pasta> <pasta-d
 ### Resultado da 1.5a
 
 As capturas antes (APK `1d705c1`) e depois (APK da 1.5a) foram feitas em seguida e comparadas com `comparar.py`. Resultado detalhado em `plano-canais.md` (etapa 1.5a).
+
+## Capturas das opções (1.5b)
+
+```bash
+sh docs/design-system/capturar_opcoes.sh <pasta>
+```
+
+- Republica a Channel+ falsa, sintoniza o **9445** e abre pelas teclas: `opcoes_menu` (Menu, linha "Opções da TV"), `opcoes_legenda`, `opcoes_configuracoes`, `opcoes_personalizar` (foco no canal atual), `opcoes_agrupar` (rádios) e `opcoes_fontes`. Entre uma tela e outra usa Voltar, o que também confere a ordem de fechamento.
+- **Cuidado:** em "Personalizar a lista", OK num canal o esconde. O script só aperta OK depois de conferir pelo `uiautomator` que o foco está em "Agrupar por". Se algo der errado, republicar a Channel+ (`am start -n com.tcl.channelplus/tif.falso.Setup`) volta todos os canais.
+- No emulador não há faixa de vídeo, áudio nem legenda. Por isso "Modo de exibição" e "Multiáudio" aparecem desligados, e a legenda só tem "Personalizar formatação". Esses painéis usam as mesmas linhas de rádio (`option_item_radio_button`) do "Agrupar por". Na TV, o multiáudio abriu com os rádios e a faixa atual marcada. A legenda e o modo de exibição não puderam ser trocados: o canal testado (1-1) não tem faixa de legenda, e com vídeo 16:9 o modo de exibição fica desligado, como antes.
+
+### Resultado da 1.5b
+
+- As capturas da 1.5a (banner, lista Todos/Transmissão/Antena, EPG e detalhe), feitas com o APK da 1.5a e logo depois com o da 1.5b: **iguais** pelo `comparar.py`. Só o `menu.png` mudou, porque o menu é uma das telas de opções. A referência em `golden/menu.png` foi trocada pela nova.
+- Referências novas: `golden/opcoes_*.png`.
