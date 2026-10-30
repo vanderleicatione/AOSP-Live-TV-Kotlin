@@ -410,6 +410,44 @@ class TuningController(
         }
     }
 
+    // Bugfix: Manche Eingänge (OpenTV, Channel+) bleiben nach dem Umschalten beim Laden hängen; Verlassen und
+    // Zurückkehren hilft, weil neu getunt wird. Dasselbe hier automatisch: nach STUCK_RETUNE_DELAY_MS ohne Video
+    // denselben Kanal neu tunen, höchstens MAX_STUCK_RETUNES-mal, danach Hinweis.
+    private var stuckChannelId = -1L
+    private var stuckRetunes = 0
+    private val stuckRetune = Runnable {
+        val channel = tvView.currentChannel ?: return@Runnable
+        if (!tvView.isPlaying || tvView.isVideoAvailable || channel != channelTuner.currentChannel ||
+            tvView.isContentBlocked || tvView.isScreenBlocked
+        ) return@Runnable
+        if (channel.id != stuckChannelId) {
+            stuckChannelId = channel.id
+            stuckRetunes = 0
+        }
+        if (stuckRetunes >= MAX_STUCK_RETUNES) {
+            Toast.makeText(activity, R.string.msg_channel_unavailable_unknown, Toast.LENGTH_SHORT).show()
+            return@Runnable
+        }
+        stuckRetunes++
+        Log.i(TAG, "Video stuck (reason ${tvView.videoUnavailableReason}), retune #$stuckRetunes of $channel")
+        stopTv("stuckRetune")
+        startTv(channel.uri)
+    }
+
+    private fun updateStuckRetune() {
+        tvView.removeCallbacks(stuckRetune)
+        if (tvView.isVideoAvailable) {
+            stuckRetunes = 0
+            return
+        }
+        when (tvView.videoUnavailableReason) {
+            TunableTvView.VIDEO_UNAVAILABLE_REASON_NOT_TUNED,
+            TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING,
+            TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING ->
+                tvView.postDelayed(stuckRetune, STUCK_RETUNE_DELAY_MS)
+        }
+    }
+
     private fun updateAvailabilityToast() {
         if (tvView.isVideoAvailable || tvView.currentChannel != channelTuner.currentChannel) return
         when (tvView.videoUnavailableReason) {
@@ -439,6 +477,7 @@ class TuningController(
             this.channel = channel
             this.wasUnderShrunkenTvView = wasUnderShrunkenTvView
             activity.programDataManager.onChannelTuned(channel.id)
+            updateStuckRetune()
         }
 
         override fun onUnexpectedStop(channel: Channel?) {
@@ -468,6 +507,7 @@ class TuningController(
             overlayManager.updateInputBannerIfNeeded(info)
             if (tvView.isVideoAvailable) activity.tvViewUiManager.fadeInTvView()
             if (!tvView.isContentBlocked && !tvView.isScreenBlocked) updateAvailabilityToast()
+            updateStuckRetune()
         }
 
         override fun onChannelRetuned(channel: Uri?) {
@@ -516,5 +556,7 @@ class TuningController(
         private const val MAX_RECENT_CHANNELS = 5
         // Bugfix: Wartezeit für die Meldung "Grund unbekannt"
         private const val UNKNOWN_UNAVAILABLE_TOAST_DELAY_MS = 2000L
+        private const val STUCK_RETUNE_DELAY_MS = 8000L
+        private const val MAX_STUCK_RETUNES = 2
     }
 }
