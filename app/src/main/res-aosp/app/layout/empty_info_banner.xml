@@ -21,5 +21,4 @@
     android:layout_height="match_parent"
     android:layout_gravity="start|top"
     android:layout_marginTop="27dp"
-    android:elevation="8dp"
-    android:background="@drawable/info_banner_background" />
+    />

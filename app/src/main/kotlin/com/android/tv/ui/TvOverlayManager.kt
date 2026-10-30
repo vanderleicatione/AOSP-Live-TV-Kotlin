@@ -416,7 +416,7 @@ class TvOverlayManager(
                 channelBannerView.updateChannelSignalStrengthView(tvView.channelSignalStrength)
             } else {
                 channelBannerView.setAdjacentChannels(
-                    channelTuner.getAdjacentBrowsableChannel(false), channelTuner.getAdjacentBrowsableChannel(true))
+                    channelTuner.getAdjacentBrowsableChannel(true), channelTuner.getAdjacentBrowsableChannel(false))
                 channelBannerView.updateViews(
                     reason == UPDATE_CHANNEL_BANNER_REASON_TUNE || reason == UPDATE_CHANNEL_BANNER_REASON_TUNE_FAST)
             }

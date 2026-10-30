@@ -240,7 +240,7 @@ class ChannelBannerView @JvmOverloads constructor(
         this.updateOnTune = false
     }
 
-    /** TCL-Stil: vorheriger Kanal über, nächster unter der Karte (unsichtbar, wenn es keinen anderen gibt). */
+    /** TCL-Stil: Kanal darüber (Kanal hoch) über, darunter (Kanal runter) unter der Karte (unsichtbar, wenn es keinen anderen gibt). */
     fun setAdjacentChannels(previous: Channel?, next: Channel?) {
         bindAdjacentChannel(previousChannelView, previousChannelNumberView, previousChannelNameView, previousChannelLogoView, previous)
         bindAdjacentChannel(nextChannelView, nextChannelNumberView, nextChannelNameView, nextChannelLogoView, next)

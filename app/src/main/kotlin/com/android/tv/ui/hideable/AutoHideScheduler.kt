@@ -8,11 +8,14 @@ import android.view.accessibility.AccessibilityManager.AccessibilityStateChangeL
 import androidx.annotation.UiThread
 import java.lang.ref.WeakReference
 
-/** Blendet nach einer Zeit automatisch aus – außer, wenn Bedienungshilfen aktiv sind. */
+/**
+ * Blendet nach einer Zeit automatisch aus – außer bei Screenreader (Touch-Erkundung). Die TCL hat immer
+ * Bedienungshilfe-Dienste an (tvQuickActions, Limite), daher reicht isEnabled nicht.
+ */
 @UiThread
 class AutoHideScheduler internal constructor(
     runnable: Runnable,
-    accessibilityManager: AccessibilityManager,
+    private val accessibilityManager: AccessibilityManager,
     looper: Looper,
 ) : AccessibilityStateChangeListener {
 
@@ -22,7 +25,7 @@ class AutoHideScheduler internal constructor(
     // Starke Referenz hier, der Handler hält nur eine schwache.
     private val runnable = runnable
     private val weakRunnable = WeakReference(runnable)
-    private var allowAutoHide = !accessibilityManager.isEnabled
+    private var allowAutoHide = !accessibilityManager.isTouchExplorationEnabled
     private val handler = Handler(looper) { msg ->
         if (msg.what == MSG_HIDE && allowAutoHide) weakRunnable.get()?.run()
         true
@@ -35,7 +38,9 @@ class AutoHideScheduler internal constructor(
         if (allowAutoHide) handler.sendEmptyMessageDelayed(MSG_HIDE, delayMs)
     }
 
-    override fun onAccessibilityStateChanged(enabled: Boolean) { allowAutoHide = !enabled }
+    override fun onAccessibilityStateChanged(enabled: Boolean) {
+        allowAutoHide = !accessibilityManager.isTouchExplorationEnabled
+    }
 
     val isScheduled: Boolean get() = handler.hasMessages(MSG_HIDE)
 
