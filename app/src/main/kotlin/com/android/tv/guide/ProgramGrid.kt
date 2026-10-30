@@ -9,8 +9,6 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.leanback.widget.VerticalGridView
-import androidx.leanback.widget.ViewHolderTask
-import androidx.recyclerview.widget.RecyclerView
 import com.android.tv.R
 import com.android.tv.ui.OnRepeatedKeyInterceptListener
 import java.util.concurrent.TimeUnit
@@ -162,7 +160,12 @@ class ProgramGrid @JvmOverloads constructor(
             Log.w(TAG, "No child view has focus")
             return null
         }
-        val nextChildIndex = if (direction == FOCUS_UP) focusedChildIndex - 1 else focusedChildIndex + 1
+        var nextChildIndex = if (direction == FOCUS_UP) focusedChildIndex - 1 else focusedChildIndex + 1
+        if (nextChildIndex < 0 && selectedPosition > 0) {
+            // Auswahl in Zeile 0: die Zeile darüber ist nicht ausgelegt – eine Zeile hochscrollen, dann normal suchen
+            scrollBy(0, -rowHeight)
+            nextChildIndex = getFocusedChildIndex() - 1
+        }
         if (nextChildIndex < 0 || nextChildIndex >= childCount) {
             // Umbruch am Listenanfang/-ende
             val itemCountTotal = adapter?.itemCount ?: 0
@@ -177,22 +180,6 @@ class ProgramGrid @JvmOverloads constructor(
                 }
                 smoothScrollToPosition(0)
                 return getChildAt(0)
-            }
-            if (direction == FOCUS_UP) {
-                // Auswahl in Zeile 0: die Zeile darüber ist nicht ausgelegt – erst hinscrollen, dann fokussieren
-                val left = focusRangeLeft
-                val right = focusRangeRight
-                val keepCurrent = isKeepCurrentProgramFocused
-                setSelectedPosition(selectedPosition - 1, object : ViewHolderTask {
-                    override fun run(viewHolder: RecyclerView.ViewHolder) {
-                        val next = GuideUtils.findNextFocusedProgram(viewHolder.itemView, left, right, keepCurrent) ?: return
-                        nextFocusByUpDown = next
-                        next.requestFocus()
-                        focusRangeLeft = left
-                        focusRangeRight = right
-                        isKeepCurrentProgramFocused = keepCurrent
-                    }
-                })
             }
             return focused
         }
