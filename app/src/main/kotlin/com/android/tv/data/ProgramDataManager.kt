@@ -56,7 +56,7 @@ class ProgramDataManager @Inject constructor(
 
     interface Callback {
         fun onProgramUpdated()
-        fun onChannelUpdated()
+        fun onChannelUpdated(channelId: Long)
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -462,7 +462,7 @@ class ProgramDataManager @Inject constructor(
                 else FeedGuide.merge(tif, FeedGuide.programsBetween(startTimeMs, endTimeMs, mapOf(channelId to feedId))[channelId].orEmpty())
             } ?: return@launch
             channelIdProgramCache[channelId] = programs
-            notifyChannelUpdated()
+            notifyChannelUpdated(channelId)
         }
     }
 
@@ -483,7 +483,7 @@ class ProgramDataManager @Inject constructor(
     }
 
     private fun notifyProgramUpdated() = callbacks.toList().forEach { it.onProgramUpdated() }
-    private fun notifyChannelUpdated() = callbacks.toList().forEach { it.onChannelUpdated() }
+    private fun notifyChannelUpdated(channelId: Long) = callbacks.toList().forEach { it.onChannelUpdated(channelId) }
 
     /** Gemeinsame Abfrage wie AsyncDbTask.AsyncQueryTask (inkl. series_id-Spalte). DB-Thread. */
     private suspend fun <T> queryPrograms(uri: Uri, sortOrder: String, onQuery: suspend (Cursor) -> T): T? {

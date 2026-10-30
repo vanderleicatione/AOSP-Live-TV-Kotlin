@@ -34,7 +34,8 @@ class ProgramManager(
     }
 
     fun interface TableEntriesUpdatedListener {
-        fun onTableEntriesUpdated()
+        /** [channelId] null: alle Kanäle. */
+        fun onTableEntriesUpdated(channelId: Long?)
     }
 
     fun interface TableEntryChangedListener {
@@ -86,7 +87,10 @@ class ProgramManager(
 
     private val programDataManagerCallback = object : ProgramDataManager.Callback {
         override fun onProgramUpdated() = updateTableEntries(true)
-        override fun onChannelUpdated() {
+        override fun onChannelUpdated(channelId: Long) {
+            // Nur den nachgeladenen Kanal neu bauen: alle 181 Kanäle neu zu bauen und alle Zeilen neu zu binden
+            // ruckelte bei jedem neuen Kanal, der beim Scrollen ins Bild kam
+            if (updateChannelEntries(channelId)) return
             updateTableEntriesWithoutNotification(false)
             notifyTableEntriesUpdated()
         }
@@ -232,20 +236,33 @@ class ProgramManager(
             }
         }
         if (endUtcMillis <= startTime) return
-        for (channel in channels) {
-            val entries = channelIdEntriesMap[channel.id] ?: continue
-            if (entries.isEmpty()) {
-                entries.add(TableEntry(channel.id, null, null, startTime, endUtcMillis, false))
-                continue
-            }
-            val last = entries.last()
-            if (endUtcMillis > last.entryEndUtcMillis) {
-                entries.add(TableEntry(channel.id, null, null, last.entryEndUtcMillis, endUtcMillis, false))
-            } else if (last.entryEndUtcMillis == Long.MAX_VALUE) {
-                // Gesperrter Kanal: bis zum Ende strecken
-                entries.removeAt(entries.size - 1)
-                entries.add(TableEntry(last.channelId, last.program, last.scheduledRecording, last.entryStartUtcMillis, endUtcMillis, last.isBlocked))
-            }
+        for (channel in channels) fillToEnd(channel.id, channelIdEntriesMap[channel.id] ?: continue)
+    }
+
+    /** Nur ein Kanal; false, wenn er das gemeinsame Ende verschiebt (dann müssen alle Kanäle neu). */
+    private fun updateChannelEntries(channelId: Long): Boolean {
+        if (channels.none { it.id == channelId }) return true
+        val entries = createProgramEntries(channelId, tvInputManagerHelper.isParentalControlsEnabled())
+        val last = entries.lastOrNull()
+        if (last != null && last.entryEndUtcMillis != Long.MAX_VALUE && last.entryEndUtcMillis > endUtcMillis) return false
+        if (endUtcMillis > startTime) fillToEnd(channelId, entries)
+        channelIdEntriesMap[channelId] = entries
+        tableEntriesUpdatedListeners.toList().forEach { it.onTableEntriesUpdated(channelId) }
+        return true
+    }
+
+    private fun fillToEnd(channelId: Long, entries: MutableList<TableEntry>) {
+        if (entries.isEmpty()) {
+            entries.add(TableEntry(channelId, null, null, startTime, endUtcMillis, false))
+            return
+        }
+        val last = entries.last()
+        if (endUtcMillis > last.entryEndUtcMillis) {
+            entries.add(TableEntry(channelId, null, null, last.entryEndUtcMillis, endUtcMillis, false))
+        } else if (last.entryEndUtcMillis == Long.MAX_VALUE) {
+            // Gesperrter Kanal: bis zum Ende strecken
+            entries.removeAt(entries.size - 1)
+            entries.add(TableEntry(last.channelId, last.program, last.scheduledRecording, last.entryStartUtcMillis, endUtcMillis, last.isBlocked))
         }
     }
 
@@ -328,7 +345,7 @@ class ProgramManager(
     private fun notifyGenresUpdated() = listeners.toList().forEach { it.onGenresUpdated() }
     private fun notifyChannelsUpdated() = listeners.toList().forEach { it.onChannelsUpdated() }
     private fun notifyTimeRangeUpdated() = listeners.toList().forEach { it.onTimeRangeUpdated() }
-    private fun notifyTableEntriesUpdated() = tableEntriesUpdatedListeners.toList().forEach { it.onTableEntriesUpdated() }
+    private fun notifyTableEntriesUpdated() = tableEntriesUpdatedListeners.toList().forEach { it.onTableEntriesUpdated(null) }
     private fun notifyTableEntryUpdated(entry: TableEntry) = tableEntryChangedListeners.toList().forEach { it.onTableEntryChanged(entry) }
 
     /** Eintrag im Raster: Sendung oder Lücke, ggf. gesperrt/mit Aufnahme. */

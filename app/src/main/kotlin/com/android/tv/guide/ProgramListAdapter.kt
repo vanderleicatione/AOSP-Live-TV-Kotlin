@@ -20,10 +20,11 @@ internal class ProgramListAdapter(res: Resources, private val programGuide: Prog
 
     init {
         setHasStableIds(true)
-        onTableEntriesUpdated()
+        onTableEntriesUpdated(null)
     }
 
-    override fun onTableEntriesUpdated() {
+    override fun onTableEntriesUpdated(channelId: Long?) {
+        if (channelId != null && channelId != this.channelId) return
         val channel = programManager.getChannel(channelIndex) ?: return // Kanal verschwunden
         channelId = channel.id
         notifyDataSetChanged()
