@@ -10,7 +10,6 @@ import com.android.tv.dvr.DvrScheduleManager
 import com.android.tv.dvr.DvrWatchedPositionManager
 import com.android.tv.dvr.recorder.RecordingScheduler
 import com.android.tv.dvr.RecordingStorageStatusManager
-import com.android.tv.data.PreviewDataManager
 import com.android.tv.util.SetupUtils
 import com.android.tv.util.TvInputManagerHelper
 import dagger.Module
@@ -29,7 +28,6 @@ interface TvSingletons {
     fun getSetupUtils(): SetupUtils
     fun getInputSessionManager(): InputSessionManager
     fun getMainActivityWrapper(): MainActivityWrapper
-    fun getPreviewDataManager(): PreviewDataManager
     /** null ohne DVR. */
     fun getDvrManager(): DvrManager?
     fun getDvrDataManager(): DvrDataManager

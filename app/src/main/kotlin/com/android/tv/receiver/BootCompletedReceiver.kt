@@ -10,7 +10,6 @@ import com.android.tv.Starter
 import com.android.tv.TvActivity
 import com.android.tv.TvSingletons
 import com.android.tv.features.TvFeatures
-import com.android.tv.recommendation.ChannelPreviewUpdater
 import com.android.tv.util.OnboardingUtils
 import com.android.tv.util.SetupUtils
 
@@ -26,7 +25,6 @@ class BootCompletedReceiver : BroadcastReceiver() {
             return
         }
         Starter.start(context)
-        ChannelPreviewUpdater.getInstance(context).updatePreviewDataForChannelsImmediately()
         SetupUtils.grantEpgPermissionToSetUpPackages(context)
         // App-Symbol beim ersten Boot einblenden
         if (TvFeatures.isUnhideEnabled(context) && OnboardingUtils.isFirstBoot(context)) {

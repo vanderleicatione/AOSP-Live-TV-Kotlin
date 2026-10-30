@@ -19,7 +19,6 @@ import com.android.tv.common.util.SharedPreferencesUtils
 import com.android.tv.common.ui.setup.animation.SetupAnimationHelper
 import com.android.tv.data.ChannelDataManager
 import com.android.tv.data.FeedGuide
-import com.android.tv.data.PreviewDataManager
 import com.android.tv.data.ProgramDataManager
 import com.android.tv.dvr.DvrDataManager
 import com.android.tv.dvr.DvrManager
@@ -31,8 +30,6 @@ import com.android.tv.dvr.recorder.RecordingScheduler
 import com.android.tv.dvr.ui.browse.DvrBrowseActivity
 import com.android.tv.features.TvFeatures
 import com.android.tv.modules.DbDispatcher
-import com.android.tv.recommendation.ChannelPreviewUpdater
-import com.android.tv.recommendation.RecordedProgramPreviewUpdater
 import com.android.tv.util.SetupUtils
 import com.android.tv.util.TvInputManagerHelper
 import com.android.tv.util.Utils
@@ -65,7 +62,6 @@ class TvApplication : Application(), TvSingletons, Starter {
     var versionName = ""
         private set
     private var selectInputActivity: SelectInputActivity? = null
-    private var previewDataManager: PreviewDataManager? = null
     private var dvrScheduleManager: DvrScheduleManager? = null
     private var dvrWatchedPositionManager: DvrWatchedPositionManager? = null
     private var recordingScheduler: RecordingScheduler? = null
@@ -117,10 +113,6 @@ class TvApplication : Application(), TvSingletons, Starter {
             dvrScheduleManager = DvrScheduleManager(this)
             recordingScheduler = RecordingScheduler.createScheduler(this)
         }
-        ChannelPreviewUpdater.getInstance(this).startRoutineService()
-        if (TvFeatures.isDvrEnabled(this)) {
-            RecordedProgramPreviewUpdater.getInstance(this).updatePreviewDataForRecordedPrograms()
-        }
     }
 
     override fun getTvInputManagerHelper(): TvInputManagerHelper = tvInputManagerHelper.get()
@@ -133,9 +125,6 @@ class TvApplication : Application(), TvSingletons, Starter {
     override fun getSetupUtils(): SetupUtils = injectedSetupUtils
     override fun getInputSessionManager(): InputSessionManager = inputSessionManager.get()
     override fun getMainActivityWrapper(): MainActivityWrapper = injectedMainActivityWrapper
-
-    override fun getPreviewDataManager(): PreviewDataManager =
-        previewDataManager ?: PreviewDataManager(this).also { it.start(); previewDataManager = it }
 
     override fun getDvrManager(): DvrManager? =
         if (TvFeatures.isDvrEnabled(this) && dvrScheduleManager != null) dvrManager.get() else null

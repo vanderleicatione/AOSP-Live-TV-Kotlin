@@ -55,7 +55,6 @@ import com.android.tv.main.TrackController
 import com.android.tv.main.TuningController
 import com.android.tv.modules.DbDispatcher
 import com.android.tv.onboarding.OnboardingActivity
-import com.android.tv.recommendation.ChannelPreviewUpdater
 import com.android.tv.search.ProgramGuideSearchFragment
 import com.android.tv.ui.ChannelBannerView
 import com.android.tv.ui.InputBannerViewBase
@@ -708,7 +707,6 @@ class MainActivity : FragmentActivity(), OnActionClickListener, OnPinCheckedList
 
     private fun applyParentalControlSettings() {
         tvView.onParentalControlChanged(isParentalControlsEnabled())
-        ChannelPreviewUpdater.getInstance(this).updatePreviewDataForChannelsImmediately()
     }
 
     fun addOnActionClickListener(listener: OnActionClickListener) { onActionClickListeners.add(listener) }

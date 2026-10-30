@@ -220,10 +220,6 @@
         <receiver android:name="com.android.tv.dvr.recorder.DvrStartRecordingReceiver"
              android:exported="false"/>
 
-        <service android:name="com.android.tv.recommendation.ChannelPreviewUpdater$ChannelPreviewUpdateService"
-             android:exported="false"
-             android:permission="android.permission.BIND_JOB_SERVICE"/>
-
         <receiver android:name="com.android.tv.receiver.BootCompletedReceiver"
              android:exported="true">
             <intent-filter>
