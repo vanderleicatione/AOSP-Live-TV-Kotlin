@@ -14,6 +14,8 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+        // Nur Portugiesisch (TV) und Englisch (Standard) — die übrigen ~80 Sprachen nur Ballast im APK
+        resourceConfigurations += listOf("en", "pt")
     }
     signingConfigs {
         // Fester Debug-Schlüssel, damit CI-Builds denselben Signatur-Key nutzen und
