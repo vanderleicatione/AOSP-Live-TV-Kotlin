@@ -48,14 +48,14 @@
         android:layout_height="@dimen/program_guide_table_header_row_height"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:paddingStart="12dp"
+        android:paddingStart="@dimen/tcl_space_12"
         android:paddingEnd="@dimen/program_guide_table_header_column_padding_end"
         android:gravity="start|center_vertical"
         android:textAlignment="viewStart"
         android:format12Hour="EEE dd/MM/yyyy"
         android:format24Hour="EEE dd/MM/yyyy"
-        android:textSize="14sp"
-        android:textColor="#B3FFFFFF" />
+        android:textAppearance="@style/TextAppearance.Tcl.Label"
+        android:textColor="@color/tcl_color_text_secondary" />
 
     <com.android.tv.guide.TimelineRow
         android:id="@+id/time_row"
@@ -67,7 +67,7 @@
         android:layout_marginStart="@dimen/program_guide_table_header_row_overlap"
         android:fadingEdgeLength="@dimen/program_guide_table_header_row_fade_length"
         android:requiresFadingEdge="horizontal"
-        android:background="#00000000" />
+        android:background="@color/tcl_color_clear" />
 
     <com.android.tv.guide.ProgramGrid
         android:id="@+id/grid"
@@ -82,10 +82,10 @@
     <ImageView
         android:id="@+id/current_time_indicator"
         android:layout_width="wrap_content"
-        android:layout_height="296.5dp"
+        android:layout_height="@dimen/tcl_epg_now_line_height"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@id/clock"
-        android:layout_marginTop="28.5dp"
+        android:layout_marginTop="@dimen/tcl_epg_now_line_top"
         android:contentDescription="@null"
         android:scaleType="fitXY"
         android:src="@drawable/tcl_epg_now_line" />

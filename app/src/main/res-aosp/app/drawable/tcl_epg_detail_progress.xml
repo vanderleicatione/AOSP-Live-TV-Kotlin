@@ -3,15 +3,15 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="#66F0F0F2" />
-            <corners android:radius="1dp" />
+            <solid android:color="@color/tcl_color_progress_track" />
+            <corners android:radius="@dimen/tcl_radius_progress" />
         </shape>
     </item>
     <item android:id="@android:id/progress">
         <clip>
             <shape>
-                <solid android:color="#FFE7211A" />
-                <corners android:radius="1dp" />
+                <solid android:color="@color/tcl_color_progress" />
+                <corners android:radius="@dimen/tcl_radius_progress" />
             </shape>
         </clip>
     </item>

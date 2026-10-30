@@ -187,8 +187,8 @@ object FeedGuide {
             listeners.toList().forEach { it.run() }
             // Logos vorab in den Speicher-Cache, damit das erste Öffnen der Liste nicht beim Dekodieren ruckelt.
             val res = appContext.resources
-            val w = res.getDimensionPixelSize(R.dimen.tcl_channel_list_logo_width)
-            val h = res.getDimensionPixelSize(R.dimen.tcl_channel_list_logo_height)
+            val w = res.getDimensionPixelSize(R.dimen.tcl_logo_small_width)
+            val h = res.getDimensionPixelSize(R.dimen.tcl_logo_small_height)
             map.values.forEach { c -> c.logoUri?.let { ImageLoader.prefetchBitmap(appContext, it, w, h) } }
         }
     }

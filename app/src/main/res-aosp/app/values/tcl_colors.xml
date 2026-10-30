@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Design system: colour tokens (docs/design-system.md). Values are TCL Live TV's own (com.tcl.tv
+     resources); names in comments are TCL's. Layouts use the semantic tokens, not the palette. -->
+<resources>
+    <!-- Palette: TCL element_primary_white_* (#F0F0F2 with alpha). -->
+    <color name="tcl_white_100">#FFF0F0F2</color>
+    <color name="tcl_white_90">#E6F0F0F2</color>
+    <color name="tcl_white_70">#B3F0F0F2</color>
+    <color name="tcl_white_40">#66F0F0F2</color>
+    <color name="tcl_white_24">#3DF0F0F2</color>
+    <color name="tcl_white_12">#1FF0F0F2</color>
+    <color name="tcl_white_8">#14F0F0F2</color>
+    <!-- Palette: TCL element_primary_black_* and the masks' blacks. -->
+    <color name="tcl_black_100">#FF000000</color>
+    <color name="tcl_black_97">#F7000000</color>
+    <color name="tcl_black_96">#F5000000</color>
+    <color name="tcl_black_90">#E6000000</color>
+    <color name="tcl_black_88">#E1000000</color>
+    <color name="tcl_black_70">#B3000000</color>
+    <color name="tcl_black_60">#99000000</color>
+    <color name="tcl_black_50">#80000000</color>
+    <color name="tcl_black_40">#66000000</color>
+    <color name="tcl_black_15">#27000000</color>
+    <color name="tcl_black_0">#00000000</color>
+
+    <!-- Text: TCL element_text_color_focus / _normal / _weak (pure white with alpha). -->
+    <color name="tcl_color_text_primary">#E6FFFFFF</color>
+    <color name="tcl_color_text_secondary">#B3FFFFFF</color>
+    <color name="tcl_color_text_tertiary">#66FFFFFF</color>
+    <!-- Text on the #F0F0F2 surfaces: TCL text_color_focused #F0F0F2 at 70%, element_primary_white_90/40. -->
+    <color name="tcl_color_text_soft">@color/tcl_white_70</color>
+    <color name="tcl_color_text_strong">@color/tcl_white_90</color>
+    <color name="tcl_color_text_weak">@color/tcl_white_40</color>
+
+    <!-- Focus: one pattern, light bar with dark text (TCL channeltype_color_focused1/2). -->
+    <color name="tcl_color_focus_bg">@color/tcl_white_100</color>
+    <color name="tcl_color_on_focus">@color/tcl_black_90</color>
+    <color name="tcl_color_on_focus_secondary">@color/tcl_black_60</color>
+    <!-- Icons are drawn in TCL's #F0F0F2 and tinted on focus. -->
+    <color name="tcl_color_icon">@color/tcl_white_100</color>
+
+    <!-- Surfaces. -->
+    <color name="tcl_color_surface_panel">#CC0A0A0A</color>
+    <color name="tcl_color_surface_rail">@color/tcl_black_88</color>
+    <color name="tcl_color_surface_banner">#6618191D</color>
+    <color name="tcl_color_banner_stroke">#B2999999</color>
+    <color name="tcl_color_surface_cell">@color/tcl_white_12</color>
+    <color name="tcl_color_surface_cell_selected">@color/tcl_white_24</color>
+    <color name="tcl_color_surface_logo">@color/tcl_black_50</color>
+    <color name="tcl_color_surface_chip">@color/tcl_white_8</color>
+    <color name="tcl_color_divider">@color/tcl_white_12</color>
+    <color name="tcl_color_scrim">@color/tcl_black_100</color>
+    <color name="tcl_color_clear">@color/tcl_black_0</color>
+
+    <!-- EPG half-hour ticks (TCL epg_pro_time_bar_divider_color). -->
+    <color name="tcl_color_tick">#4DFFFFFF</color>
+    <color name="tcl_color_tick_now">#A3FFFFFF</color>
+
+    <!-- Accents: TCL element_tcl_card_red (playing marker, now line) and the detail seek bar red. -->
+    <color name="tcl_color_accent_live">#FFFA2C25</color>
+    <color name="tcl_color_progress">#FFE7211A</color>
+    <color name="tcl_color_progress_track">@color/tcl_white_40</color>
+</resources>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- TCL epg_detail_pro_mask: black from the left, the video shows through on the right. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <gradient android:angle="0" android:startColor="#F5000000" android:centerColor="#B3000000" android:endColor="#66000000" />
+    <gradient android:angle="0" android:startColor="@color/tcl_black_96" android:centerColor="@color/tcl_black_70" android:endColor="@color/tcl_black_40" />
 </shape>

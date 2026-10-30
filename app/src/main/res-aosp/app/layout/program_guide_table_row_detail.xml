@@ -154,7 +154,7 @@
                     android:fontFamily="@string/font"
                     android:textSize="@dimen/program_guide_table_detail_desc_text_size"
                     android:textColor="@color/program_guide_table_detail_desc_text_color"
-                    android:lineSpacingExtra="4sp"
+                    android:lineSpacingExtra="@dimen/program_guide_table_detail_desc_line_spacing"
                     android:maxLines="2"
                     android:ellipsize="end" />
 

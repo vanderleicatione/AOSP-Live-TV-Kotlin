@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TclChip: TCL element_tcl_layout_tag, style Tag_Small (13dp/1dp padding, Text_Small1). -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.Tcl.Chip" />

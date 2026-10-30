@@ -7,13 +7,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.android.tv.R
 import com.android.tv.guide.ProgramManager.TableEntry
+import com.android.tv.ui.TclChannelRow
 
 /** Einträge einer Kanalzeile in der Programmübersicht. */
 internal class ProgramListAdapter(res: Resources, private val programGuide: ProgramGuide, private val channelIndex: Int) :
     RecyclerView.Adapter<ProgramListAdapter.ProgramItemViewHolder>(), ProgramManager.TableEntriesUpdatedListener {
 
     private val programManager = programGuide.programManager
-    private val noInfoProgramTitle = res.getString(R.string.tcl_no_information)
+    private val noInfoProgramTitle = TclChannelRow.titleOrNoInformation(res, null)
     private val blockedProgramTitle = res.getString(R.string.program_title_for_blocked_channel)
     private var channelId = 0L
 

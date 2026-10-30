@@ -120,10 +120,6 @@
     <color name="channel_banner_text_color">#FFEEEEEE</color>
     <color name="channel_banner_episode_text_color">#B3EEEEEE</color>
     <color name="channel_banner_dim_text_color">#80EEEEEE</color>
-    <!-- TCL Live TV infobar text_focus_color. -->
-    <color name="tcl_banner_text_color">#E6FFFFFF</color>
-    <!-- TCL Live TV infobar info_normal_text_color (previous/next channel). -->
-    <color name="tcl_banner_secondary_text_color">#B3FFFFFF</color>
 
     <!-- Keypad channel switch -->
     <color name="keypad_channel_switch_text_color">@color/channel_banner_text_color</color>

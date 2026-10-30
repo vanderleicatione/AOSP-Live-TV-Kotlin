@@ -4,18 +4,18 @@
      before the programmes. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_selected="true">
-        <inset android:insetRight="2dp" android:insetBottom="4dp">
+        <inset android:insetRight="@dimen/tcl_epg_cell_gap" android:insetBottom="@dimen/tcl_space_4">
             <shape>
-                <solid android:color="#3DF0F0F2" />
-                <corners android:radius="6dp" />
+                <solid android:color="@color/tcl_color_surface_cell_selected" />
+                <corners android:radius="@dimen/tcl_radius_cell" />
             </shape>
         </inset>
     </item>
     <item>
-        <inset android:insetRight="2dp" android:insetBottom="4dp">
+        <inset android:insetRight="@dimen/tcl_epg_cell_gap" android:insetBottom="@dimen/tcl_space_4">
             <shape>
-                <solid android:color="#1FF0F0F2" />
-                <corners android:radius="6dp" />
+                <solid android:color="@color/tcl_color_surface_cell" />
+                <corners android:radius="@dimen/tcl_radius_cell" />
             </shape>
         </inset>
     </item>

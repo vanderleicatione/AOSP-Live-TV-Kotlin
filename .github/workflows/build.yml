@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Design tokens (no literal colours or sizes)
+        run: sh .github/scripts/check-design-tokens.sh
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

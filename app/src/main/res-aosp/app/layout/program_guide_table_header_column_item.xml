@@ -22,7 +22,7 @@
     android:id="@+id/header_column"
     android:layout_width="@dimen/program_guide_table_header_column_width"
     android:layout_height="match_parent"
-    android:paddingBottom="4dp"
+    android:paddingBottom="@dimen/tcl_space_4"
     android:background="@drawable/tcl_epg_channel_cell_bg"
     android:gravity="center_vertical"
     android:orientation="horizontal">
@@ -36,9 +36,9 @@
 
     <TextView
         android:id="@+id/channel_number"
-        android:layout_width="44dp"
+        android:layout_width="@dimen/tcl_epg_channel_number_width"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="@dimen/tcl_space_12"
         android:fontFamily="sans-serif-medium"
         android:singleLine="true"
         android:ellipsize="end"
@@ -49,7 +49,7 @@
         android:id="@+id/channel_logo"
         android:layout_width="@dimen/program_guide_table_header_column_channel_logo_width"
         android:layout_height="@dimen/program_guide_table_header_column_channel_logo_height"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="@dimen/tcl_space_4"
         android:scaleType="fitCenter"
         android:visibility="invisible" />
 
@@ -58,8 +58,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="@dimen/tcl_space_4"
+        android:layout_marginEnd="@dimen/tcl_space_8"
         android:duplicateParentState="true"
         android:fontFamily="sans-serif-medium"
         android:letterSpacing="0.04"
@@ -72,7 +72,7 @@
         android:id="@+id/channel_block"
         android:layout_width="@dimen/program_guide_table_header_column_channel_block_width"
         android:layout_height="@dimen/program_guide_table_header_column_channel_block_height"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="@dimen/tcl_space_8"
         android:scaleType="center"
         android:src="@drawable/ic_guide_lock"
         android:alpha="@dimen/program_guide_table_header_column_channel_block_opacity"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- TCL Live TV epg_pro_time_bar_divider_color: brighter on the half hour that contains now. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_selected="true" android:color="#A3FFFFFF" />
-    <item android:color="#4DFFFFFF" />
+    <item android:state_selected="true" android:color="@color/tcl_color_tick_now" />
+    <item android:color="@color/tcl_color_tick" />
 </selector>

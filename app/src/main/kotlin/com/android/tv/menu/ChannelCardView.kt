@@ -10,6 +10,7 @@ import com.android.tv.MainActivity
 import com.android.tv.R
 import com.android.tv.data.api.Channel
 import com.android.tv.data.api.Program
+import com.android.tv.ui.TclChannelRow
 import com.android.tv.util.images.ImageLoader
 
 /**
@@ -64,7 +65,7 @@ class ChannelCardView @JvmOverloads constructor(
                 program = currentProgram
                 if (currentProgram == null || currentProgram.title.isNullOrEmpty()) {
                     setTextViewEnabled(false)
-                    setText(R.string.tcl_no_information)
+                    setText(TclChannelRow.titleOrNoInformation(resources, null))
                 } else {
                     setTextViewEnabled(true)
                     setText(currentProgram.title)

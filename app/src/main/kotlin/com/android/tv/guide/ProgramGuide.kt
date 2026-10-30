@@ -35,6 +35,7 @@ import com.android.tv.data.api.Channel
 import com.android.tv.dvr.DvrDataManager
 import com.android.tv.dvr.DvrScheduleManager
 import com.android.tv.ui.HardwareLayerAnimatorListenerAdapter
+import com.android.tv.ui.TclChannelRow
 import com.android.tv.ui.ViewUtils
 import com.android.tv.ui.hideable.AutoHideScheduler
 import com.android.tv.util.TvInputManagerHelper
@@ -349,12 +350,7 @@ class ProgramGuide(
     /** TCL: Titel, Zeit und Beschreibung der fokussierten Sendung oben statt in einer Detailzeile. */
     private fun updateDetail(entry: ProgramManager.TableEntry) {
         val program = entry.program
-        val title = program?.title
-        detailTitle.text = if (entry.isGap || program == null || title.isNullOrEmpty()) {
-            activity.getString(R.string.tcl_no_information)
-        } else {
-            program.getEpisodeDisplayTitle(activity).let { if (it.isNullOrEmpty()) title else "$title: $it" }
-        }
+        detailTitle.text = TclChannelRow.programTitle(activity, if (entry.isGap) null else program)
         detailTime.text = Utils.getDurationString(activity, clock, entry.entryStartUtcMillis, entry.entryEndUtcMillis, true)
         detailDescription.text = when {
             entry.isBlocked -> activity.getString(R.string.program_guide_content_locked)
@@ -385,7 +381,7 @@ class ProgramGuide(
             })
         val title = program.title
         detailScreen.findViewById<TextView>(R.id.program_guide_detail_screen_title).text =
-            if (title.isNullOrEmpty()) activity.getString(R.string.tcl_no_information) else title
+            TclChannelRow.titleOrNoInformation(activity.resources, title)
         val timeFormat = DateFormat.getTimeFormat(activity)
         detailScreen.findViewById<TextView>(R.id.program_guide_detail_screen_start).text = timeFormat.format(Date(entry.entryStartUtcMillis))
         detailScreen.findViewById<TextView>(R.id.program_guide_detail_screen_end).text = timeFormat.format(Date(entry.entryEndUtcMillis))

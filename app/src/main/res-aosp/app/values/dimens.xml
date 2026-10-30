@@ -231,6 +231,7 @@
     <dimen name="program_guide_table_critic_score_score_text_size">12dp</dimen>
     <dimen name="program_guide_table_detail_desc_margin_top">46dp</dimen>
     <dimen name="program_guide_table_detail_desc_text_size">12sp</dimen>
+    <dimen name="program_guide_table_detail_desc_line_spacing">4sp</dimen>
     <dimen name="program_guide_table_width_per_hour">311dp</dimen>
     <dimen name="program_guide_table_exit_x">368dp</dimen>
 
@@ -258,13 +259,6 @@
     <dimen name="empty_input_status_block_info_margin_top">16dp</dimen>
 
     <!-- Channel banner -->
-    <!-- TCL Live TV item_channel values for the left channel list. -->
-    <dimen name="tcl_channel_list_logo_width">46dp</dimen>
-    <!-- Gap between the category icons and the settings gear in the rail. -->
-    <dimen name="tcl_channel_list_settings_margin_top">24dp</dimen>
-    <dimen name="tcl_channel_list_logo_height">26dp</dimen>
-    <dimen name="tcl_channel_list_program_start">78dp</dimen>
-    <dimen name="tcl_channel_list_program_start_playing">102dp</dimen>
 
     <!-- TCL Live TV infobar values: 300dp card, number always 28sp, logo 64x36dp. -->
     <dimen name="channel_banner_width">300dp</dimen>
@@ -274,8 +268,8 @@
     <dimen name="channel_banner_channel_number_large_margin_top">8dp</dimen>
     <dimen name="channel_banner_channel_number_medium_margin_top">8dp</dimen>
     <dimen name="channel_banner_channel_number_small_margin_top">8dp</dimen>
-    <dimen name="channel_banner_channel_logo_width">64dp</dimen>
-    <dimen name="channel_banner_channel_logo_height">36dp</dimen>
+    <dimen name="channel_banner_channel_logo_width">@dimen/tcl_logo_large_width</dimen>
+    <dimen name="channel_banner_channel_logo_height">@dimen/tcl_logo_large_height</dimen>
     <dimen name="channel_banner_channel_logo_margin_start">32dp</dimen>
     <dimen name="channel_banner_input_logo_size">16dp</dimen>
     <dimen name="channel_banner_program_description_width">164dp</dimen>

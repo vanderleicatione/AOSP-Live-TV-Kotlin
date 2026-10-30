@@ -20,6 +20,7 @@ import com.android.tv.dvr.data.ScheduledRecording
 import com.android.tv.dvr.ui.DvrUiHelper
 import com.android.tv.features.TvFeatures
 import com.android.tv.guide.ProgramManager.TableEntry
+import com.android.tv.ui.TclChannelRow
 import com.android.tv.util.Utils
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
@@ -141,7 +142,7 @@ class ProgramItemView @JvmOverloads constructor(
             layoutParams = it
         }
         var title = if (entry.isGap) gapTitle else entry.program?.title
-        if (title.isNullOrEmpty()) title = resources.getString(R.string.tcl_no_information)
+        title = TclChannelRow.titleOrNoInformation(resources, title)
         updateText(selectedGenreId, title)
         updateIcons()
         updateContentDescription(title)

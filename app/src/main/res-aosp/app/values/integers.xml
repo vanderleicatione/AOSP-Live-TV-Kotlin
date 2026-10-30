@@ -46,17 +46,17 @@
     <integer name="side_panel_ripple_anim_duration">@integer/ripple_anim_duration</integer>
 
     <!-- Program guide -->
-    <integer name="program_guide_anim_duration">250</integer>
-    <integer name="program_guide_table_fade_anim_duration">150</integer>
-    <integer name="program_guide_table_detail_fade_anim_duration">150</integer>
+    <integer name="program_guide_anim_duration">@integer/tcl_motion_normal</integer>
+    <integer name="program_guide_table_fade_anim_duration">@integer/tcl_motion_fast</integer>
+    <integer name="program_guide_table_detail_fade_anim_duration">@integer/tcl_motion_fast</integer>
     <integer name="program_guide_table_detail_toggle_anim_duration">100</integer>
-    <integer name="program_guide_show_duration">60000</integer>
+    <integer name="program_guide_show_duration">@integer/tcl_motion_hide_guide</integer>
     <integer name="program_guide_ripple_anim_duration">@integer/ripple_anim_duration</integer>
     <!-- TCL EPG opens with the current channel on the first row. -->
     <integer name="program_guide_selection_row">0</integer>
 
     <!-- Channel banner -->
-    <integer name="channel_banner_show_duration">8000</integer>
+    <integer name="channel_banner_show_duration">@integer/tcl_motion_hide_banner</integer>
     <integer name="channel_banner_anim_duration">250</integer>
     <integer name="channel_banner_fast_anim_duration">75</integer>
 

@@ -46,7 +46,7 @@ internal object GuideTags {
     /** Etiketten in [container] zeigen; vorhandene TextViews werden wiederverwendet (kein Inflate je Fokus). */
     fun bind(container: ViewGroup, tags: List<String>) {
         while (container.childCount < tags.size) {
-            LayoutInflater.from(container.context).inflate(R.layout.tcl_tag, container, true)
+            LayoutInflater.from(container.context).inflate(R.layout.tcl_chip, container, true)
         }
         for (i in 0 until container.childCount) {
             val tag = container.getChildAt(i) as TextView

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Category rail icon tint: dark on the focused light bar, otherwise the icon's own #F0F0F2. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_focused="true" android:color="#E6000000" />
-    <item android:color="#FFF0F0F2" />
+    <item android:state_focused="true" android:color="@color/tcl_color_on_focus" />
+    <item android:color="@color/tcl_color_icon" />
 </selector>

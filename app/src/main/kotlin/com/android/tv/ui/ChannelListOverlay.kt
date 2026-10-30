@@ -1,12 +1,10 @@
 package com.android.tv.ui
 
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.leanback.widget.VerticalGridView
 import androidx.recyclerview.widget.RecyclerView
 import com.android.tv.ChannelTuner
@@ -15,7 +13,6 @@ import com.android.tv.R
 import com.android.tv.data.ProgramDataManager
 import com.android.tv.data.api.Channel
 import com.android.tv.ui.hideable.AutoHideScheduler
-import com.android.tv.util.images.ImageLoader
 
 /**
  * Kanalliste links im Stil von TCL Live TV (activity_channellist/item_channel), mit OK geöffnet:
@@ -37,10 +34,8 @@ class ChannelListOverlay(
     private val adapter = ChannelAdapter()
     private val autoHideScheduler = AutoHideScheduler(activity) { hide() }
     private val res = activity.resources
-    private val logoWidth = res.getDimensionPixelSize(R.dimen.tcl_channel_list_logo_width)
-    private val logoHeight = res.getDimensionPixelSize(R.dimen.tcl_channel_list_logo_height)
-    private val programStart = res.getDimensionPixelSize(R.dimen.tcl_channel_list_program_start)
-    private val programStartPlaying = res.getDimensionPixelSize(R.dimen.tcl_channel_list_program_start_playing)
+    private val showDurationMillis = res.getInteger(R.integer.tcl_motion_hide_list).toLong()
+    private val unselectedAlpha = res.getFloat(R.dimen.tcl_alpha_unselected)
     private var allChannels: List<Channel> = emptyList()
     private var category = Category.ALL
     private var selectedRailItemId = View.NO_ID
@@ -78,7 +73,7 @@ class ChannelListOverlay(
         onHidden.run()
     }
 
-    fun scheduleHide() = autoHideScheduler.schedule(SHOW_DURATION_MILLIS)
+    fun scheduleHide() = autoHideScheduler.schedule(showDurationMillis)
 
     /** Eine Seite (sichtbare Zeilen) nach oben bzw. unten. */
     fun page(down: Boolean) {
@@ -104,7 +99,7 @@ class ChannelListOverlay(
         val inflater = LayoutInflater.from(activity)
         for (c in Category.entries) {
             if (c != Category.ALL && c !in present) continue
-            val item = inflater.inflate(R.layout.tcl_channel_type_item, typeRail, false)
+            val item = inflater.inflate(R.layout.tcl_rail_item, typeRail, false)
             item.id = View.generateViewId()
             item.tag = c
             item.contentDescription = activity.getString(c.labelRes)
@@ -115,12 +110,12 @@ class ChannelListOverlay(
             typeRail.addView(item)
         }
         // Zahnrad unter den Kategorien: öffnet das Menü auf der Zeile mit den Optionen.
-        val settings = inflater.inflate(R.layout.tcl_channel_type_item, typeRail, false)
+        val settings = inflater.inflate(R.layout.tcl_rail_item, typeRail, false)
         settings.contentDescription = activity.getString(R.string.tcl_channel_list_settings)
         settings.findViewById<ImageView>(R.id.channel_type_icon).setImageResource(R.drawable.tcl_ic_settings)
         settings.nextFocusRightId = R.id.channel_list_grid
         (settings.layoutParams as ViewGroup.MarginLayoutParams).topMargin =
-            res.getDimensionPixelSize(R.dimen.tcl_channel_list_settings_margin_top)
+            res.getDimensionPixelSize(R.dimen.tcl_space_24)
         settings.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) scheduleHide() }
         settings.setOnClickListener {
             hide()
@@ -136,7 +131,7 @@ class ChannelListOverlay(
             val selected = item.tag == category
             if (selected) selectedRailItemId = item.id
             // TCL: gewählte Kategorie voll deckend, die anderen mit 60 % ("withalpha").
-            item.findViewById<View>(R.id.channel_type_icon).alpha = if (selected) 1f else 0.6f
+            item.findViewById<View>(R.id.channel_type_icon).alpha = if (selected) 1f else unselectedAlpha
         }
     }
 
@@ -161,14 +156,6 @@ class ChannelListOverlay(
         scheduleHide()
     }
 
-    private fun programText(channel: Channel): String {
-        val program = programDataManager.getCurrentProgram(channel.id)
-        val title = program?.title
-        if (program == null || title.isNullOrEmpty()) return activity.getString(R.string.tcl_no_information)
-        val episode = program.getEpisodeDisplayTitle(activity)
-        return if (episode.isNullOrEmpty()) title else "$title: $episode"
-    }
-
     private enum class Category(val iconRes: Int, val labelRes: Int) {
         ALL(R.drawable.tcl_ic_type_all, R.string.tcl_channel_type_all),
         BROADCAST(R.drawable.tcl_ic_type_streaming, R.string.tcl_channel_type_broadcast),
@@ -177,11 +164,7 @@ class ChannelListOverlay(
     }
 
     private class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val logo: ImageView = view.findViewById(R.id.channel_logo)
-        val number: TextView = view.findViewById(R.id.channel_number)
-        val name: TextView = view.findViewById(R.id.channel_name)
-        val playing: View = view.findViewById(R.id.channel_playing)
-        val program: TextView = view.findViewById(R.id.channel_program)
+        val row = TclChannelRow(view)
     }
 
     private inner class ChannelAdapter : RecyclerView.Adapter<ViewHolder>() {
@@ -196,39 +179,18 @@ class ChannelListOverlay(
         override fun getItemCount() = channels.size
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-            ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.tcl_channel_list_item, parent, false))
+            ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.tcl_channel_row, parent, false))
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val channel = channels[position]
-            holder.number.text = channel.displayNumber
-            holder.name.text = channel.displayName
-            val playing = channel.id == channelTuner.currentChannelId
-            holder.playing.visibility = if (playing) View.VISIBLE else View.GONE
-            val lp = holder.program.layoutParams as ViewGroup.MarginLayoutParams
-            lp.marginStart = if (playing) programStartPlaying else programStart
-            holder.program.layoutParams = lp
-            holder.program.text = programText(channel)
-            holder.logo.setImageDrawable(null)
-            holder.logo.tag = channel.id
-            if (channel.channelLogoExists()) {
-                channel.loadBitmap(activity, Channel.LOAD_IMAGE_TYPE_CHANNEL_LOGO, logoWidth, logoHeight,
-                    LogoCallback(holder.logo, channel.id))
-            }
+            holder.row.bind(channel, programDataManager.getCurrentProgram(channel.id),
+                channel.id == channelTuner.currentChannelId)
             holder.itemView.nextFocusLeftId = selectedRailItemId
             holder.itemView.setOnClickListener { onChannelClicked(channel) }
         }
     }
 
-    /** Recycelte Zeilen: Logo nur setzen, wenn die Zeile noch denselben Kanal zeigt. */
-    private class LogoCallback(view: ImageView, private val channelId: Long) :
-        ImageLoader.ImageLoaderCallback<ImageView>(view) {
-        override fun onBitmapLoaded(referent: ImageView, bitmap: Bitmap?) {
-            if (referent.tag == channelId) referent.setImageBitmap(bitmap)
-        }
-    }
-
     companion object {
-        private const val SHOW_DURATION_MILLIS = 15_000L
         private const val INPUT_ANTENNA = "com.tcl.tvinput/.TDTVInputService"
         private const val INPUT_BROADCAST = "com.tcl.channelplus/"
     }

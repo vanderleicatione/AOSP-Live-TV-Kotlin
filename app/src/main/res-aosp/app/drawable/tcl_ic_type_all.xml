@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- TCL Live TV channellist_ic_type_all (channel-list category rail). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="18dp"
-    android:height="18dp"
+    android:width="@dimen/tcl_icon_rail"
+    android:height="@dimen/tcl_icon_rail"
     android:viewportWidth="96"
     android:viewportHeight="96">
     <path
-        android:fillColor="#FFF0F0F2"
+        android:fillColor="@color/tcl_color_icon"
         android:fillType="evenOdd"
         android:pathData="M84,72L84,78C84,80.1422 82.316,81.8911 80.1996,81.9951L80,82L12,82L12,76C12,73.8578 13.684,72.1089 15.8004,72.0049L16,72L84,72ZM58,29.399C58.3399,29.399 58.6742,29.4856 58.9713,29.6507L85.193,46.2183C86.1586,46.7548 86.5064,47.9724 85.97,48.9379C85.8215,49.2052 85.6137,49.435 85.3625,49.6094L59.1408,65.8189C58.2335,66.4489 56.9873,66.2242 56.3573,65.3169C56.1247,64.982 56,64.5839 56,64.1762L56,31.399C56,30.2945 56.8954,29.399 58,29.399ZM44,52L44,58C44,60.2091 42.2091,62 40,62L12,62L12,56C12,53.7909 13.7909,52 16,52L44,52ZM44,32L44,38C44,40.2091 42.2091,42 40,42L12,42L12,36C12,33.7909 13.7909,32 16,32L44,32ZM84,12L84,18C84,20.1422 82.316,21.8911 80.1996,21.9951L80,22L12,22L12,16C12,13.8578 13.684,12.1089 15.8004,12.0049L16,12L84,12Z" />
 </vector>

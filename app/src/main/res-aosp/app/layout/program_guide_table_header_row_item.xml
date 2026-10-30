@@ -24,18 +24,18 @@
     android:orientation="horizontal">
 
     <View
-        android:layout_width="2dp"
-        android:layout_height="12dp"
+        android:layout_width="@dimen/tcl_epg_tick_width"
+        android:layout_height="@dimen/tcl_epg_tick_height"
         android:background="@color/tcl_epg_time_tick"
         android:duplicateParentState="true" />
 
     <TextView
         android:id="@+id/time"
-        android:layout_width="65dp"
+        android:layout_width="@dimen/tcl_epg_time_width"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="@dimen/tcl_space_8"
         android:duplicateParentState="true"
         android:singleLine="true"
         android:textColor="@color/tcl_epg_time_text"
-        android:textSize="14sp" />
+        android:textAppearance="@style/TextAppearance.Tcl.Label" />
 </LinearLayout>

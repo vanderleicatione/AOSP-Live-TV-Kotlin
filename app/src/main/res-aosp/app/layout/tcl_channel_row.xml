@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TclChannelRow, as TCL's item_channel: 68dp, logo card 46x26dp at 20/21dp, number + name (16sp medium)
+     at 78/12dp, now playing (14sp) at 78/36dp, red playing marker at 78/38dp on the tuned channel.
+     Bound by TclChannelRow.bind(). -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/tcl_channel_row_height"
+    android:background="@drawable/tcl_channel_list_item_bg"
+    android:clickable="true"
+    android:focusable="true">
+
+    <ImageView
+        android:id="@+id/tcl_row_logo"
+        style="@style/Widget.Tcl.LogoCard.Framed"
+        android:layout_width="@dimen/tcl_logo_small_width"
+        android:layout_height="@dimen/tcl_logo_small_height"
+        android:layout_marginStart="@dimen/tcl_space_20"
+        android:layout_marginTop="@dimen/tcl_channel_row_logo_top"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tcl_row_number"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/tcl_channel_row_line1_height"
+        android:layout_marginStart="@dimen/tcl_channel_row_text_start"
+        android:layout_marginTop="@dimen/tcl_space_12"
+        android:duplicateParentState="true"
+        android:fontFamily="sans-serif-medium"
+        android:includeFontPadding="false"
+        android:gravity="center_vertical"
+        android:textColor="@color/tcl_channel_list_primary_text"
+        android:textAppearance="@style/TextAppearance.Tcl.Body"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tcl_row_name"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/tcl_channel_row_line1_height"
+        android:layout_marginStart="@dimen/tcl_space_8"
+        android:layout_marginEnd="@dimen/tcl_space_20"
+        android:layout_marginTop="@dimen/tcl_space_12"
+        android:duplicateParentState="true"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:includeFontPadding="false"
+        android:gravity="center_vertical"
+        android:letterSpacing="0.04"
+        android:singleLine="true"
+        android:textColor="@color/tcl_channel_list_primary_text"
+        android:textAppearance="@style/TextAppearance.Tcl.Body"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tcl_row_number"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/tcl_row_playing"
+        android:layout_width="@dimen/tcl_icon_small"
+        android:layout_height="@dimen/tcl_icon_small"
+        android:layout_marginStart="@dimen/tcl_channel_row_text_start"
+        android:layout_marginTop="@dimen/tcl_channel_row_playing_top"
+        android:src="@drawable/tcl_ic_playing"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- marginStart moves past the playing marker (TclChannelRow.bind). -->
+    <TextView
+        android:id="@+id/tcl_row_program"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/tcl_channel_row_line2_height"
+        android:layout_marginStart="@dimen/tcl_channel_row_text_start"
+        android:layout_marginEnd="@dimen/tcl_space_20"
+        android:layout_marginTop="@dimen/tcl_channel_row_line2_top"
+        android:duplicateParentState="true"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:gravity="center_vertical"
+        android:letterSpacing="0.04"
+        android:singleLine="true"
+        android:textColor="@color/tcl_channel_list_secondary_text"
+        android:textAppearance="@style/TextAppearance.Tcl.Label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

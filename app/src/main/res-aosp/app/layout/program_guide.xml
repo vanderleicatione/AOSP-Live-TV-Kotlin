@@ -25,54 +25,54 @@
     android:visibility="gone">
 
     <View
-        android:layout_width="58dp"
+        android:layout_width="@dimen/tcl_rail_width"
         android:layout_height="match_parent"
-        android:background="#FF000000" />
+        android:background="@color/tcl_color_scrim" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="58dp"
+        android:layout_marginStart="@dimen/tcl_rail_width"
         android:background="@drawable/tcl_epg_left_mask" />
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginStart="58dp"
+        android:layout_height="@dimen/tcl_epg_top_mask_height"
+        android:layout_marginStart="@dimen/tcl_rail_width"
         android:background="@drawable/tcl_epg_top_mask" />
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="337dp"
+        android:layout_height="@dimen/tcl_epg_bottom_mask_height"
         android:layout_gravity="bottom"
-        android:layout_marginStart="58dp"
+        android:layout_marginStart="@dimen/tcl_rail_width"
         android:background="@drawable/tcl_epg_bottom_mask" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="58dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginStart="@dimen/tcl_rail_width"
+        android:layout_marginTop="@dimen/tcl_space_32"
         android:text="@string/tcl_epg_title"
-        android:textColor="#B3F0F0F2"
-        android:textSize="19sp" />
+        android:textColor="@color/tcl_color_text_soft"
+        android:textAppearance="@style/TextAppearance.Tcl.Headline" />
 
     <TextClock
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginTop="@dimen/tcl_space_32"
+        android:layout_marginEnd="@dimen/tcl_space_32"
         android:format12Hour="EEE dd/MM/yyyy h:mm a"
         android:format24Hour="EEE dd/MM/yyyy HH:mm"
-        android:textColor="#B3F0F0F2"
-        android:textSize="16sp" />
+        android:textColor="@color/tcl_color_text_soft"
+        android:textAppearance="@style/TextAppearance.Tcl.Body" />
 
     <LinearLayout
-        android:layout_width="400dp"
+        android:layout_width="@dimen/tcl_epg_detail_width"
         android:layout_height="wrap_content"
-        android:layout_marginStart="58dp"
-        android:layout_marginTop="73dp"
+        android:layout_marginStart="@dimen/tcl_rail_width"
+        android:layout_marginTop="@dimen/tcl_epg_detail_top"
         android:orientation="vertical">
 
         <TextView
@@ -82,23 +82,23 @@
             android:ellipsize="end"
             android:letterSpacing="0.04"
             android:maxLines="2"
-            android:textColor="#E6FFFFFF"
-            android:textSize="24sp" />
+            android:textColor="@color/tcl_color_text_primary"
+            android:textAppearance="@style/TextAppearance.Tcl.Title" />
 
         <TextView
             android:id="@+id/program_guide_detail_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/tcl_space_8"
             android:singleLine="true"
-            android:textColor="#B3FFFFFF"
-            android:textSize="14sp" />
+            android:textColor="@color/tcl_color_text_secondary"
+            android:textAppearance="@style/TextAppearance.Tcl.Label" />
 
         <LinearLayout
             android:id="@+id/program_guide_detail_tags"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="7dp"
+            android:layout_marginTop="@dimen/tcl_epg_detail_gap"
             android:orientation="horizontal"
             android:visibility="gone" />
 
@@ -106,12 +106,12 @@
             android:id="@+id/program_guide_detail_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="7dp"
+            android:layout_marginTop="@dimen/tcl_epg_detail_gap"
             android:ellipsize="end"
             android:letterSpacing="0.04"
             android:maxLines="2"
-            android:textColor="#B3F0F0F2"
-            android:textSize="19sp" />
+            android:textColor="@color/tcl_color_text_soft"
+            android:textAppearance="@style/TextAppearance.Tcl.Headline" />
     </LinearLayout>
 
     <!-- AOSP genre panel: TCL has an icon rail here instead, so it is kept (ProgramGuide binds it) but hidden. -->
@@ -122,51 +122,42 @@
          not on air; Back closes it. Focusable so the arrow keys stay here instead of moving the grid. -->
     <FrameLayout
         android:id="@+id/program_guide_detail_screen"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/tcl_epg_detail_mask"
-        android:focusable="true"
+        style="@style/Widget.Tcl.Dialog"
         android:visibility="gone">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="59dp"
-            android:layout_marginTop="60dp"
-            android:orientation="vertical">
+        <LinearLayout style="@style/Widget.Tcl.Dialog.Content">
 
             <TextView
                 android:id="@+id/program_guide_detail_screen_channel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:textColor="#B3FFFFFF"
-                android:textSize="16sp" />
+                android:textColor="@color/tcl_color_text_secondary"
+                android:textAppearance="@style/TextAppearance.Tcl.Body" />
 
             <ImageView
                 android:id="@+id/program_guide_detail_screen_logo"
-                android:layout_width="64dp"
-                android:layout_height="36dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/tcl_channel_logo_bg"
-                android:scaleType="fitCenter"
+                style="@style/Widget.Tcl.LogoCard.Framed"
+                android:layout_width="@dimen/tcl_logo_large_width"
+                android:layout_height="@dimen/tcl_logo_large_height"
+                android:layout_marginTop="@dimen/tcl_space_12"
                 android:visibility="gone" />
 
             <TextView
                 android:id="@+id/program_guide_detail_screen_title"
-                android:layout_width="612dp"
+                android:layout_width="@dimen/tcl_dialog_title_width"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/tcl_space_12"
                 android:ellipsize="end"
                 android:letterSpacing="0.04"
                 android:singleLine="true"
-                android:textColor="#E6FFFFFF"
-                android:textSize="40sp" />
+                android:textColor="@color/tcl_color_text_primary"
+                android:textAppearance="@style/TextAppearance.Tcl.Hero" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/tcl_space_12"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -174,16 +165,16 @@
                     android:id="@+id/program_guide_detail_screen_start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#B3FFFFFF"
-                    android:textSize="12sp" />
+                    android:textColor="@color/tcl_color_text_secondary"
+                    android:textAppearance="@style/TextAppearance.Tcl.Caption" />
 
                 <ProgressBar
                     android:id="@+id/program_guide_detail_screen_progress"
                     style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="240dp"
-                    android:layout_height="2dp"
-                    android:layout_marginStart="6dp"
-                    android:layout_marginEnd="6dp"
+                    android:layout_width="@dimen/tcl_dialog_progress_width"
+                    android:layout_height="@dimen/tcl_dialog_progress_height"
+                    android:layout_marginStart="@dimen/tcl_dialog_progress_gap"
+                    android:layout_marginEnd="@dimen/tcl_dialog_progress_gap"
                     android:max="10000"
                     android:progressDrawable="@drawable/tcl_epg_detail_progress" />
 
@@ -191,37 +182,37 @@
                     android:id="@+id/program_guide_detail_screen_end"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#B3FFFFFF"
-                    android:textSize="12sp" />
+                    android:textColor="@color/tcl_color_text_secondary"
+                    android:textAppearance="@style/TextAppearance.Tcl.Caption" />
 
                 <TextView
                     android:id="@+id/program_guide_detail_screen_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:textColor="#B3FFFFFF"
-                    android:textSize="12sp" />
+                    android:layout_marginStart="@dimen/tcl_space_12"
+                    android:textColor="@color/tcl_color_text_secondary"
+                    android:textAppearance="@style/TextAppearance.Tcl.Caption" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/program_guide_detail_screen_tags"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="@dimen/tcl_space_20"
                 android:orientation="horizontal"
                 android:visibility="gone" />
 
             <TextView
                 android:id="@+id/program_guide_detail_screen_desc"
-                android:layout_width="633dp"
+                android:layout_width="@dimen/tcl_dialog_text_width"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="@dimen/tcl_space_20"
                 android:ellipsize="end"
                 android:letterSpacing="0.04"
-                android:lineHeight="20dp"
+                android:lineHeight="@dimen/tcl_dialog_line_height"
                 android:maxLines="6"
-                android:textColor="#B3FFFFFF"
-                android:textSize="16sp" />
+                android:textColor="@color/tcl_color_text_secondary"
+                android:textAppearance="@style/TextAppearance.Tcl.Body" />
         </LinearLayout>
     </FrameLayout>
 

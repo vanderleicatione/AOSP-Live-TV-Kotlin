@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Left channel list, laid out like TCL Live TV's activity_channellist: 58dp category rail (#E1000000),
-     a 1px divider, then the 280dp channel column (#CC0A0A0A). -->
+<!-- Left channel list, laid out like TCL Live TV's activity_channellist: TclRail (58dp, #E1000000),
+     a 1px divider, then the TclPanel channel column (280dp, #CC0A0A0A) of TclChannelRows. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/channel_list_overlay"
     android:layout_width="wrap_content"
@@ -9,31 +9,26 @@
     android:orientation="horizontal"
     android:visibility="gone">
 
-    <FrameLayout
-        android:layout_width="58dp"
-        android:layout_height="match_parent"
-        android:background="#E1000000">
+    <FrameLayout style="@style/Widget.Tcl.Rail">
 
         <LinearLayout
             android:id="@+id/channel_list_types"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:paddingEnd="25dp"
+            android:layout_marginTop="@dimen/tcl_space_20"
+            android:paddingEnd="@dimen/tcl_rail_padding_end"
             android:orientation="vertical" />
     </FrameLayout>
 
     <!-- Over the rail's last pixel, as in TCL, so the channel column starts right at 58dp. -->
     <View
-        android:layout_width="1px"
+        android:layout_width="@dimen/tcl_divider"
         android:layout_height="match_parent"
-        android:layout_marginStart="-1px"
-        android:background="#1FF0F0F2" />
+        android:layout_marginStart="@dimen/tcl_divider_overlap"
+        android:background="@color/tcl_color_divider" />
 
     <androidx.leanback.widget.VerticalGridView
         android:id="@+id/channel_list_grid"
-        android:layout_width="280dp"
-        android:layout_height="match_parent"
-        android:background="#CC0A0A0A"
+        style="@style/Widget.Tcl.Panel"
         android:descendantFocusability="afterDescendants" />
 </LinearLayout>

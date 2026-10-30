@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Design system: size tokens (docs/design-system.md). Spacing is a 4dp scale; the component sizes are
+     TCL Live TV's own (com.tcl.tv layouts), kept exactly as they are on screen. -->
+<resources>
+    <!-- Spacing (4dp scale). -->
+    <dimen name="tcl_space_4">4dp</dimen>
+    <dimen name="tcl_space_8">8dp</dimen>
+    <dimen name="tcl_space_12">12dp</dimen>
+    <dimen name="tcl_space_16">16dp</dimen>
+    <dimen name="tcl_space_20">20dp</dimen>
+    <dimen name="tcl_space_24">24dp</dimen>
+    <dimen name="tcl_space_32">32dp</dimen>
+    <dimen name="tcl_divider">1px</dimen>
+    <dimen name="tcl_divider_overlap">-1px</dimen>
+
+    <!-- Corners. -->
+    <dimen name="tcl_radius_cell">6dp</dimen>
+    <dimen name="tcl_radius_panel">8dp</dimen>
+    <dimen name="tcl_radius_logo">4dp</dimen>
+    <dimen name="tcl_radius_chip">21dp</dimen>
+    <dimen name="tcl_radius_progress">1dp</dimen>
+
+    <!-- TclLogoCard: small (list, banner neighbours) and large (banner card, programme details). -->
+    <dimen name="tcl_logo_small_width">46dp</dimen>
+    <dimen name="tcl_logo_small_height">26dp</dimen>
+    <dimen name="tcl_logo_large_width">64dp</dimen>
+    <dimen name="tcl_logo_large_height">36dp</dimen>
+
+    <!-- Icons. -->
+    <dimen name="tcl_icon_small">16dp</dimen>
+    <dimen name="tcl_icon_rail">18dp</dimen>
+
+    <!-- TclRail (TCL item_channel_type): 58dp column, 42dp items, icon at 15/12dp. -->
+    <dimen name="tcl_rail_width">58dp</dimen>
+    <dimen name="tcl_rail_padding_end">25dp</dimen>
+    <dimen name="tcl_rail_item_height">42dp</dimen>
+    <dimen name="tcl_rail_icon_margin_start">15dp</dimen>
+
+    <!-- TclPanel: channel column next to the rail. -->
+    <dimen name="tcl_panel_width">280dp</dimen>
+
+    <!-- TclChannelRow (TCL item_channel): 68dp, logo at 20/21dp, text at 78dp, second line at 36dp. -->
+    <dimen name="tcl_channel_row_height">68dp</dimen>
+    <dimen name="tcl_channel_row_logo_top">21dp</dimen>
+    <dimen name="tcl_channel_row_text_start">78dp</dimen>
+    <dimen name="tcl_channel_row_text_start_playing">102dp</dimen>
+    <dimen name="tcl_channel_row_line1_height">24dp</dimen>
+    <dimen name="tcl_channel_row_line2_top">36dp</dimen>
+    <dimen name="tcl_channel_row_line2_height">20dp</dimen>
+    <dimen name="tcl_channel_row_playing_top">38dp</dimen>
+    <!-- Compact row (banner neighbours, TCL infobar_left_layout): 218x44dp. -->
+    <dimen name="tcl_channel_row_compact_width">218dp</dimen>
+    <dimen name="tcl_channel_row_compact_height">44dp</dimen>
+
+    <!-- Channel banner card (TCL bg_focus_info): 124dp from the top, 104dp tall, text at 116dp. -->
+    <dimen name="tcl_banner_margin_top">124dp</dimen>
+    <dimen name="tcl_banner_min_height">104dp</dimen>
+    <dimen name="tcl_banner_logo_top">34dp</dimen>
+    <dimen name="tcl_banner_text_start">116dp</dimen>
+    <dimen name="tcl_banner_number_height">40dp</dimen>
+    <dimen name="tcl_banner_name_top">1dp</dimen>
+    <dimen name="tcl_banner_stroke">1dp</dimen>
+    <dimen name="tcl_banner_stroke_offset">-3dp</dimen>
+
+    <!-- TclChip (TCL element_tcl_layout_tag, Tag_Small). -->
+    <dimen name="tcl_chip_padding_horizontal">13dp</dimen>
+    <dimen name="tcl_chip_padding_vertical">1dp</dimen>
+
+    <!-- EPG (TCL fragment_epg_pro). -->
+    <dimen name="tcl_epg_top_mask_height">100dp</dimen>
+    <dimen name="tcl_epg_bottom_mask_height">337dp</dimen>
+    <dimen name="tcl_epg_detail_top">73dp</dimen>
+    <dimen name="tcl_epg_detail_width">400dp</dimen>
+    <dimen name="tcl_epg_detail_gap">7dp</dimen>
+    <dimen name="tcl_epg_now_line_width">12dp</dimen>
+    <dimen name="tcl_epg_now_line_top">28.5dp</dimen>
+    <dimen name="tcl_epg_now_line_height">296.5dp</dimen>
+    <dimen name="tcl_epg_tick_width">2dp</dimen>
+    <dimen name="tcl_epg_tick_height">12dp</dimen>
+    <dimen name="tcl_epg_time_width">65dp</dimen>
+    <dimen name="tcl_epg_cell_gap">2dp</dimen>
+    <dimen name="tcl_epg_channel_number_width">44dp</dimen>
+
+    <!-- TclDialog (TCL fragment_epgdetail_pro). -->
+    <dimen name="tcl_dialog_margin_start">59dp</dimen>
+    <dimen name="tcl_dialog_margin_top">60dp</dimen>
+    <dimen name="tcl_dialog_title_width">612dp</dimen>
+    <dimen name="tcl_dialog_text_width">633dp</dimen>
+    <dimen name="tcl_dialog_line_height">20dp</dimen>
+    <dimen name="tcl_dialog_progress_width">240dp</dimen>
+    <dimen name="tcl_dialog_progress_height">2dp</dimen>
+    <dimen name="tcl_dialog_progress_gap">6dp</dimen>
+
+    <!-- TclOptionRow (TCL dialog_universal_option_item: 40dp rows, 15dp icon at 13dp, text at 23dp). -->
+    <dimen name="tcl_option_row_height">40dp</dimen>
+    <dimen name="tcl_option_row_icon">15dp</dimen>
+    <dimen name="tcl_option_row_icon_margin_start">13dp</dimen>
+    <dimen name="tcl_option_row_text_margin_start">23dp</dimen>
+
+    <!-- Rail: unselected categories at 60% (TCL "withalpha"). -->
+    <item name="tcl_alpha_unselected" format="float" type="dimen">0.6</item>
+</resources>

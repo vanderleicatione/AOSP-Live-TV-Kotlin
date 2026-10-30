@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Design system: timing tokens in ms (docs/design-system.md). -->
+<resources>
+    <!-- Auto-hide. -->
+    <integer name="tcl_motion_hide_banner">8000</integer>
+    <integer name="tcl_motion_hide_list">15000</integer>
+    <integer name="tcl_motion_hide_guide">60000</integer>
+    <!-- Animations. -->
+    <integer name="tcl_motion_fast">150</integer>
+    <integer name="tcl_motion_normal">250</integer>
+</resources>
