@@ -24,7 +24,7 @@ class FeedNamesTest {
     @Test fun keyIgnoresOnlyFormatting() {
         assertEquals("globo", FeedNames.key(".Globo HD"))
         assertEquals("globo", FeedNames.key("São Paulo/SP  Globo"))
-        assertEquals("a e", FeedNames.key("A&E"))
+        assertEquals("a e e", FeedNames.key("A&E")) // como o chave() do agregador
         assertEquals("pokemon", FeedNames.key("Pokémon FHD"))
         assertEquals("bloomberg tv+", FeedNames.key("Bloomberg TV+"))
     }
