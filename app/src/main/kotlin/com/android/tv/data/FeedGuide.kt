@@ -35,7 +35,7 @@ import org.xmlpull.v1.XmlPullParser
 /**
  * Ersatz-Guide und -Logos aus dem eigenen Feed (epg-agregador, XMLTV gzip) für Kanäle, zu denen das TIF
  * nichts liefert: Antenne (keine EPG im TIF), OpenTV-Kanäle ohne EPG und Logos aller Kanäle (ohne ACCESS_ALL_EPG_DATA liefert der
- * TvProvider fremde Logos nicht). Zuordnung über den Anzeigenamen (trim) je Quelle, nicht über die Nummer.
+ * TvProvider fremde Logos nicht). Zuordnung über Anzeigename und Aliasse je Quelle (FeedNames), nicht über die Nummer.
  * Daten liegen in einer eigenen SQLite-DB, Logos als PNG im App-Speicher.
  */
 object FeedGuide {
@@ -59,7 +59,7 @@ object FeedGuide {
     private val syncing = AtomicBoolean(false)
     private val listeners = LinkedHashSet<Runnable>()
 
-    /** "quelle|name" → Feed-Kanal. Wird im Hintergrund ersetzt, gelesen vom Main-Thread. */
+    /** FeedNames.keys → Feed-Kanal. Wird im Hintergrund ersetzt, gelesen vom Main-Thread. */
     @Volatile private var channels: Map<String, FeedChannel> = emptyMap()
 
     /** Beim App-Start: gespeicherte Kopie laden, 12-h-Job planen, bei alter Kopie sofort laden. */
@@ -84,20 +84,20 @@ object FeedGuide {
     /** Main-Thread; wird nach jedem Laden/Aktualisieren des Feeds aufgerufen. */
     fun addListener(listener: Runnable) { listeners.add(listener) }
 
-    /** Bekannte Quellen nur in ihrer eigenen Feed-Liste; jede andere (Canais+ …) per Name in allen, Internet zuerst. */
+    /**
+     * Bekannte Quellen nur in ihrer eigenen Feed-Liste; jede andere (Canais+ …) in allen, Internet (Masterliste) zuerst.
+     * Abgleich über Name und Aliasse aus dem Feed (FeedNames).
+     */
     private fun lookup(channel: Channel): FeedChannel? {
-        val name = channel.displayName?.let(::cleanName) ?: return null
+        val name = channel.displayName ?: return null
         val sources = when {
             channel.inputId.startsWith(INPUT_ANTENNA) -> listOf("antena")
             channel.inputId.startsWith(INPUT_BROADCAST) -> listOf("channelplus")
             channel.inputId.startsWith(INPUT_OPENTV) -> listOf("opentv")
             else -> listOf("opentv", "channelplus", "antena")
         }
-        return sources.firstNotNullOfOrNull { channels["$it|$name"] }
+        return FeedNames.find(channels, sources, name)
     }
-
-    /** Antennen-Namen beginnen im TIF mit einem Steuerzeichen, das die TV (und der Feed) als "." zeigt. */
-    private fun cleanName(name: String) = name.trim { it.isWhitespace() || it.isISOControl() || it == '.' }
 
     fun feedId(channel: Channel): String? = lookup(channel)?.id
 
@@ -176,14 +176,19 @@ object FeedGuide {
                     val id = c.getString(0)
                     val file = File(logoDir, "$id.png")
                     val logo = if (file.exists()) Uri.fromFile(file).toString() else c.getString(2)
-                    map[id.substringBefore('.') + "|" + cleanName(c.getString(1))] = FeedChannel(id, logo)
+                    val channel = FeedChannel(id, logo)
+                    // name: alle display-name, durch Zeilenumbruch getrennt; bei gleichem Schlüssel gewinnt der erste Kanal
+                    for (k in FeedNames.keys(id.substringBefore('.'), c.getString(1).split('
+'))) map.putIfAbsent(k, channel)
                 }
             }
         } catch (e: Exception) {
             Log.w(TAG, "Feed channels not loaded", e)
         }
         channels = map
-        Log.i(TAG, "Feed channels loaded: ${map.size}")
+        Log.i(TAG, "Feed channels loaded: ${map.size} keys")
+        // Neue DB (Installation, Schema-Update): nicht 12 h ohne Logos warten
+        if (map.isEmpty() && !syncing.get()) executor.execute { sync() }
         mainHandler.post {
             listeners.toList().forEach { it.run() }
             // Logos vorab in den Speicher-Cache, damit das erste Öffnen der Liste nicht beim Dekodieren ruckelt.
@@ -243,7 +248,11 @@ object FeedGuide {
                             row.clear()
                             row.put("id", p.getAttributeValue(null, "id"))
                         }
-                        "display-name" -> if (inChannel && !row.containsKey("name")) row.put("name", p.nextText().trim())
+                        "display-name" -> if (inChannel) {
+                            val name = p.nextText().trim()
+                            row.put("name", row.getAsString("name")?.let { "$it
+$name" } ?: name)
+                        }
                         "icon" -> if (inChannel) row.put("logo", p.getAttributeValue(null, "src"))
                         "programme" -> {
                             row.clear()
@@ -296,7 +305,7 @@ object FeedGuide {
         }
     }
 
-    private class Db(context: Context) : SQLiteOpenHelper(context, "feed_guide.db", null, 1) {
+    private class Db(context: Context) : SQLiteOpenHelper(context, "feed_guide.db", null, 2) {
         // WAL: Lesen (Guide) läuft weiter, während eine Aktualisierung schreibt.
         init { setWriteAheadLoggingEnabled(true) }
 
@@ -306,7 +315,12 @@ object FeedGuide {
             db.execSQL("CREATE INDEX programme_time ON programme (stop, start)")
         }
 
-        override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
+        // v2: channel.name hat alle display-name. Kopie verwerfen, loadChannels lädt den Feed neu.
+        override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+            db.execSQL("DROP TABLE IF EXISTS channel")
+            db.execSQL("DROP TABLE IF EXISTS programme")
+            onCreate(db)
+        }
     }
 
     /** Aktualisierung alle 12 h über WorkManager. */
