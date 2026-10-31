@@ -178,8 +178,7 @@ object FeedGuide {
                     val logo = if (file.exists()) Uri.fromFile(file).toString() else c.getString(2)
                     val channel = FeedChannel(id, logo)
                     // name: alle display-name, durch Zeilenumbruch getrennt; bei gleichem Schlüssel gewinnt der erste Kanal
-                    for (k in FeedNames.keys(id.substringBefore('.'), c.getString(1).split('
-'))) map.putIfAbsent(k, channel)
+                    for (k in FeedNames.keys(id.substringBefore('.'), c.getString(1).split('\n'))) map.putIfAbsent(k, channel)
                 }
             }
         } catch (e: Exception) {
@@ -250,8 +249,7 @@ object FeedGuide {
                         }
                         "display-name" -> if (inChannel) {
                             val name = p.nextText().trim()
-                            row.put("name", row.getAsString("name")?.let { "$it
-$name" } ?: name)
+                            row.put("name", row.getAsString("name")?.let { "$it\n$name" } ?: name)
                         }
                         "icon" -> if (inChannel) row.put("logo", p.getAttributeValue(null, "src"))
                         "programme" -> {
