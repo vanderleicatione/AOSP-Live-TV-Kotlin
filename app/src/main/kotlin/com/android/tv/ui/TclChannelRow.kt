@@ -20,14 +20,12 @@ import com.android.tv.util.images.ImageLoader
  */
 class TclChannelRow(val view: View) {
     private val logo: ImageView? = view.findViewById(R.id.tcl_row_logo)
-    private val number: TextView? = view.findViewById(R.id.tcl_row_number)
     private val name: TextView? = view.findViewById(R.id.tcl_row_name)
     private val playing: ImageView? = view.findViewById(R.id.tcl_row_playing)
     private val program: TextView? = view.findViewById(R.id.tcl_row_program)
 
     fun bind(channel: Channel, program: Program?, isPlaying: Boolean) {
         val res = view.resources
-        number?.text = channel.displayNumber
         name?.text = channel.displayName
         playing?.visibility = if (isPlaying) View.VISIBLE else View.GONE
         (playing?.drawable as? Animatable)?.let { if (isPlaying) it.start() else it.stop() }

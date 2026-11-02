@@ -12,7 +12,6 @@ import android.os.Looper
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.TextAppearanceSpan
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,8 +56,6 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
     private val imageHeight = res.getDimensionPixelSize(R.dimen.program_guide_table_detail_image_height)
     private val programTitleForNoInformation = TclChannelRow.titleOrNoInformation(res, null)
     private val programTitleForBlockedChannel = res.getString(R.string.program_title_for_blocked_channel)
-    private val channelTextColor = res.getColor(R.color.program_guide_table_header_column_channel_number_text_color, null)
-    private val channelBlockedTextColor = res.getColor(R.color.program_guide_table_header_column_channel_number_blocked_text_color, null)
     private val detailTextColor = res.getColor(R.color.program_guide_table_detail_title_text_color, null)
     private val detailGrayedTextColor = res.getColor(R.color.program_guide_table_detail_title_grayed_text_color, null)
     private val animationDuration = res.getInteger(R.integer.program_guide_table_detail_fade_anim_duration).toLong()
@@ -205,18 +202,8 @@ internal class ProgramTableAdapter(private val context: Context, private val pro
                 channelBlockView.visibility = View.GONE
                 return
             }
-            val displayNumber = channel.displayNumber
-            if (displayNumber == null) {
-                channelNumberView.visibility = View.GONE
-            } else {
-                val size = if (displayNumber.length <= 4) R.dimen.program_guide_table_header_column_channel_number_large_font_size
-                else R.dimen.program_guide_table_header_column_channel_number_small_font_size
-                channelNumberView.setTextSize(TypedValue.COMPLEX_UNIT_PX, res.getDimension(size))
-                channelNumberView.text = displayNumber
-                channelNumberView.visibility = View.VISIBLE
-            }
+            channelNumberView.visibility = View.GONE // Nummern ausgeblendet; nur Name/Logo
             val locked = tvInputManagerHelper.isParentalControlsEnabled() && channel.isLocked
-            channelNumberView.setTextColor(if (locked) channelBlockedTextColor else channelTextColor)
             channelLogoView.setImageBitmap(null)
             // Platz für das Logo bleibt (TCL), damit die Namen bündig stehen
             channelLogoView.visibility = View.INVISIBLE

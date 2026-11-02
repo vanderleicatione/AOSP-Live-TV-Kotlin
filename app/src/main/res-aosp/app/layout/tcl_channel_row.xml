@@ -20,26 +20,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tcl_row_number"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/tcl_channel_row_line1_height"
-        android:layout_marginStart="@dimen/tcl_channel_row_text_start"
-        android:layout_marginTop="@dimen/tcl_space_12"
-        android:duplicateParentState="true"
-        android:fontFamily="@font/tcl_montserrat_semibold"
-        android:includeFontPadding="false"
-        android:gravity="center_vertical"
-        android:textColor="@color/tcl_channel_list_primary_text"
-        android:textAppearance="@style/TextAppearance.Tcl.Body"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tcl_row_name"
         android:layout_width="0dp"
         android:layout_height="@dimen/tcl_channel_row_line1_height"
-        android:layout_marginStart="@dimen/tcl_space_8"
+        android:layout_marginStart="@dimen/tcl_channel_row_text_start"
         android:layout_marginEnd="@dimen/tcl_space_20"
         android:layout_marginTop="@dimen/tcl_space_12"
         android:duplicateParentState="true"
@@ -52,7 +38,7 @@
         android:textColor="@color/tcl_channel_list_primary_text"
         android:textAppearance="@style/TextAppearance.Tcl.Body"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/tcl_row_number"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView

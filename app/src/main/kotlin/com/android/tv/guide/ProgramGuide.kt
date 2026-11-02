@@ -362,7 +362,7 @@ class ProgramGuide(
         val program = entry.program ?: return
         val channel = activity.channelDataManager.getChannel(entry.channelId)
         detailScreen.findViewById<TextView>(R.id.program_guide_detail_screen_channel).text =
-            listOfNotNull(channel?.displayNumber, channel?.displayName).joinToString("  ")
+            channel?.displayName
         val logo = detailScreen.findViewById<ImageView>(R.id.program_guide_detail_screen_logo)
         logo.setImageBitmap(null)
         logo.visibility = View.GONE

@@ -121,7 +121,14 @@ class ChannelListOverlay(
             hide()
             onSettings.run()
         }
+        settings.id = View.generateViewId()
         typeRail.addView(settings)
+        // Sonst springt DOWN vom letzten Icon über den Abstandhalter in die Liste: Kette fest im Trilho.
+        val items = (0 until typeRail.childCount).map { typeRail.getChildAt(it) }.filter { it !is Space }
+        items.forEachIndexed { i, v ->
+            v.nextFocusUpId = items[maxOf(i - 1, 0)].id
+            v.nextFocusDownId = items[minOf(i + 1, items.lastIndex)].id
+        }
         updateRail()
     }
 
