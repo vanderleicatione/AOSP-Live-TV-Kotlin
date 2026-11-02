@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Side panel item with the QR code of the groups page on the phone (M3). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="@dimen/tcl_space_16">
+
+    <ImageView
+        android:id="@+id/qr_image"
+        android:layout_width="@dimen/tcl_qr_size"
+        android:layout_height="@dimen/tcl_qr_size" />
+
+    <TextView
+        android:id="@+id/qr_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tcl_space_16"
+        android:gravity="center_horizontal"
+        android:textAppearance="@style/TextAppearance.Tcl.Body"
+        android:textColor="@color/tcl_color_text_primary" />
+
+    <TextView
+        android:id="@+id/qr_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tcl_space_8"
+        android:gravity="center_horizontal"
+        android:textAppearance="@style/TextAppearance.Tcl.Caption"
+        android:textColor="@color/tcl_color_text_secondary" />
+</LinearLayout>

@@ -46,6 +46,12 @@ class SettingsFragment : SideFragment<Item>() {
         customizeChannelListItem.setEnabled(false)
         items.add(customizeChannelListItem)
 
+        items.add(object : SubMenuItem(
+            getString(R.string.settings_groups), getString(R.string.settings_groups_description), sideFragmentManager,
+        ) {
+            override fun getFragment(): SideFragment<*> = GruposFragment()
+        })
+
         val hasNewInput = TvSingletons.getSingletons(requireContext()).getSetupUtils().hasNewInput(activity.tvInputManagerHelper)
         items.add(object : ActionItem(
             getString(R.string.settings_channel_source_item_setup),

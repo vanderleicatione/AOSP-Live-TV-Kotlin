@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rail item with a user group name (M3) instead of the category icon; same box as tcl_rail_item. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.Tcl.RailItem"
+    android:id="@+id/channel_type_label"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="@dimen/tcl_space_8"
+    android:singleLine="true"
+    android:ellipsize="end"
+    android:fontFamily="@font/tcl_montserrat_semibold"
+    android:textAppearance="@style/TextAppearance.Tcl.Label"
+    android:textColor="@color/tcl_channel_type_icon" />

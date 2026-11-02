@@ -1078,4 +1078,9 @@
     <!-- TCL-style programme guide -->
     <string name="tcl_epg_title">Programme Guide</string>
     <string name="tcl_no_program_details">No programme details.</string>
+    <string name="tcl_group_all">All</string>
+    <string name="settings_groups">Channel groups</string>
+    <string name="settings_groups_description">Set them up on your phone</string>
+    <string name="groups_qr_hint">Scan with your phone on the same Wi-Fi</string>
+    <string name="groups_no_network">No home network</string>
 </resources>

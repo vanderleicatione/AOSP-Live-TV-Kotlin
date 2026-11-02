@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Left channel list, laid out like TCL Live TV's activity_channellist: TclRail (58dp, #E1000000),
+<!-- Left channel list, laid out like TCL Live TV's activity_channellist: TclRail (group names, #E1000000),
      a 1px divider, then the TclPanel channel column (280dp, #CC0A0A0A) of TclChannelRows. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/channel_list_overlay"
@@ -9,7 +9,9 @@
     android:orientation="horizontal"
     android:visibility="gone">
 
-    <FrameLayout style="@style/Widget.Tcl.Rail">
+    <FrameLayout
+        style="@style/Widget.Tcl.Rail"
+        android:layout_width="@dimen/tcl_rail_width_groups">
 
         <LinearLayout
             android:id="@+id/channel_list_types"
@@ -20,7 +22,7 @@
             android:orientation="vertical" />
     </FrameLayout>
 
-    <!-- Over the rail's last pixel, as in TCL, so the channel column starts right at 58dp. -->
+    <!-- Over the rail's last pixel, as in TCL, so the channel column starts right after the rail. -->
     <View
         android:layout_width="@dimen/tcl_divider"
         android:layout_height="match_parent"

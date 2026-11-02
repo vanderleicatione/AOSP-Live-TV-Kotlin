@@ -362,4 +362,9 @@
     <string name="tcl_channel_list_settings">"Configurações"</string>
     <string name="tcl_epg_title">"Guia de Programa"</string>
     <string name="tcl_no_program_details">"Nenhum detalhe de programa."</string>
+    <string name="tcl_group_all">"Todos"</string>
+    <string name="settings_groups">"Grupos de canais"</string>
+    <string name="settings_groups_description">"Monte pelo celular"</string>
+    <string name="groups_qr_hint">"Aponte a câmera do celular (mesma rede Wi-Fi)"</string>
+    <string name="groups_no_network">"Sem rede local"</string>
 </resources>

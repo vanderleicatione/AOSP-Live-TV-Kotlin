@@ -33,6 +33,9 @@
     <!-- TclRail (TCL item_channel_type): 58dp column, 42dp items, icon at 15/12dp. -->
     <dimen name="tcl_rail_width">58dp</dimen>
     <dimen name="tcl_rail_item_height">42dp</dimen>
+    <!-- Channel list rail with the user group names (M3); the guide keeps the 58dp icon rail. -->
+    <dimen name="tcl_rail_width_groups">112dp</dimen>
+    <dimen name="tcl_qr_size">240dp</dimen>
 
     <!-- TclPanel: channel column next to the rail. -->
     <dimen name="tcl_panel_width">280dp</dimen>
